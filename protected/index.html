@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta name="google-site-verification" content="8gbsZLeAvYpeaO23ML3gs-CgZQtnUwcclpNu2QxktXI" />
+<script>(function(){var t=localStorage.getItem('tstats_theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#090f1a">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tstats">
+<title>Tstats – Statistiques de tennis point par point</title>
+<meta name="description" content="Application gratuite de statistiques pour le tennis : score en direct, suivi des coups, zones du terrain et bilan de match. Fonctionne sur téléphone, sans installation.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Tstats","url":"https://tstats.appbeachstats.workers.dev/","applicationCategory":"SportsApplication","operatingSystem":"Web","inLanguage":["fr","en","pt"],"description":"Application de statistiques de tennis : score en direct, coups gagnants, fautes, types de coups et zones du terrain.","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}
+</script>
+<link rel="canonical" href="https://tstats.appbeachstats.workers.dev/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Tstats – Statistiques de tennis">
+<meta property="og:description" content="Score en direct, suivi des coups, zones du terrain et bilan de match pour le tennis.">
+<meta property="og:image" content="https://tstats.appbeachstats.workers.dev/hero.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:url" content="https://tstats.appbeachstats.workers.dev/">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a1628; --surface:#0d1a2e; --card:#111e35; --hover:#162040; --border:#1e3560;
+  --gold:#f5c518; --blue:#3b82f6; --orange:#f97316; --green:#22c55e; --purple:#a855f7;
+  --red:#ef4444; --text:#e0eaf8; --muted:#3b5280;
+}
+[data-theme="light"]{
+  --bg:#eef1f6; --surface:#e7ecf3; --card:#f7f9fc; --hover:#dde4ee; --border:#aebad2;
+  --gold:#b3860f; --blue:#3b66c4; --orange:#c9601e; --green:#1f8a4c; --purple:#7c4bc4;
+  --red:#c23a3a; --text:#2c3646; --muted:#748094;
+}
+[data-theme="neon"]{
+  --bg:#050214; --surface:#0d0620; --card:#140a2e; --hover:#1c0f3d; --border:#3d1a6b;
+  --gold:#ffe600; --blue:#00e5ff; --orange:#ff2e97; --green:#39ff14; --purple:#c644ff;
+  --red:#ff2e5f; --text:#f2ecff; --muted:#8c6bc9;
+}
+[data-theme="sunset"]{
+  --bg:linear-gradient(180deg,#200a12 0%,#4a1f16 22%,#b8531f 48%,#f0c542 62%,#6b2a52 84%,#241130 100%);
+  --surface:linear-gradient(135deg,#3c1a14 0%,#6b3420 100%);
+  --card:linear-gradient(150deg,#481f18 0%,#7a3f22 100%);
+  --hover:linear-gradient(135deg,#5c2a1c 0%,#8a4a26 100%);
+  --border:#a35a35;
+  --gold:#ffcb3d; --blue:#5ec8f5; --orange:#ff7f3f; --green:#3fd9ae; --purple:#e488a8;
+  --red:#ef4a4a; --text:#fff8ec; --muted:#e0b89f;
+}
+[data-theme="lagoon"]{
+  --bg:linear-gradient(180deg,#02141a 0%,#053b3f 22%,#0a6e6e 48%,#17d6d0 62%,#0a4a5c 84%,#02121e 100%);
+  --surface:linear-gradient(135deg,#04262b 0%,#0a4a4a 100%);
+  --card:linear-gradient(150deg,#063339 0%,#0d5555 100%);
+  --hover:linear-gradient(135deg,#0a4045 0%,#116868 100%);
+  --border:#1ec9c9;
+  --gold:#ffd166; --blue:#22d3ee; --orange:#ff8c42; --green:#2dd4a7; --purple:#7c83fd;
+  --red:#ff5c5c; --text:#e0fbfc; --muted:#5fa8ac;
+}
+[data-theme="eclat"]{
+  --bg:linear-gradient(180deg,#ffffff 0%,#fff3d1 18%,#ffe0ee 36%,#e3f3ff 54%,#dffbe8 72%,#fff9f0 88%,#ffffff 100%);
+  --surface:linear-gradient(135deg,#fffaf0 0%,#ffeaf3 100%);
+  --card:linear-gradient(150deg,#ffffff 0%,#fff3fa 100%);
+  --hover:linear-gradient(135deg,#ffeedd 0%,#ffdcee 100%);
+  --border:#ffb4d1;
+  --gold:#ffb100; --blue:#0080ff; --orange:#ff5400; --green:#00c853; --purple:#a600ff;
+  --red:#ff1744; --text:#14171f; --muted:#66707f;
+}
+[data-theme="glacier"]{
+  --bg:linear-gradient(180deg,#020a12 0%,#062038 22%,#0f3f5c 48%,#63d8ff 62%,#123048 84%,#02101c 100%);
+  --surface:linear-gradient(135deg,#04182a 0%,#0a3550 100%);
+  --card:linear-gradient(150deg,#082238 0%,#0e3d5c 100%);
+  --hover:linear-gradient(135deg,#0c2d46 0%,#155070 100%);
+  --border:#3fa0cf;
+  --gold:#d6faff; --blue:#7fd8ff; --orange:#ffb4a8; --green:#9dfcd8; --purple:#b8c6ff;
+  --red:#ff8fa3; --text:#eaf9ff; --muted:#6f93ab;
+}
+/* ── RÉGLAGES (thème + langue, menu unique) ── */
+body{transition:background-color .25s ease,color .25s ease}
+.theme-switch-wrap{position:relative}
+.theme-menu{position:absolute;top:calc(100% + 8px);left:0;background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:8px;display:none;flex-direction:column;gap:2px;z-index:30;min-width:190px;max-height:70vh;overflow-y:auto;
+  box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.theme-menu.open{display:flex}
+.settings-section-title{font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);padding:8px 8px 2px;margin-top:4px}
+.settings-section-title:first-child{margin-top:0}
+.settings-divider{height:1px;background:var(--border);margin:4px 0}
+.theme-swatch{display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--text);
+  font-family:Barlow,sans-serif;font-size:13px;padding:7px 8px;border-radius:6px;cursor:pointer;text-align:left;width:100%}
+.theme-swatch:hover{background:var(--surface)}
+.theme-swatch.active{outline:1px solid var(--gold)}
+.theme-swatch.locked{opacity:.55}
+.theme-swatch .lock-badge{margin-left:auto;font-size:9px;font-weight:900;letter-spacing:.5px;color:var(--gold);display:none;align-items:center;gap:2px;flex-shrink:0}
+.theme-swatch.locked .lock-badge{display:flex}
+.sw{width:14px;height:14px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.25)}
+.sw-dark{background:linear-gradient(135deg,#080f1e,#3b82f6)}
+.sw-light{background:linear-gradient(135deg,#f7f9fc,#3b66c4)}
+.sw-neon{background:linear-gradient(135deg,#050214,#ff2e97)}
+.sw-sunset{background:linear-gradient(135deg,#2a130f,#ff6b1a)}
+.sw-lagoon{background:linear-gradient(135deg,#02141a,#17d6d0)}
+.sw-eclat{background:linear-gradient(135deg,#ffe0ee,#ff5400 55%,#0080ff)}
+.sw-glacier{background:linear-gradient(135deg,#020a12,#63d8ff)}
+body{font-family:Barlow,sans-serif;min-height:100vh;background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:0 1rem 3rem}
+.page-wrapper{width:100%;max-width:520px;display:flex;flex-direction:column;align-items:stretch}
+.install-banner{
+  display:none;align-items:center;gap:12px;width:100%;max-width:520px;
+  background:var(--card);border:1.5px solid var(--gold);border-radius:16px;
+  padding:.9rem 1rem;margin-bottom:1rem;box-shadow:0 4px 20px rgba(0,0,0,.35);
+}
+.install-banner-icon{font-size:26px;flex-shrink:0}
+.install-banner-text{flex:1;min-width:0;font-size:13px;line-height:1.45;color:var(--text)}
+.install-banner-text strong{display:block;font-family:Barlow Condensed,sans-serif;font-size:13px;
+  font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:2px}
+.install-banner-action{
+  flex-shrink:0;background:var(--gold);color:#0a0f1a;border:none;font-family:Barlow Condensed,sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:.55rem 1rem;
+  border-radius:14px;cursor:pointer;white-space:nowrap;
+}
+.install-banner-close{
+  flex-shrink:0;background:none;border:none;color:var(--muted);font-size:18px;line-height:1;
+  cursor:pointer;padding:4px;
+}
+.install-banner-close:hover{color:var(--text)}
+.hero{width:100%;position:relative;border-radius:0 0 20px 20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+.hero{background:var(--surface);aspect-ratio:1040/693;max-height:260px}
+.hero img{width:100%;height:100%;display:block;object-fit:cover;opacity:0;transition:opacity .4s ease}
+.hero img.loaded{opacity:1}
+.hero-badge{position:absolute;bottom:14px;right:16px;background:rgba(10,22,40,.78);border:1.5px solid var(--gold);color:var(--gold);font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;padding:4px 12px;border-radius:20px;text-transform:uppercase}
+.hero-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin-top:.85rem;flex-wrap:wrap;row-gap:8px}
+.hero-actions .theme-switch-wrap{display:flex}
+.history-btn{display:flex;align-items:center;gap:6px;background:var(--surface);border:1.5px solid var(--muted);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;padding:6px 12px 6px 10px;border-radius:20px;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:border-color .18s,color .18s}
+.history-btn i{font-size:15px}
+.history-btn:hover{border-color:var(--gold);color:var(--gold)}
+.bt-card{width:100%;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.75rem 1.5rem;margin-top:1.5rem;box-shadow:0 4px 32px rgba(0,0,0,.45)}
+.bt-title{font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900;color:var(--text);text-align:center;text-transform:uppercase;letter-spacing:3px;margin-bottom:1.4rem;display:flex;align-items:center;justify-content:center;gap:8px}
+.bt-title .hl{color:var(--gold)}
+.bt-title i{font-size:20px;color:var(--gold)}
+.team-label{font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding-left:4px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.team-label.a{color:var(--blue)}
+.team-label.b{color:var(--orange)}
+.team-name-input{
+  background:none;border:none;outline:none;font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:inherit;text-align:right;flex:1;min-width:0;
+  border-bottom:1px dashed transparent;padding-bottom:1px;transition:border-color .15s;
+}
+.team-name-input::placeholder{color:inherit;opacity:.55}
+.team-name-input:hover,.team-name-input:focus{border-bottom-color:currentColor}
+.names-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:.75rem}
+.player-slot{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;transition:border-color .2s}
+.player-slot:focus-within{border-color:var(--gold)}
+.player-slot.team-b:focus-within{border-color:var(--orange)}
+.player-slot i{font-size:17px;color:var(--blue);flex-shrink:0}
+.player-slot.team-b i{color:var(--orange)}
+.player-slot input{background:none;border:none;outline:none;font-family:Barlow,sans-serif;font-size:14px;color:var(--text);width:100%;min-width:0}
+.player-slot input::placeholder{color:var(--muted)}
+.vs-divider{display:flex;align-items:center;gap:12px;margin:4px 0 12px}
+.vs-divider::before,.vs-divider::after{content:"";flex:1;height:1px;background:var(--border)}
+.vs-divider span{font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:900;color:var(--muted);letter-spacing:2px}
+.mode-selector{display:flex;align-items:center;justify-content:space-between;background:var(--surface);padding:12px 16px;border-radius:12px;border:1px solid var(--border);margin-bottom:1.5rem;gap:10px}
+.mode-label-wrap{display:flex;align-items:center;gap:6px;position:relative}
+.mode-label{font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase}
+.info-btn{background:none;border:none;padding:0;margin:0;cursor:pointer;display:flex;align-items:center;color:var(--muted);transition:color .18s;flex-shrink:0}
+.info-btn:hover,.info-btn.active{color:var(--gold)}
+.info-btn i{font-size:17px}
+.info-tooltip{position:absolute;top:calc(100% + 10px);left:0;width:250px;background:var(--hover);border:1px solid var(--gold);border-radius:10px;padding:12px 14px;font-family:Barlow,sans-serif;font-size:12.5px;line-height:1.5;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:10;display:none}
+.info-tooltip.open{display:block}
+.info-tooltip::before{content:"";position:absolute;top:-6px;left:14px;width:11px;height:11px;background:var(--hover);border-left:1px solid var(--gold);border-top:1px solid var(--gold);transform:rotate(45deg)}
+.info-tooltip b{color:var(--gold)}
+.info-tooltip p+p{margin-top:6px}
+@media(max-width:380px){.info-tooltip{width:200px}}
+.switch{position:relative;display:inline-block;width:50px;height:24px}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:var(--border);transition:.4s;border-radius:24px}
+.slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.4s;border-radius:50%}
+input:checked+.slider{background-color:var(--gold)}
+input:checked+.slider:before{transform:translateX(26px)}
+.btn-group{display:flex;flex-direction:column;gap:10px;margin-top:1.25rem}
+.stat-row{display:flex;align-items:center;gap:8px;position:relative}
+.btn-stat{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:15px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .18s;flex:1;min-width:0;text-align:left;text-decoration:none}
+.btn-stat:hover{background:var(--hover);transform:translateX(3px)}
+.btn-stat:active{transform:scale(.98)}
+.btn-stat i{font-size:19px}
+.btn-stat .arrow{margin-left:auto;font-size:15px;color:var(--muted)}
+.btn-stat:hover .arrow{color:var(--text)}
+.btn-stat.points{border-left:3px solid var(--gold)}
+.btn-stat.points i{color:var(--gold)}
+.btn-stat.base{border-left:3px solid var(--blue)}
+.btn-stat.base i{color:var(--blue)}
+.btn-stat.avancees{border-left:3px solid var(--orange)}
+.btn-stat.avancees i{color:var(--orange)}
+.btn-stat.intermediaire{border-left:3px solid var(--green)}
+.btn-stat.intermediaire i{color:var(--green)}
+.btn-stat.pro{border-left:3px solid var(--purple)}
+.btn-stat.pro i{color:var(--purple)}
+.paid-badge{
+  font-family:Barlow Condensed,sans-serif;font-size:9.5px;font-weight:900;letter-spacing:1px;
+  color:#0a0f1a;background:var(--gold);padding:2px 7px;border-radius:10px;
+  text-transform:uppercase;flex-shrink:0;white-space:nowrap;
+}
+.stat-row .info-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;width:42px;height:47px;justify-content:center;flex-shrink:0}
+.stat-row .info-btn:hover,.stat-row .info-btn.active{border-color:var(--gold)}
+.stat-row .info-tooltip{top:calc(100% + 8px);left:auto;right:0;width:100%}
+.stat-row .info-tooltip::before{left:auto;right:16px}
+.contact-link{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border);font-family:Barlow Condensed,sans-serif;font-size:12.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .18s}
+.contact-link i{font-size:16px}
+.contact-link:hover{color:var(--gold)}
+.legal-links{margin-top:.9rem;text-align:center;font-size:11.5px;color:var(--muted)}
+.legal-links a{color:var(--muted);text-decoration:underline}
+.legal-links a:hover{color:var(--gold)}
+@media(max-width:380px){.names-grid{grid-template-columns:1fr}.bt-title{font-size:17px;letter-spacing:2px}.btn-stat{font-size:13px;padding:11px 12px}.hero img{max-height:180px}.stat-row .info-btn{width:38px;height:43px}}
+
+.intro{width:100%;text-align:center;padding:1.4rem 0 .2rem}
+.seo-h1{font-family:Barlow Condensed,sans-serif;font-weight:900;text-transform:uppercase;line-height:1;color:var(--text);display:flex;flex-direction:column;align-items:center;gap:.45rem}
+.seo-h1 .brand{font-size:clamp(34px,10vw,46px);letter-spacing:3px}
+.seo-h1 .hl{color:var(--gold)}
+.seo-h1 .sub{font-size:clamp(11px,3.1vw,14px);font-weight:700;letter-spacing:3px;white-space:nowrap;color:var(--gold);opacity:.95}
+.intro-line{width:46px;height:3px;border-radius:3px;background:var(--gold);margin:.95rem auto .85rem;opacity:.9}
+.seo-lead{font-size:14.5px;line-height:1.6;color:var(--text);opacity:.82;max-width:430px;margin:0 auto;text-wrap:balance}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);width:100%;margin:1.1rem 0 0;padding:.7rem 0;list-style:none;background:var(--surface);border:1px solid var(--border);border-radius:14px}
+.chips li{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;padding:2px 6px;text-align:center;font-family:Barlow Condensed,sans-serif;font-size:11.5px;font-weight:700;letter-spacing:1.3px;line-height:1.25;text-transform:uppercase;color:var(--text)}
+.chips li+li{border-left:1px solid var(--border)}
+.chips li i{color:var(--gold);font-size:19px;line-height:1}
+.hero-actions{display:grid;grid-template-columns:44px 1fr 1fr;gap:10px;align-items:stretch;margin-top:.9rem}
+.hero-actions .theme-switch-wrap{display:block}
+.hero-actions .history-btn{width:100%;height:40px;padding:0 10px;justify-content:center;font-size:12.5px}
+.hero-actions .theme-switch-wrap .history-btn{padding:0}
+.seo{width:100%;margin-top:1.75rem;color:var(--text)}
+.seo h2{font-family:Barlow Condensed,sans-serif;font-size:19px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:1.6rem 0 .6rem}
+.seo p,.seo li{font-size:14px;line-height:1.6;opacity:.88}
+.seo p+p{margin-top:.6rem}
+.seo ul{list-style:none;display:flex;flex-direction:column;gap:.55rem}
+.seo li{padding:.7rem .9rem;background:var(--card);border:1px solid var(--border);border-radius:12px}
+.seo li b{color:var(--gold);font-weight:600}
+.seo details{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.75rem .9rem;margin-bottom:.5rem}
+.seo summary{cursor:pointer;font-size:14px;font-weight:500;opacity:1}
+.seo details p{margin-top:.5rem}
+.seo-foot{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);text-align:center;font-size:12px;opacity:.6}
+.clear-names{display:block;margin:2px auto 12px;background:none;border:0;color:var(--muted,#8ba3c7);font:inherit;font-size:13px;padding:8px 12px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+</style>
+
+<script>
+// Enregistrement du service worker (mode hors ligne). Échec silencieux si
+// non supporté ou si le fichier n'est pas encore déployé, pour ne jamais
+// bloquer le chargement normal de la page.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+</script>
+</head>
+<body>
+<div class="install-banner" id="installBanner">
+  <div class="install-banner-icon">📲</div>
+  <div class="install-banner-text">
+    <strong data-i18n="install_title">Installe Tstats</strong>
+    <span id="installBannerInstructions"></span>
+  </div>
+  <button class="install-banner-close" onclick="dismissInstallBanner()" aria-label="Fermer">✕</button>
+</div>
+<div class="page-wrapper">
+  <div class="hero">
+    <img src="/hero.jpg" width="1040" height="693" alt="Tennis : raquettes et balle sur la plage" fetchpriority="high" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded')">
+    <script>(function(){var i=document.querySelector('.hero img');if(i&&i.complete)i.classList.add('loaded');})();</script>
+    <div class="hero-badge" data-i18n="hero_badge">Interface Bêta</div>
+  </div>
+  <div class="intro">
+    <h1 class="seo-h1"><span class="brand">T<span class="hl">stats</span></span><span class="sub">Statistiques de tennis</span></h1>
+    <div class="intro-line"></div>
+    <p class="seo-lead">Score en direct, coups gagnants, fautes et zones du terrain : suis ton match point par point et relis ton jeu avec des chiffres.</p>
+    <ul class="chips">
+      <li><i class="ti ti-gift"></i><span>Gratuit</span></li>
+      <li><i class="ti ti-device-mobile"></i><span>Sans installation</span></li>
+      <li><i class="ti ti-language"></i><span>FR · EN · PT</span></li>
+    </ul>
+  </div>
+  <div class="hero-actions">
+    <div class="theme-switch-wrap">
+      <button type="button" class="history-btn" onclick="toggleSettingsMenu(event)" aria-label="Réglages"><svg class="gear-svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0-6 0"/></svg></button>
+      <div class="theme-menu settings-menu" id="settingsMenu">
+        <div class="settings-section-title" data-i18n="settings_theme">Thème</div>
+        <button class="theme-swatch" data-theme-choice="dark" onclick="setTheme('dark')"><span class="sw sw-dark"></span><span data-i18n="theme_dark">Sombre</span></button>
+        <button class="theme-swatch" data-theme-choice="light" onclick="setTheme('light')"><span class="sw sw-light"></span><span data-i18n="theme_light">Clair</span></button>
+        <button class="theme-swatch" data-theme-choice="neon" onclick="setTheme('neon')"><span class="sw sw-neon"></span>Neon Beach<span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+        <button class="theme-swatch" data-theme-choice="sunset" onclick="setTheme('sunset')"><span class="sw sw-sunset"></span>Sunset Gold<span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+        <button class="theme-swatch" data-theme-choice="lagoon" onclick="setTheme('lagoon')"><span class="sw sw-lagoon"></span><span data-i18n="theme_lagoon">Lagon</span><span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+        <button class="theme-swatch" data-theme-choice="eclat" onclick="setTheme('eclat')"><span class="sw sw-eclat"></span><span data-i18n="theme_eclat">Éclat</span><span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+        <button class="theme-swatch" data-theme-choice="glacier" onclick="setTheme('glacier')"><span class="sw sw-glacier"></span><span data-i18n="theme_glacier">Glacier</span><span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+        <div class="settings-divider"></div>
+        <div class="settings-section-title" data-i18n="settings_lang">Langue</div>
+        <button class="theme-swatch" data-lang-choice="fr" onclick="setLanguage('fr')">Français</button>
+        <button class="theme-swatch" data-lang-choice="en" onclick="setLanguage('en')">English</button>
+        <button class="theme-swatch" data-lang-choice="pt" onclick="setLanguage('pt')">Português</button>
+      </div>
+    </div>
+    <button type="button" class="history-btn" onclick="goToHistorique()"><i class="ti ti-history"></i><span data-i18n="history_btn">Historique</span></button>
+    <a class="history-btn" href="/compte" id="accountBtn"><i class="ti ti-user"></i><span data-i18n="account_btn">Compte</span></a>
+  </div>
+  <div class="bt-card">
+    <p class="bt-title"><i class="ti ti-users"></i><span data-i18n="title_teams">Equipes &amp;</span> <span class="hl" data-i18n="title_players">Joueurs</span></p>
+    <div class="team-label a">
+      <span data-i18n="team_a">Equipe A</span>
+      <input type="text" id="teamA" autocomplete="off" spellcheck="false" class="team-name-input" data-i18n-placeholder="team_name_placeholder" placeholder="Nom d'équipe (optionnel)" maxlength="24">
+    </div>
+    <div class="names-grid">
+      <div class="player-slot"><i class="ti ti-user"></i><input id="j1" type="text" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="next" data-i18n-placeholder="player1" placeholder="Joueur 1"></div>
+      <div class="player-slot"><i class="ti ti-user"></i><input id="j2" type="text" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="next" data-i18n-placeholder="player2" placeholder="Joueur 2"></div>
+    </div>
+    <div class="vs-divider"><span>VS</span></div>
+    <div class="team-label b">
+      <span data-i18n="team_b">Equipe B</span>
+      <input type="text" id="teamB" autocomplete="off" spellcheck="false" class="team-name-input" data-i18n-placeholder="team_name_placeholder" placeholder="Nom d'équipe (optionnel)" maxlength="24">
+    </div>
+    <div class="names-grid">
+      <div class="player-slot team-b"><i class="ti ti-user"></i><input id="j3" type="text" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="next" data-i18n-placeholder="player3" placeholder="Joueur 3"></div>
+      <div class="player-slot team-b"><i class="ti ti-user"></i><input id="j4" type="text" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="next" data-i18n-placeholder="player4" placeholder="Joueur 4"></div>
+    </div>
+
+    <button type="button" class="clear-names" id="btnClearNames" onclick="clearNames()"><i class="ti ti-eraser"></i> <span data-i18n="clear_names">Effacer les noms</span></button>
+    <div class="mode-selector">
+      <div class="mode-label-wrap">
+        <span class="mode-label" id="modeText" data-i18n="mode_player">Stats par Joueur</span>
+        <button type="button" class="info-btn" data-target="infoTooltip-mode" aria-label="Explication du mode" data-i18n-aria="aria_mode_info" onclick="toggleInfo(event, this)">
+          <i class="ti ti-info-circle"></i>
+        </button>
+        <div class="info-tooltip" id="infoTooltip-mode">
+          <p><b data-i18n="mode_info_team_title">Par Équipe :</b> <span data-i18n="mode_info_team">les statistiques cumulent les actions des deux joueurs d'une même équipe (Équipe A vs Équipe B).</span></p>
+          <p><b data-i18n="mode_info_player_title">Par Joueur :</b> <span data-i18n="mode_info_player">les statistiques sont détaillées individuellement pour chacun des 4 joueurs.</span></p>
+        </div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="modeToggle" checked onchange="updateModeText()">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="btn-group">
+      <div class="stat-row">
+        <button type="button" class="btn-stat points" onclick="goToCDP()"><i class="ti ti-trophy"></i><span data-i18n="btn_points">Comptage de points</span><i class="ti ti-chevron-right arrow"></i></button>
+        <button type="button" class="info-btn" data-target="infoTooltip-points" aria-label="Explication Comptage de points" onclick="toggleInfo(event, this)"><i class="ti ti-info-circle"></i></button>
+        <div class="info-tooltip" id="infoTooltip-points">
+          <p data-i18n-html="info_points">Sert uniquement à <b>compter les points</b> du match, sans relever aucune autre statistique de jeu.</p>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <button type="button" class="btn-stat base" onclick="goToSbase()"><i class="ti ti-chart-bar"></i><span data-i18n="btn_base">Stats de base</span><i class="ti ti-chevron-right arrow"></i></button>
+        <button type="button" class="info-btn" data-target="infoTooltip-base" aria-label="Explication Stats de base" onclick="toggleInfo(event, this)"><i class="ti ti-info-circle"></i></button>
+        <div class="info-tooltip" id="infoTooltip-base">
+          <p data-i18n-html="info_base">Relève uniquement les <b>coups gagnants</b> et les <b>fautes directes</b>.</p>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <button type="button" class="btn-stat intermediaire" onclick="goToSintermediaire()"><i class="ti ti-chart-area-line"></i><span data-i18n="btn_inter">Stats intermediaires</span><i class="ti ti-chevron-right arrow"></i></button>
+        <button type="button" class="info-btn" data-target="infoTooltip-inter" aria-label="Explication Stats intermediaires" onclick="toggleInfo(event, this)"><i class="ti ti-info-circle"></i></button>
+        <div class="info-tooltip" id="infoTooltip-inter">
+          <p data-i18n-html="info_inter">Relève les <b>coups gagnants</b> et les <b>fautes</b>, ainsi que le <b>type de coup</b> joué (smash, service, amorti, etc.).</p>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <button type="button" class="btn-stat avancees" onclick="goToSavancee()"><i class="ti ti-chart-dots"></i><span data-i18n="btn_avancees">Stats avancees</span><span class="paid-badge" data-i18n="paid_badge">🔒 Payant</span><i class="ti ti-chevron-right arrow"></i></button>
+        <button type="button" class="info-btn" data-target="infoTooltip-avancees" aria-label="Explication Stats avancees" onclick="toggleInfo(event, this)"><i class="ti ti-info-circle"></i></button>
+        <div class="info-tooltip" id="infoTooltip-avancees">
+          <p data-i18n-html="info_avancees">Relève le <b>type de coup</b>, s'il est joué en <b>coup droit ou en revers</b>, ainsi que les <b>zones de service</b>.</p>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <button type="button" class="btn-stat pro" onclick="goToSpro()"><i class="ti ti-medal"></i><span data-i18n="btn_pro">Stats pro</span><span class="paid-badge" data-i18n="paid_badge">🔒 Payant</span><i class="ti ti-chevron-right arrow"></i></button>
+        <button type="button" class="info-btn" data-target="infoTooltip-pro" aria-label="Explication Stats pro" onclick="toggleInfo(event, this)"><i class="ti ti-info-circle"></i></button>
+        <div class="info-tooltip" id="infoTooltip-pro">
+          <p data-i18n-html="info_pro">Le mode le plus complet : <b>tous les types de coups</b>, <b>toutes les zones</b> du terrain, avec un <b>schéma de statistiques</b> détaillé.</p>
+        </div>
+      </div>
+    </div>
+
+    <a class="contact-link" href="mailto:supportsbeachstats@gmail.com"><i class="ti ti-mail"></i><span data-i18n="contact">Nous contacter</span></a>
+    <p class="legal-links"><a href="/conditions">Conditions</a> · <a href="/confidentialite">Confidentialité</a> · <a href="/mentions-legales">Mentions légales</a></p>
+  </div>
+
+  <section class="seo" id="presentation">
+    <h2>Une application de stats pour le tennis</h2>
+    <p>Tstats est une application gratuite pour suivre un match de tennis en direct. Tu notes chaque point depuis ton téléphone, sur le sable, et l'application calcule le score et les statistiques pour toi : coups gagnants, fautes directes, types de coups, zones du terrain.</p>
+    <p>Elle fonctionne directement dans le navigateur, sur téléphone, tablette ou ordinateur. Il n'y a rien à installer, et tu peux aussi l'ajouter à l'écran d'accueil comme une application. Elle est disponible en français, en anglais et en portugais.</p>
+
+    <h2>Ce que tu peux faire</h2>
+    <ul>
+      <li><b>Compter les points</b> : un tableau de score pour le tennis (jeux, sets, service), sans rien d'autre à noter.</li>
+      <li><b>Stats de base</b> : les coups gagnants et les fautes directes, par équipe ou par joueur.</li>
+      <li><b>Stats intermédiaires</b> : en plus, le type de coup joué (service, smash, amorti, lob…).</li>
+      <li><b>Stats avancées et Pro</b> : coup droit ou revers, zones de service, cartographie du terrain zone par zone et schéma de statistiques détaillé.</li>
+      <li><b>Historique et PDF</b> : retrouve tes matchs passés et télécharge un bilan en PDF. Avec un compte, ton historique se synchronise entre tes appareils.</li>
+      <li><b>Partage en direct</b> : un code à donner à tes amis ou à ton coach pour suivre le score en direct.</li>
+    </ul>
+
+    <h2>Questions fréquentes</h2>
+    <details>
+      <summary>Tstats est-il gratuit ?</summary>
+      <p>Oui, le comptage de points, les stats de base et les stats intermédiaires sont gratuits. Les stats avancées et Pro sont en abonnement mensuel, avec un compte Tstats.</p>
+    </details>
+    <details>
+      <summary>Faut-il installer l'application ?</summary>
+      <p>Non. Ouvre simplement le site dans ton navigateur. Tu peux l'ajouter à l'écran d'accueil de ton téléphone pour l'ouvrir comme une application.</p>
+    </details>
+    <details>
+      <summary>Peut-on l'utiliser sans connexion à la plage ?</summary>
+      <p>Oui, une fois chargée, l'application continue de fonctionner pour noter un match, même avec peu ou pas de réseau.</p>
+    </details>
+    <details>
+      <summary>Où sont enregistrés mes matchs ?</summary>
+      <p>Sur ton appareil. Si tu crées un compte, ils sont aussi sauvegardés dans le cloud, dans la limite de ton niveau (4 matchs en gratuit, 10 en Avancées, illimité en Pro), et tu les retrouves sur tous tes appareils.</p>
+    </details>
+    <details>
+      <summary>Comment suivre un match en direct ?</summary>
+      <p>Depuis la page de partage en direct, tu génères un code. Les personnes qui ont ce code suivent le score en temps réel sur leur propre téléphone.</p>
+    </details>
+
+    <p class="seo-foot">Tstats – statistiques de tennis pour les joueurs, les couples et les coachs.</p>
+  </section>
+</div>
+<script>
+function updateModeText() {
+  const isChecked = document.getElementById('modeToggle').checked;
+  const dict = I18N[currentLang] || I18N.fr;
+  document.getElementById('modeText').textContent = isChecked ? dict.mode_player : dict.mode_team;
+}
+
+function toggleInfo(event, btn) {
+  event.stopPropagation();
+  const tooltip = document.getElementById(btn.dataset.target);
+  const isOpen = tooltip.classList.contains('open');
+  closeAllInfo();
+  if (!isOpen) {
+    tooltip.classList.add('open');
+    btn.classList.add('active');
+  }
+}
+
+function closeAllInfo() {
+  document.querySelectorAll('.info-tooltip.open').forEach(t => t.classList.remove('open'));
+  document.querySelectorAll('.info-btn.active').forEach(b => b.classList.remove('active'));
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.info-tooltip') && !e.target.closest('.info-btn')) {
+    closeAllInfo();
+  }
+});
+
+function getParams() {
+  const j1 = document.getElementById('j1').value.trim() || 'Joueur 1';
+  const j2 = document.getElementById('j2').value.trim() || 'Joueur 2';
+  const j3 = document.getElementById('j3').value.trim() || 'Joueur 3';
+  const j4 = document.getElementById('j4').value.trim() || 'Joueur 4';
+  const teamA = document.getElementById('teamA').value.trim();
+  const teamB = document.getElementById('teamB').value.trim();
+  const mode = document.getElementById('modeToggle').checked ? 'joueur' : 'equipe';
+
+  // Mémorise les noms saisis pour les pré-remplir automatiquement au
+  // prochain match — plus besoin de les retaper à chaque fois.
+  try {
+    localStorage.setItem('tstats_last_names', JSON.stringify({ j1, j2, j3, j4, teamA, teamB, mode }));
+  } catch(e) {}
+
+  return `j1=${encodeURIComponent(j1)}&j2=${encodeURIComponent(j2)}&j3=${encodeURIComponent(j3)}&j4=${encodeURIComponent(j4)}&mode=${mode}&teamA=${encodeURIComponent(teamA)}&teamB=${encodeURIComponent(teamB)}`;
+}
+
+// Vide tous les noms et oublie ceux mémorisés sur cet appareil.
+function clearNames() {
+  ['j1','j2','j3','j4','teamA','teamB'].forEach(k => { const el = document.getElementById(k); if (el) el.value = ''; });
+  try { localStorage.removeItem('tstats_last_names'); } catch(e) {}
+}
+
+// Pré-remplit les champs avec les derniers noms utilisés, s'ils existent.
+function restoreLastNames() {
+  try {
+    const raw = localStorage.getItem('tstats_last_names');
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    const defaults = { j1:'Joueur 1', j2:'Joueur 2', j3:'Joueur 3', j4:'Joueur 4' };
+    ['j1','j2','j3','j4'].forEach(k => {
+      if (saved[k] && saved[k] !== defaults[k]) document.getElementById(k).value = saved[k];
+    });
+    if (saved.teamA) document.getElementById('teamA').value = saved.teamA;
+    if (saved.teamB) document.getElementById('teamB').value = saved.teamB;
+    if (saved.mode) document.getElementById('modeToggle').checked = saved.mode === 'joueur';
+  } catch(e) {}
+}
+
+function goToSavancee() { window.location.href = `/avancees?${getParams()}`; }
+function goToSbase() { window.location.href = `/base?${getParams()}`; }
+function goToCDP() { window.location.href = `/points?${getParams()}`; }
+function goToSintermediaire() { window.location.href = `/intermediaire?${getParams()}`; }
+function goToSpro() { window.location.href = `/pro?${getParams()}`; }
+function goToHistorique() { window.location.href = `/historique`; }
+
+// ── THÈMES ────────────────────────────────────────────────────────────────
+const PRO_THEMES = ['neon', 'sunset', 'lagoon', 'eclat', 'glacier'];
+let userTier = null;
+
+function applyTheme(theme) { document.documentElement.setAttribute('data-theme', theme); }
+
+function setTheme(theme) {
+  if (PRO_THEMES.includes(theme) && userTier !== 'pro') {
+    window.open('https://REMPLACER-LIEN-GUMROAD-TSTATS', '_blank');
+    return;
+  }
+  localStorage.setItem('tstats_theme', theme);
+  applyTheme(theme);
+  document.querySelectorAll('.theme-swatch').forEach(b => b.classList.toggle('active', b.dataset.themeChoice === theme));
+  document.getElementById('settingsMenu')?.classList.remove('open');
+}
+
+function updateThemeLockUI() {
+  document.querySelectorAll('.theme-swatch[data-theme-choice]').forEach(b => {
+    const isProTheme = PRO_THEMES.includes(b.dataset.themeChoice);
+    b.classList.toggle('locked', isProTheme && userTier !== 'pro');
+  });
+}
+
+function toggleSettingsMenu(e) {
+  e.stopPropagation();
+  document.getElementById('settingsMenu')?.classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.theme-switch-wrap')) document.getElementById('settingsMenu')?.classList.remove('open');
+});
+
+// ── LANGUES ──────────────────────────────────────────────────────────────
+const I18N = {
+  fr: {
+    history_btn: "Historique",
+    account_btn: "Compte",
+    settings_theme: "Thème", settings_lang: "Langue",
+    theme_dark: "Sombre", theme_light: "Clair", theme_lagoon: "Lagon", theme_eclat: "Éclat", theme_glacier: "Glacier",
+    badge_pro: "🔒 PRO",
+    hero_badge: "Interface Bêta",
+    title_teams: "Equipes &", title_players: "Joueurs",
+    team_a: "Equipe A", team_b: "Equipe B",
+    team_name_placeholder: "Nom d'équipe (optionnel)",
+    clear_names: "Effacer les noms",
+    player1: "Joueur 1", player2: "Joueur 2", player3: "Joueur 3", player4: "Joueur 4",
+    mode_team: "Stats par Équipe", mode_player: "Stats par Joueur",
+    mode_info_team_title: "Par Équipe :",
+    mode_info_team: "les statistiques cumulent les actions des deux joueurs d'une même équipe (Équipe A vs Équipe B).",
+    mode_info_player_title: "Par Joueur :",
+    mode_info_player: "les statistiques sont détaillées individuellement pour chacun des 4 joueurs.",
+    btn_points: "Comptage de points",
+    info_points: "Sert uniquement à <b>compter les points</b> du match, sans relever aucune autre statistique de jeu.",
+    btn_base: "Stats de base",
+    info_base: "Relève uniquement les <b>coups gagnants</b> et les <b>fautes directes</b>.",
+    btn_inter: "Stats intermediaires",
+    info_inter: "Relève les <b>coups gagnants</b> et les <b>fautes</b>, ainsi que le <b>type de coup</b> joué (smash, service, amorti, etc.).",
+    btn_avancees: "Stats avancees",
+    info_avancees: "Relève le <b>type de coup</b>, s'il est joué en <b>coup droit ou en revers</b>, ainsi que les <b>zones de service</b>.",
+    btn_pro: "Stats pro",
+    info_pro: "Le mode le plus complet : <b>tous les types de coups</b>, <b>toutes les zones</b> du terrain, avec un <b>schéma de statistiques</b> détaillé.",
+    paid_badge: "🔒 Payant",
+    contact: "Nous contacter",
+    install_title: "Installe Tstats",
+    install_ios: "Appuie sur <b>Partager</b> puis <b>« Sur l'écran d'accueil »</b>",
+    install_android: "Ajoute l'appli sur ton écran d'accueil pour y accéder plus vite, même hors ligne.",
+    install_btn: "Installer",
+  },
+  en: {
+    history_btn: "History",
+    account_btn: "Account",
+    settings_theme: "Theme", settings_lang: "Language",
+    theme_dark: "Dark", theme_light: "Light", theme_lagoon: "Lagoon", theme_eclat: "Radiance", theme_glacier: "Glacier",
+    badge_pro: "🔒 PRO",
+    hero_badge: "Beta Interface",
+    title_teams: "Teams &", title_players: "Players",
+    team_a: "Team A", team_b: "Team B",
+    team_name_placeholder: "Team name (optional)",
+    clear_names: "Clear names",
+    player1: "Player 1", player2: "Player 2", player3: "Player 3", player4: "Player 4",
+    mode_team: "Team Stats", mode_player: "Player Stats",
+    mode_info_team_title: "By Team:",
+    mode_info_team: "stats combine the actions of both players on the same team (Team A vs Team B).",
+    mode_info_player_title: "By Player:",
+    mode_info_player: "stats are tracked individually for each of the 4 players.",
+    btn_points: "Score Counter",
+    info_points: "Only counts the match <b>score</b>, with no other stat tracked.",
+    btn_base: "Basic Stats",
+    info_base: "Tracks only <b>winners</b> and <b>unforced errors</b>.",
+    btn_inter: "Intermediate Stats",
+    info_inter: "Tracks <b>winners</b> and <b>errors</b>, plus the <b>shot type</b> played (smash, serve, drop shot, etc.).",
+    btn_avancees: "Advanced Stats",
+    info_avancees: "Tracks the <b>shot type</b>, whether played <b>forehand or backhand</b>, plus <b>serve zones</b>.",
+    btn_pro: "Pro Stats",
+    info_pro: "The most complete mode: <b>every shot type</b>, <b>every court zone</b>, with a detailed <b>stats map</b>.",
+    paid_badge: "🔒 Paid",
+    contact: "Contact us",
+    install_title: "Install Tstats",
+    install_ios: "Tap <b>Share</b> then <b>\"Add to Home Screen\"</b>",
+    install_android: "Add the app to your home screen for faster access, even offline.",
+    install_btn: "Install",
+  },
+  pt: {
+    history_btn: "Histórico",
+    account_btn: "Conta",
+    settings_theme: "Tema", settings_lang: "Idioma",
+    theme_dark: "Escuro", theme_light: "Claro", theme_lagoon: "Lagoa", theme_eclat: "Brilho", theme_glacier: "Glaciar",
+    badge_pro: "🔒 PRO",
+    hero_badge: "Interface Beta",
+    title_teams: "Equipes e", title_players: "Jogadores",
+    team_a: "Equipe A", team_b: "Equipe B",
+    team_name_placeholder: "Nome da equipe (opcional)",
+    clear_names: "Apagar os nomes",
+    player1: "Jogador 1", player2: "Jogador 2", player3: "Jogador 3", player4: "Jogador 4",
+    mode_team: "Stats por Equipe", mode_player: "Stats por Jogador",
+    mode_info_team_title: "Por Equipe:",
+    mode_info_team: "as estatísticas somam as ações dos dois jogadores da mesma equipe (Equipe A vs Equipe B).",
+    mode_info_player_title: "Por Jogador:",
+    mode_info_player: "as estatísticas são detalhadas individualmente para cada um dos 4 jogadores.",
+    btn_points: "Contagem de Pontos",
+    info_points: "Serve apenas para <b>contar os pontos</b> da partida, sem registrar nenhuma outra estatística.",
+    btn_base: "Stats Básicas",
+    info_base: "Registra apenas <b>winners</b> e <b>erros não forçados</b>.",
+    btn_inter: "Stats Intermediárias",
+    info_inter: "Registra <b>winners</b> e <b>erros</b>, além do <b>tipo de golpe</b> jogado (smash, saque, amortecida, etc.).",
+    btn_avancees: "Stats Avançadas",
+    info_avancees: "Registra o <b>tipo de golpe</b>, se foi jogado de <b>direita ou de esquerda</b>, além das <b>zonas de saque</b>.",
+    btn_pro: "Stats Pro",
+    info_pro: "O modo mais completo: <b>todos os tipos de golpe</b>, <b>todas as zonas</b> da quadra, com um <b>mapa de estatísticas</b> detalhado.",
+    paid_badge: "🔒 Pago",
+    contact: "Fale conosco",
+    install_title: "Instale o Tstats",
+    install_ios: "Toque em <b>Compartilhar</b> e depois em <b>\"Adicionar à Tela de Início\"</b>",
+    install_android: "Adicione o app à tela inicial para acessar mais rápido, mesmo offline.",
+    install_btn: "Instalar",
+  },
+};
+
+let currentLang = 'fr';
+
+function applyLanguage(lang) {
+  const dict = I18N[lang] || I18N.fr;
+  currentLang = lang;
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (dict[key] !== undefined) el.textContent = dict[key];
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.dataset.i18nHtml;
+    if (dict[key] !== undefined) el.innerHTML = dict[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    if (dict[key] !== undefined) el.placeholder = dict[key];
+  });
+
+  // Le texte du mode (Équipe/Joueur) dépend de l'état du bouton, pas d'un
+  // simple attribut fixe : on le recalcule à chaque changement de langue.
+  updateModeText();
+}
+
+function setLanguage(lang) {
+  localStorage.setItem('tstats_lang', lang);
+  applyLanguage(lang);
+  document.querySelectorAll('[data-lang-choice]').forEach(b => {
+    b.classList.toggle('active', b.dataset.langChoice === lang);
+  });
+  document.getElementById('settingsMenu')?.classList.remove('open');
+}
+
+async function checkTier() {
+  try {
+    const res = await fetch('/api/tier');
+    const data = await res.json();
+    userTier = data.tier;
+  } catch (e) {
+    userTier = null;
+  }
+  updateThemeLockUI();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const current = localStorage.getItem('tstats_theme') || 'dark';
+  document.querySelectorAll('.theme-swatch[data-theme-choice]').forEach(b => b.classList.toggle('active', b.dataset.themeChoice === current));
+
+  // Langue : reprend le choix déjà fait, sinon devine depuis la langue du
+  // navigateur (utile pour un visiteur brésilien ou anglophone qui arrive
+  // pour la première fois), sinon retombe sur le français par défaut.
+  let lang = localStorage.getItem('tstats_lang');
+  if (!lang) {
+    const nav = (navigator.language || 'fr').toLowerCase();
+    lang = nav.startsWith('pt') ? 'pt' : nav.startsWith('en') ? 'en' : 'fr';
+  }
+  document.querySelectorAll('[data-lang-choice]').forEach(b => b.classList.toggle('active', b.dataset.langChoice === lang));
+  applyLanguage(lang);
+
+  restoreLastNames();
+  checkTier();
+});
+
+// ── BANNIÈRE D'INSTALLATION (PWA) ────────────────────────────────────────
+// iOS Safari ne propose jamais de bouton d'installation automatique (c'est
+// une limitation d'Apple) : on affiche donc les instructions manuelles.
+// Sur Android/Chrome, l'événement natif "beforeinstallprompt" permet un vrai
+// bouton "Installer" en un clic. Rien ne s'affiche si l'appli est déjà
+// installée, ou si la personne a déjà fermé la bannière une fois.
+(function() {
+  const DISMISS_KEY = 'tstats_install_dismissed';
+  if (localStorage.getItem(DISMISS_KEY)) return;
+
+  const isStandalone = (typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+  if (isStandalone) return; // déjà installée
+
+  const ua = window.navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  const isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS/.test(ua);
+
+  let deferredPrompt = null;
+
+  function showInstallBanner(type) {
+    const banner = document.getElementById('installBanner');
+    const textEl = document.getElementById('installBannerInstructions');
+    if (!banner || !textEl) return;
+
+    if (type === 'ios') {
+      textEl.innerHTML = (I18N[currentLang] || I18N.fr).install_ios;
+    } else {
+      textEl.textContent = (I18N[currentLang] || I18N.fr).install_android;
+      if (!banner.querySelector('.install-banner-action')) {
+        const btn = document.createElement('button');
+        btn.className = 'install-banner-action';
+        btn.textContent = (I18N[currentLang] || I18N.fr).install_btn;
+        btn.onclick = async function() {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            await deferredPrompt.userChoice;
+            deferredPrompt = null;
+          }
+          dismissInstallBanner();
+        };
+        banner.insertBefore(btn, banner.querySelector('.install-banner-close'));
+      }
+    }
+    banner.style.display = 'flex';
+  }
+
+  window.dismissInstallBanner = function() {
+    localStorage.setItem(DISMISS_KEY, '1');
+    const banner = document.getElementById('installBanner');
+    if (banner) banner.style.display = 'none';
+  };
+
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    showInstallBanner('android');
+  });
+
+  if (isSafari) {
+    setTimeout(function() { showInstallBanner('ios'); }, 1200);
+  }
+})();
+</script>
+</body>
+</html>

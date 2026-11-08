@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /compte
+
+Sitemap: https://tstats.appbeachstats.workers.dev/sitemap.xml

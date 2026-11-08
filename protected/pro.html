@@ -1,0 +1,3812 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script>(function(){var t=localStorage.getItem('tstats_theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#090f1a">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tstats">
+<title>Tennis – Stats Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#080f1e;
+  --surface:#0d1829;
+  --card:#111e35;
+  --border:#1e3560;
+  --hover:#162040;
+  --gold:#f5c518;
+  --blue:#3b82f6;
+  --orange:#f97316;
+  --green:#22c55e;
+  --red:#ef4444;
+  --purple:#a855f7;
+  --text:#e2eaf8;
+  --muted:#4a6494;
+}
+[data-theme="light"]{
+  --bg:#eef1f6; --surface:#e7ecf3; --card:#f7f9fc; --hover:#dde4ee; --border:#aebad2;
+  --gold:#b3860f; --blue:#3b66c4; --orange:#c9601e; --green:#1f8a4c; --purple:#7c4bc4;
+  --red:#c23a3a; --text:#2c3646; --muted:#748094;
+}
+[data-theme="neon"]{
+  --bg:#050214; --surface:#0d0620; --card:#140a2e; --hover:#1c0f3d; --border:#3d1a6b;
+  --gold:#ffe600; --blue:#00e5ff; --orange:#ff2e97; --green:#39ff14; --purple:#c644ff;
+  --red:#ff2e5f; --text:#f2ecff; --muted:#8c6bc9;
+}
+[data-theme="sunset"]{
+  --bg:linear-gradient(180deg,#200a12 0%,#4a1f16 22%,#b8531f 48%,#f0c542 62%,#6b2a52 84%,#241130 100%);
+  --surface:linear-gradient(135deg,#3c1a14 0%,#6b3420 100%);
+  --card:linear-gradient(150deg,#481f18 0%,#7a3f22 100%);
+  --hover:linear-gradient(135deg,#5c2a1c 0%,#8a4a26 100%);
+  --border:#a35a35;
+  --gold:#ffcb3d; --blue:#5ec8f5; --orange:#ff7f3f; --green:#3fd9ae; --purple:#e488a8;
+  --red:#ef4a4a; --text:#fff8ec; --muted:#e0b89f;
+}
+[data-theme="lagoon"]{
+  --bg:linear-gradient(180deg,#02141a 0%,#053b3f 22%,#0a6e6e 48%,#17d6d0 62%,#0a4a5c 84%,#02121e 100%);
+  --surface:linear-gradient(135deg,#04262b 0%,#0a4a4a 100%);
+  --card:linear-gradient(150deg,#063339 0%,#0d5555 100%);
+  --hover:linear-gradient(135deg,#0a4045 0%,#116868 100%);
+  --border:#1ec9c9;
+  --gold:#ffd166; --blue:#22d3ee; --orange:#ff8c42; --green:#2dd4a7; --purple:#7c83fd;
+  --red:#ff5c5c; --text:#e0fbfc; --muted:#5fa8ac;
+}
+[data-theme="eclat"]{
+  --bg:linear-gradient(180deg,#ffffff 0%,#fff3d1 18%,#ffe0ee 36%,#e3f3ff 54%,#dffbe8 72%,#fff9f0 88%,#ffffff 100%);
+  --surface:linear-gradient(135deg,#fffaf0 0%,#ffeaf3 100%);
+  --card:linear-gradient(150deg,#ffffff 0%,#fff3fa 100%);
+  --hover:linear-gradient(135deg,#ffeedd 0%,#ffdcee 100%);
+  --border:#ffb4d1;
+  --gold:#ffb100; --blue:#0080ff; --orange:#ff5400; --green:#00c853; --purple:#a600ff;
+  --red:#ff1744; --text:#14171f; --muted:#66707f;
+}
+[data-theme="glacier"]{
+  --bg:linear-gradient(180deg,#020a12 0%,#062038 22%,#0f3f5c 48%,#63d8ff 62%,#123048 84%,#02101c 100%);
+  --surface:linear-gradient(135deg,#04182a 0%,#0a3550 100%);
+  --card:linear-gradient(150deg,#082238 0%,#0e3d5c 100%);
+  --hover:linear-gradient(135deg,#0c2d46 0%,#155070 100%);
+  --border:#3fa0cf;
+  --gold:#d6faff; --blue:#7fd8ff; --orange:#ffb4a8; --green:#9dfcd8; --purple:#b8c6ff;
+  --red:#ff8fa3; --text:#eaf9ff; --muted:#6f93ab;
+}
+/* ── SÉLECTEUR DE THÈME ── */
+body{transition:background-color .25s ease,color .25s ease}
+.theme-switch-wrap{position:relative}
+.theme-menu{position:absolute;top:calc(100% + 8px);left:0;background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:8px;display:none;flex-direction:column;gap:2px;z-index:30;min-width:170px;
+  box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.theme-menu.open{display:flex}
+.theme-swatch{display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--text);
+  font-family:Barlow,sans-serif;font-size:13px;padding:7px 8px;border-radius:6px;cursor:pointer;text-align:left;width:100%}
+.theme-swatch:hover{background:var(--surface)}
+.theme-swatch.active{outline:1px solid var(--gold)}
+.theme-swatch.locked{opacity:.55}
+.theme-swatch .lock-badge{margin-left:auto;font-size:9px;font-weight:900;letter-spacing:.5px;color:var(--gold);display:none;align-items:center;gap:2px;flex-shrink:0}
+.theme-swatch.locked .lock-badge{display:flex}
+.prefs-menu-label{font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:var(--muted);padding:4px 8px 2px}
+.prefs-menu-divider{height:1px;background:var(--border);margin:6px 4px}
+.gear-menu-item{justify-content:space-between}
+.menu-chevron{margin-left:auto;color:var(--muted);font-size:15px;font-weight:700}
+.prefs-back-btn{display:flex;align-items:center;gap:4px;background:none;border:none;color:var(--muted);
+  font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:6px 8px;border-radius:6px;cursor:pointer;text-align:left;width:100%;margin-bottom:4px}
+.prefs-back-btn:hover{background:var(--surface);color:var(--gold)}
+.shot-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:none;border:none;
+  color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:600;letter-spacing:.2px;
+  padding:8px;border-radius:6px;cursor:pointer;text-align:left;width:100%}
+.shot-toggle-row:hover{background:var(--surface)}
+.toggle-switch{position:relative;width:34px;height:18px;border-radius:20px;background:var(--border);flex-shrink:0;transition:background .2s}
+.toggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--text);transition:transform .2s}
+.toggle-switch.on{background:var(--gold)}
+.toggle-switch.on::after{transform:translateX(16px);background:var(--bg)}
+.sw{width:14px;height:14px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.25)}
+.sw-dark{background:linear-gradient(135deg,#080f1e,#3b82f6)}
+.sw-light{background:linear-gradient(135deg,#f7f9fc,#3b66c4)}
+.sw-neon{background:linear-gradient(135deg,#050214,#ff2e97)}
+.sw-sunset{background:linear-gradient(135deg,#2a130f,#ff6b1a)}
+.sw-lagoon{background:linear-gradient(135deg,#02141a,#17d6d0)}
+.sw-eclat{background:linear-gradient(135deg,#ffe0ee,#ff5400 55%,#0080ff)}
+.sw-glacier{background:linear-gradient(135deg,#020a12,#63d8ff)}
+
+body{
+  font-family:Barlow,sans-serif;
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:0 1rem 4rem;
+}
+
+/* ── HEADER ── */
+.header{
+  width:100%;max-width:580px;
+  display:flex;flex-direction:column;gap:.6rem;
+  padding:1.2rem 0 1rem;
+  border-bottom:1px solid var(--border);
+  margin-bottom:1.2rem;}
+.header-top-row{display:flex;align-items:center;justify-content:space-between;width:100%}
+.header-gear-btn{background:none;border:1px solid var(--border);color:var(--muted);
+  width:34px;height:34px;border-radius:50%;cursor:pointer;transition:all .18s;
+  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.header-gear-btn:hover{border-color:var(--gold);color:var(--gold);transform:rotate(25deg)}
+.theme-menu-right{left:auto;right:0}
+.header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
+@media(max-width:480px){
+  .header-logo{font-size:18px}
+  .header-back{font-size:11px;padding:5px 9px}
+}
+.header-logo{font-family:Barlow Condensed,sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:var(--gold)}
+.header-logo span{color:var(--text);opacity:.5}
+.header-back{background:none;border:1px solid var(--border);color:var(--muted);font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all .18s}
+.header-back:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── STATUS BAR ── */
+.status-bar{
+  width:100%;max-width:580px;
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:.75rem 1.4rem;display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-bottom:1rem;
+}
+.status-pill{font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--bg);background:var(--gold);padding:4px 14px;border-radius:20px}
+[data-theme="glacier"] .status-pill{color:#0a2e52}
+[data-theme="sunset"] .status-pill{color:#3a140a}
+[data-theme="lagoon"] .status-pill{color:#04302c}
+[data-theme="eclat"] .status-pill{color:#14171f}
+.status-label{font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+
+/* ── SCOREBOARD ── */
+.scoreboard{
+  width:100%;max-width:580px;
+  background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;
+  box-shadow:0 8px 48px rgba(0,0,0,.5);margin-bottom:1rem;
+}
+.score-header{
+  display:grid;grid-template-columns:1fr 44px 44px 44px 80px;
+  padding:.6rem 1.4rem;background:var(--surface);border-bottom:1px solid var(--border);
+}
+.score-header span{font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:center}
+.score-header span:first-child{text-align:left}
+.team-row{
+  display:grid;grid-template-columns:1fr 44px 44px 44px 80px;align-items:center;
+  padding:1rem 1.4rem;border-bottom:1px solid var(--border);transition:background .15s;
+}
+.team-row:last-child{border-bottom:none}
+.team-info{display:flex;flex-direction:column;gap:3px}
+.team-name{font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+.team-name-input{
+  font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  background:none;border:none;border-bottom:1px dashed transparent;color:var(--muted);width:100%;padding:0 0 1px;
+  outline:none;transition:border-color .15s;
+}
+.team-name-input::placeholder{color:inherit;opacity:1}
+.team-name-input:hover,.team-name-input:focus{border-bottom-color:var(--muted)}
+.team-players{font-size:15px;color:var(--text);font-weight:900;font-family:Barlow Condensed,sans-serif;
+  letter-spacing:.3px;display:flex;flex-direction:column;line-height:1.25}
+.team-players .serving-ball{display:inline-block;margin-left:3px;font-size:13px}
+.team-row.team-a .team-players{color:var(--blue)}
+.team-row.team-b .team-players{color:var(--orange)}
+.cell{text-align:center;font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900}
+.cell.sets-cell span{display:inline-block;width:28px;height:28px;line-height:28px;border-radius:50%;font-size:14px;font-weight:900}
+.cell.sets-cell span.won{background:var(--gold);color:var(--bg)}
+[data-theme="glacier"] .cell.sets-cell span.won{color:#0a2e52}
+[data-theme="sunset"] .cell.sets-cell span.won{color:#3a140a}
+[data-theme="lagoon"] .cell.sets-cell span.won{color:#04302c}
+[data-theme="eclat"] .cell.sets-cell span.won{color:#14171f}
+.cell.set-score{
+  font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:900;
+  text-align:center;color:var(--muted);
+}
+.cell.set-score.active{color:var(--text)}
+.cell.set-score.won{color:var(--gold)}
+.cell.point-cell{font-size:36px;color:var(--gold);font-style:italic}
+
+/* ── STATS CARD ── */
+.stats-card{
+  width:100%;max-width:580px;
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:1.2rem 1.4rem;margin-bottom:1rem;
+}
+.stats-title{
+  font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+  margin-bottom:1rem;display:flex;align-items:center;gap:8px;
+}
+.stats-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.stats-view-switch{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.sv-chip{background:var(--surface);border:1px solid var(--border);color:var(--muted);
+  font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;padding:.4rem .75rem;border-radius:20px;cursor:pointer;transition:all .15s}
+.sv-chip:hover{color:var(--text);border-color:var(--muted)}
+.sv-chip.active{background:var(--gold);border-color:var(--gold);color:#0a0f1a}
+.zone-view-badge{font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:var(--gold);background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:2px 8px;margin-left:4px}
+
+.stat-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin-bottom:.7rem}
+.stat-row:last-child{margin-bottom:0}
+.stat-val{
+  font-family:Barlow Condensed,sans-serif;font-size:24px;font-weight:900;
+}
+.stat-val.a{color:var(--blue);text-align:right}
+.stat-val.b{color:var(--orange);text-align:left}
+.stat-name{
+  font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:center;
+  white-space:nowrap;
+}
+.stat-bar-wrap{grid-column:1/-1;display:flex;height:4px;border-radius:4px;overflow:hidden;background:var(--surface)}
+.stat-bar-a{background:var(--blue);transition:width .4s}
+.stat-bar-b{background:var(--orange);transition:width .4s}
+
+/* ── ACTIONS ── */
+.team-controls{width:100%;max-width:580px;margin-bottom:.8rem}
+.team-ctrl-label-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.team-ctrl-label{
+  font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;padding-left:4px;
+}
+.team-ctrl-label.a{color:var(--blue)}
+.team-ctrl-label.b{color:var(--orange)}
+.side-toggle-btn{
+  font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;padding:3px 9px;border-radius:12px;cursor:pointer;border:1px solid var(--border);
+  background:var(--surface);color:var(--muted);transition:all .15s;
+}
+.side-toggle-btn:hover{border-color:var(--gold);color:var(--gold)}
+.side-toggle-btn.side-r{border-color:var(--blue);color:var(--blue)}
+.side-toggle-btn.side-l{border-color:var(--orange);color:var(--orange)}
+.ctrl-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-winner,.btn-faute{
+  padding:.9rem .8rem;border-radius:14px;border:2px solid;cursor:pointer;
+  transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1;
+  font-family:Barlow Condensed,sans-serif;
+}
+.btn-winner:active,.btn-faute:active{transform:scale(.96)}
+.btn-icon{font-size:22px}
+.btn-main{font-size:16px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+.btn-sub{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;opacity:.6}
+.btn-winner.a{background:rgba(34,197,94,.1);border-color:var(--green);color:var(--green)}
+.btn-winner.a:hover{background:rgba(34,197,94,.22);transform:scale(1.02)}
+.btn-winner.b{background:rgba(34,197,94,.1);border-color:var(--green);color:var(--green)}
+.btn-winner.b:hover{background:rgba(34,197,94,.22);transform:scale(1.02)}
+.btn-faute.a{background:rgba(239,68,68,.08);border-color:var(--red);color:var(--red)}
+.btn-faute.a:hover{background:rgba(239,68,68,.2);transform:scale(1.02)}
+.btn-faute.b{background:rgba(239,68,68,.08);border-color:var(--red);color:var(--red)}
+.btn-faute.b:hover{background:rgba(239,68,68,.2);transform:scale(1.02)}
+
+.actions{width:100%;max-width:580px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1rem}
+.btn-action{
+  padding:.75rem;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);
+  font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-action:hover{background:var(--hover);border-color:var(--muted)}
+.btn-action.undo{border-color:#f59e0b;color:#f59e0b}
+.btn-action.undo:hover{background:rgba(245,158,11,.12)}
+.btn-action.reset{border-color:var(--red);color:var(--red)}
+.btn-action.reset:hover{background:rgba(239,68,68,.12)}
+.btn-action.pdf{border-color:var(--green);color:var(--green)}
+.btn-action.pdf:hover{background:rgba(34,197,94,.12)}
+
+/* ── ZONE MAP ── */
+.zone-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:1rem;scrollbar-width:none}
+.zone-side-tabs{display:flex;gap:6px;margin-bottom:1rem}
+.zone-side-tab{
+  flex:1;background:var(--surface);border:1px solid var(--border);color:var(--muted);
+  font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;padding:.5rem;border-radius:8px;cursor:pointer;transition:all .15s;
+}
+.zone-side-tab:hover{color:var(--text);border-color:var(--muted)}
+.zone-side-tab.active{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+[data-theme="glacier"] .zone-side-tab.active{color:#0a2e52}
+[data-theme="sunset"] .zone-side-tab.active{color:#3a140a}
+[data-theme="lagoon"] .zone-side-tab.active{color:#04302c}
+[data-theme="eclat"] .zone-side-tab.active{color:#14171f}
+.zone-tabs::-webkit-scrollbar{display:none}
+.zone-tab{
+  flex:0 0 auto;background:var(--surface);border:1px solid var(--border);color:var(--muted);
+  font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:.45rem .8rem;border-radius:10px;cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.zone-tab:hover{color:var(--text);border-color:var(--muted)}
+.zone-tab.active{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+/* Sunset, Lagon, Éclat, Magma et Glacier ont un fond en dégradé : color:var(--bg)
+   n'est pas une couleur valide dans ce cas et le texte des onglets sélectionnés
+   retombe sur une couleur claire, illisible sur le fond doré. On force une
+   teinte profonde et légèrement dégradée, assortie à chaque thème. */
+[data-theme="glacier"] .zone-tab.active{color:#0a2e52}
+[data-theme="glacier"] .zone-tab.active .zt-label{
+  background:linear-gradient(120deg,#062038 0%,#0f4d7c 55%,#0a2e52 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+[data-theme="sunset"] .zone-tab.active{color:#3a140a}
+[data-theme="sunset"] .zone-tab.active .zt-label{
+  background:linear-gradient(120deg,#2a0d06 0%,#5c2410 55%,#3a140a 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+[data-theme="lagoon"] .zone-tab.active{color:#04302c}
+[data-theme="lagoon"] .zone-tab.active .zt-label{
+  background:linear-gradient(120deg,#022018 0%,#0a4a42 55%,#04302c 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+[data-theme="eclat"] .zone-tab.active{color:#14171f}
+[data-theme="eclat"] .zone-tab.active .zt-label{
+  background:linear-gradient(120deg,#1a1200 0%,#4a3200 55%,#1a1200 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.zone-court-wrap{width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.zone-court-item{display:flex;flex-direction:column;align-items:center;gap:6px}
+.zone-court-title{font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase;text-align:center}
+.zone-court-svg{width:100%;height:auto;display:block;overflow:visible}
+.zc-lbl{font-family:Barlow Condensed,sans-serif;font-weight:900;font-size:20px;fill:var(--text);opacity:.9}
+.zc-count{font-family:Barlow Condensed,sans-serif;font-weight:900;font-size:22px}
+.zc-count .w{fill:var(--green)}
+.zc-count .sep{fill:var(--muted);font-size:16px}
+.zc-count .f{fill:var(--red)}
+.zc-net-lbl{font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;fill:var(--gold);text-transform:uppercase}
+.zc-band-lbl{font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;fill:var(--muted);text-transform:uppercase}
+.zone-depth-note{font-family:Barlow,sans-serif;font-size:12px;line-height:1.4;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.6rem .8rem;margin-bottom:.9rem}
+.zone-depth-note b{color:var(--gold)}
+.zone-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:.9rem;padding-top:.8rem;border-top:1px solid var(--border)}
+.zl-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-weight:500}
+.zl-dot{width:9px;height:9px;border-radius:3px;display:inline-block}
+.zl-dot.zl-win{background:var(--green)}
+.zl-dot.zl-flt{background:var(--red)}
+.zl-dot.zl-tie{background:var(--gold)}
+
+/* ── LOG ── */
+.log-wrap{width:100%;max-width:580px}
+.log-title{font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;padding-left:4px}
+.log-list{display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto}
+.log-entry{
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:.45rem 1rem;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;
+}
+.log-entry .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.log-entry.dot-a .dot{background:var(--blue)}
+.log-entry.dot-b .dot{background:var(--orange)}
+.log-entry.dot-w .dot{background:var(--green)}
+.log-entry.dot-f .dot{background:var(--red)}
+.log-entry.event .dot{background:var(--gold)}
+.log-tag{
+  margin-left:auto;font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:10px;
+}
+.log-tag.winner{background:rgba(34,197,94,.15);color:var(--green)}
+.log-tag.faute{background:rgba(239,68,68,.15);color:var(--red)}
+
+/* ── WINNER OVERLAY ── */
+.winner-overlay{
+  display:none;position:fixed;inset:0;background:rgba(8,15,30,.92);z-index:100;
+  align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;padding:2rem;
+}
+.winner-overlay.show{display:flex}
+.winner-box{
+  background:var(--card);border:2px solid var(--gold);border-radius:24px;
+  padding:2.5rem 2rem;text-align:center;max-width:400px;width:100%;
+  box-shadow:0 0 80px rgba(245,197,24,.2);
+}
+.winner-trophy{font-size:60px;margin-bottom:1rem}
+.winner-label{font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);opacity:.7;margin-bottom:.5rem}
+.winner-name{font-family:Barlow Condensed,sans-serif;font-size:32px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#fff;margin-bottom:.4rem}
+.winner-score{font-family:Barlow Condensed,sans-serif;font-size:16px;color:var(--muted);letter-spacing:1px;margin-bottom:1.2rem}
+.winner-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.4rem}
+.ws-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.8rem}
+.ws-val{font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:900}
+.ws-val.a{color:var(--blue)}
+.ws-val.b{color:var(--orange)}
+.ws-lbl{font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.winner-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.winner-btn{padding:.7rem 1.4rem;border-radius:10px;border:1.5px solid;font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.winner-btn.primary{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.1)}
+.winner-btn.primary:hover{background:rgba(245,197,24,.25)}
+.winner-btn.secondary{border-color:var(--border);color:var(--muted);background:none}
+.winner-btn.secondary:hover{border-color:var(--muted);color:var(--text)}
+
+/* ── TIMER ── */
+.timer-wrap{
+  width:100%;max-width:580px;
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:.9rem 1.4rem;margin-bottom:1rem;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.timer-display{
+  font-family:Barlow Condensed,sans-serif;font-size:38px;font-weight:900;
+  letter-spacing:4px;color:var(--gold);font-variant-numeric:tabular-nums;
+  min-width:110px;
+}
+.timer-display.running{color:#fff}
+.timer-btns{display:flex;gap:8px}
+
+.correction-toggle{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--surface);border:1px dashed var(--border);color:var(--muted);
+  font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;padding:.6rem;border-radius:10px;cursor:pointer;margin-bottom:.8rem;
+  transition:all .15s;
+}
+.correction-toggle:hover{color:var(--text);border-color:var(--muted)}
+.correction-toggle-arrow{font-size:11px;transition:transform .2s}
+.correction-toggle.open .correction-toggle-arrow{transform:rotate(180deg)}
+.correction-panel{display:none;background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:1rem 1.1rem;margin-bottom:1rem}
+.correction-panel.open{display:block}
+.correction-hint{font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:.9rem}
+.correction-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.correction-col{display:flex;flex-direction:column;gap:6px}
+.correction-col-label{font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;text-align:center;margin-bottom:2px}
+.correction-col-label.a{color:var(--blue)}
+.correction-col-label.b{color:var(--orange)}
+.correction-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.correction-btn{
+  background:var(--surface);border:1px solid var(--border);color:var(--text);
+  font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;padding:.55rem;border-radius:8px;cursor:pointer;transition:all .15s;
+}
+.correction-btn.a:hover{border-color:var(--blue);color:var(--blue)}
+.correction-btn.b:hover{border-color:var(--orange);color:var(--orange)}
+.correction-btn.minus{opacity:.72}
+.correction-btn.minus:hover{opacity:1;border-color:var(--red);color:var(--red)}
+.correction-super-btn{
+  width:100%;margin-top:12px;background:var(--surface);border:1px dashed var(--gold);color:var(--gold);
+  font-family:Barlow Condensed,sans-serif;font-size:11.5px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;padding:.65rem;border-radius:8px;cursor:pointer;transition:all .15s;
+}
+.correction-super-btn:hover{background:rgba(245,197,24,.12)}
+
+.server-indicator{
+  display:flex;align-items:center;gap:8px;width:100%;background:var(--card);
+  border:1px solid var(--gold);border-radius:12px;padding:.6rem .9rem;margin-bottom:1rem;
+}
+.server-indicator.team-a{border-color:var(--blue)}
+.server-indicator.team-b{border-color:var(--orange)}
+.server-ball{font-size:16px;flex-shrink:0}
+.server-indicator span{font-size:12.5px;color:var(--muted)}
+.server-indicator .server-name{color:var(--text);font-family:Barlow Condensed,sans-serif;
+  font-weight:900;letter-spacing:.5px}
+.server-change-btn{
+  margin-left:auto;flex-shrink:0;background:var(--surface);border:1px solid var(--border);
+  color:var(--muted);font-family:Barlow Condensed,sans-serif;font-size:10.5px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;padding:.3rem .7rem;border-radius:14px;cursor:pointer;
+}
+.server-change-btn:hover{color:var(--text);border-color:var(--muted)}
+
+.server-modal-backdrop{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:110;
+  align-items:center;justify-content:center;padding:1rem;
+}
+.server-modal-backdrop.show{display:flex}
+.server-modal-box{
+  background:var(--card);border:1px solid var(--gold);border-radius:16px;
+  padding:1.6rem 1.4rem;max-width:380px;width:100%;text-align:center;
+}
+.server-modal-title{
+  font-family:Barlow Condensed,sans-serif;font-size:17px;font-weight:900;letter-spacing:.5px;
+  color:var(--text);margin-bottom:.3rem;
+}
+.server-modal-box::before{content:'🎾';display:block;font-size:30px;margin-bottom:.5rem}
+#zoneOrientationModal .server-modal-box::before{content:'📍'}
+.zone-orientation-hint{font-size:12px;color:var(--muted);line-height:1.5;margin-top:.4rem}
+.server-modal-btns{display:flex;flex-direction:column;gap:14px;margin-top:1.1rem}
+.server-modal-group{display:flex;flex-direction:column;gap:6px}
+.server-modal-group-label{font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;text-align:left}
+.server-modal-group-label.team-a{color:var(--blue)}
+.server-modal-group-label.team-b{color:var(--orange)}
+.server-modal-group-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.server-modal-btn{
+  background:var(--surface);border:1.5px solid var(--border);color:var(--text);
+  font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;letter-spacing:.5px;
+  padding:.7rem .4rem;border-radius:10px;cursor:pointer;transition:all .15s;
+}
+.server-modal-btn.team-a:hover{border-color:var(--blue);color:var(--blue)}
+.server-modal-btn.team-b:hover{border-color:var(--orange);color:var(--orange)}
+
+
+.timer-btn{
+  padding:.5rem 1rem;border-radius:8px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text);
+  font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;
+}
+.timer-btn:hover{background:var(--hover);border-color:var(--muted)}
+.timer-btn.start{border-color:var(--green);color:var(--green)}
+.timer-btn.start:hover{background:rgba(34,197,94,.12)}
+.timer-btn.pause{border-color:var(--gold);color:var(--gold)}
+.timer-btn.pause:hover{background:rgba(245,197,24,.12)}
+.timer-btn.stop{border-color:var(--red);color:var(--red)}
+.timer-btn.stop:hover{background:rgba(239,68,68,.12)}
+.timer-btn.live{border-color:var(--blue);color:var(--blue)}
+.timer-btn.live:hover{background:rgba(59,130,246,.12)}
+.timer-btn.live.active{background:var(--blue);color:#fff}
+.timer-btn.live.active::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff;margin-right:6px;animation:live-pulse 1.4s ease-in-out infinite}
+@keyframes live-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.live-modal-backdrop{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;
+  align-items:center;justify-content:center;padding:1rem;
+}
+.live-modal-backdrop.show{display:flex}
+.live-modal{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:1.4rem;max-width:420px;width:100%;
+}
+.live-modal-title{
+  font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:900;
+  letter-spacing:1px;margin-bottom:.9rem;
+}
+.live-modal-body p{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:.8rem}
+.live-link-row{display:flex;gap:8px;margin-bottom:.6rem}
+.live-link-row input{
+  flex:1;min-width:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:.6rem .7rem;color:var(--text);font-size:13px;
+}
+.live-link-row button{
+  background:var(--gold);border:none;border-radius:8px;padding:.6rem 1rem;
+  font-family:Barlow Condensed,sans-serif;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;font-size:12px;color:#0a0f1a;cursor:pointer;flex-shrink:0;
+}
+.live-modal-note{font-size:11px !important;color:var(--muted)}
+.live-modal-actions{display:flex;gap:8px;margin-top:1rem}
+.live-modal-actions button{
+  flex:1;padding:.6rem;border-radius:8px;font-family:Barlow Condensed,sans-serif;
+  font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+}
+.live-stop-btn{background:none;border:1px solid var(--red);color:var(--red)}
+.live-stop-btn:hover{background:rgba(239,68,68,.12)}
+.live-close-btn{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+.live-close-btn:hover{background:var(--hover)}
+
+/* ── SHOT MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(8,15,30,.88);z-index:50;align-items:flex-end;justify-content:center;padding:1rem}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:24px 24px 20px 20px;width:100%;max-width:520px;padding:1.4rem 1.2rem 1.8rem;box-shadow:0 -8px 48px rgba(0,0,0,.6)}
+.modal-context{font-family:Barlow Condensed,sans-serif;font-size:17px;font-weight:900;letter-spacing:1px;text-transform:uppercase;text-align:center;margin-bottom:1rem;color:var(--text)}
+.modal-context span{display:block;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:4px}
+
+/* Shot Grid Layout */
+.shot-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.shot-group{display:flex;flex-direction:column;gap:5px;background:rgba(255,255,255,0.03);padding:8px;border-radius:14px;border:1px solid var(--border)}
+.shot-back{grid-column:1 / -1;background:none;border:1px solid var(--border);color:var(--muted);font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:8px;border-radius:10px;cursor:pointer;transition:all .15s;margin-bottom:2px}
+.shot-back:hover{border-color:var(--gold);color:var(--gold)}
+.shot-group-title{font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;text-align:center;margin-bottom:2px}
+.shot-sub-row{display:flex;flex-wrap:wrap;gap:6px}
+.shot-sub-row .shot-btn{flex:1 1 calc(50% - 3px)}
+
+.shot-btn{padding:.7rem .3rem;border-radius:12px;border:2px solid;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;line-height:1.2;text-align:center}
+.shot-btn:active{transform:scale(.95)}
+.shot-btn .s-ico{font-size:20px}
+.shot-btn.type-winner{border-color:var(--green);color:var(--green);background:rgba(34,197,94,.08)}
+.shot-btn.type-winner:hover{background:rgba(34,197,94,.2)}
+.shot-btn.type-faute{border-color:var(--red);color:var(--red);background:rgba(239,68,68,.08)}
+.shot-btn.type-faute:hover{background:rgba(239,68,68,.2)}
+
+.modal-cancel{width:100%;padding:.65rem;border-radius:10px;border:1px solid var(--border);background:none;color:var(--muted);font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.modal-cancel:hover{border-color:var(--muted);color:var(--text)}
+
+/* ── ADVANCED STATS TABLE ── */
+.stats-section{margin-bottom:.8rem}
+.stats-section-title{font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:.5rem;display:flex;align-items:center;gap:6px}
+.stats-section-title.w{color:var(--green)}
+.stats-section-title.f{color:var(--red)}
+.stats-table{width:100%;border-collapse:collapse}
+.stats-table tr{border-bottom:1px solid var(--border)}
+.stats-table tr:last-child{border-bottom:none}
+.stats-table td{padding:.35rem .2rem;font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;vertical-align:middle}
+.stats-table .td-lbl{color:var(--muted);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center;line-height:1.1}
+.stats-table .td-a{color:var(--blue);text-align:right;font-size:18px;width:36px}
+.stats-table .td-b{color:var(--orange);text-align:left;font-size:18px;width:36px}
+.stats-table .td-bar{padding:0 .4rem}
+.mini-bar{height:5px;border-radius:4px;overflow:hidden;background:var(--surface);display:flex}
+.mini-bar-a{background:var(--blue);transition:width .3s}
+.mini-bar-b{background:var(--orange);transition:width .3s}
+.stats-totals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:.6rem}
+.tot-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.6rem;text-align:center}
+.tot-val{font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:900;display:flex;justify-content:center;gap:8px}
+.tot-val span.a{color:var(--blue)}
+.tot-val span.b{color:var(--orange)}
+.tot-lbl{font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:2px}
+
+/* ── STATS PAR JOUEUR ── */
+.player-stats-section{margin-bottom:1rem}
+.player-stats-header{
+  font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;
+  padding:.3rem .5rem;border-radius:6px;margin-bottom:.4rem;
+  display:inline-block;
+}
+.player-stats-header.pa{background:rgba(59,130,246,.15);color:var(--blue)}
+.player-stats-header.pb{background:rgba(249,115,22,.15);color:var(--orange)}
+.player-stats-table{width:100%;border-collapse:collapse;margin-bottom:.3rem}
+.player-stats-table tr{border-bottom:1px solid var(--border)}
+.player-stats-table tr:last-child{border-bottom:none}
+.player-stats-table td{padding:.3rem .2rem;font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;vertical-align:middle}
+.player-stats-table .td-lbl{color:var(--muted);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center}
+.player-stats-table .td-val{font-size:17px;font-weight:900;text-align:center;width:32px}
+.player-stats-table .td-val.pa{color:var(--blue)}
+.player-stats-table .td-val.pb{color:var(--orange)}
+.player-pair-divider{height:1px;background:var(--border);margin:.4rem 0 .6rem}
+
+@media(max-width:440px){
+  .score-header,.team-row{grid-template-columns:1fr 36px 36px 36px 64px;padding:.8rem .7rem}
+  .cell.point-cell{font-size:28px}
+  .shot-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+
+<script>
+// Enregistrement du service worker (mode hors ligne). Échec silencieux si
+// non supporté ou si le fichier n'est pas encore déployé, pour ne jamais
+// bloquer le chargement normal de la page.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+</script>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top-row">
+    <div class="header-logo">T<span>/</span>Stats</div>
+    <div class="theme-switch-wrap">
+      <button class="header-gear-btn" onclick="toggleGearMenu(event)" aria-label="Menu">⚙</button>
+      <div class="theme-menu theme-menu-right" id="gearMenu">
+        <button class="theme-swatch gear-menu-item" onclick="openThemeSubmenu(event)" data-i18n="settings_theme">Thème<span class="menu-chevron">›</span></button>
+        <button class="theme-swatch gear-menu-item" onclick="openLangSubmenu(event)" data-i18n="settings_lang">Langue<span class="menu-chevron">›</span></button>
+        <button class="theme-swatch gear-menu-item" onclick="openPrefsMenu(event)" data-i18n="settings_prefs">Préférences<span class="menu-chevron">›</span></button>
+      </div>
+      <div class="theme-menu theme-menu-right" id="themeSubmenu">
+        <button class="prefs-back-btn" onclick="closeThemeSubmenu(event)" data-i18n="back">‹ Retour</button>
+        <button class="theme-swatch" data-theme-choice="dark" onclick="setTheme('dark')"><span class="sw sw-dark"></span><span data-i18n="theme_dark">Sombre</span></button>
+        <button class="theme-swatch" data-theme-choice="light" onclick="setTheme('light')"><span class="sw sw-light"></span><span data-i18n="theme_light">Clair</span></button>
+        <button class="theme-swatch" data-theme-choice="neon" onclick="setTheme('neon')"><span class="sw sw-neon"></span>Neon Beach<span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+        <button class="theme-swatch" data-theme-choice="sunset" onclick="setTheme('sunset')"><span class="sw sw-sunset"></span>Sunset Gold<span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+        <button class="theme-swatch" data-theme-choice="lagoon" onclick="setTheme('lagoon')"><span class="sw sw-lagoon"></span><span data-i18n="theme_lagoon">Lagon</span><span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+        <button class="theme-swatch" data-theme-choice="eclat" onclick="setTheme('eclat')"><span class="sw sw-eclat"></span><span data-i18n="theme_eclat">Éclat</span><span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+        <button class="theme-swatch" data-theme-choice="glacier" onclick="setTheme('glacier')"><span class="sw sw-glacier"></span><span data-i18n="theme_glacier">Glacier</span><span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+      </div>
+      <div class="theme-menu theme-menu-right" id="langSubmenu">
+        <button class="prefs-back-btn" onclick="closeLangSubmenu(event)" data-i18n="back">‹ Retour</button>
+        <button class="theme-swatch" data-lang-choice="fr" onclick="setLanguage('fr')">Français</button>
+        <button class="theme-swatch" data-lang-choice="en" onclick="setLanguage('en')">English</button>
+        <button class="theme-swatch" data-lang-choice="pt" onclick="setLanguage('pt')">Português</button>
+      </div>
+      <div class="theme-menu theme-menu-right" id="prefsMenu">
+        <button class="prefs-back-btn" onclick="closePrefsMenu(event)" data-i18n="back">‹ Retour</button>
+        <button class="theme-swatch gear-menu-item" onclick="openPdfMenu(event)">PDF<span class="menu-chevron">›</span></button>
+        <button class="theme-swatch gear-menu-item" onclick="openMatchMenu(event)" data-i18n="prefs_match">Match<span class="menu-chevron">›</span></button>
+        <button class="theme-swatch gear-menu-item" onclick="openShotsMenu(event)" data-i18n="prefs_shots">Coups<span class="menu-chevron">›</span></button>
+      </div>
+      <div class="theme-menu theme-menu-right" id="pdfMenu">
+        <button class="prefs-back-btn" onclick="backToPrefsMenu(event)" data-i18n="back">‹ Retour</button>
+        <div class="prefs-menu-label">PDF</div>
+        <button class="theme-swatch" data-pdf-style-choice="bars" onclick="setPdfStyle('bars')"><span class="sw sw-light"></span><span data-i18n="pdf_style_bars">Barres (nouveau)</span></button>
+        <button class="theme-swatch" data-pdf-style-choice="classic" onclick="setPdfStyle('classic')"><span class="sw sw-dark"></span><span data-i18n="pdf_style_classic">Terrains (classique)</span></button>
+      </div>
+      <div class="theme-menu theme-menu-right" id="matchMenu">
+        <button class="prefs-back-btn" onclick="backToPrefsMenu(event)" data-i18n="back">‹ Retour</button>
+        <div class="prefs-menu-label" data-i18n="prefs_match">Match</div>
+        <button class="theme-swatch" data-stats-mode-choice="equipe" onclick="switchStatsMode('equipe')"><span class="sw sw-dark"></span><span data-i18n="mode_team">Par équipe</span></button>
+        <button class="theme-swatch" data-stats-mode-choice="joueur" onclick="switchStatsMode('joueur')"><span class="sw sw-light"></span><span data-i18n="mode_player">Par joueur</span></button>
+      </div>
+      <div class="theme-menu theme-menu-right" id="shotsMenu">
+        <button class="prefs-back-btn" onclick="backToPrefsMenu(event)" data-i18n="back">‹ Retour</button>
+        <div class="prefs-menu-label" data-i18n="prefs_shots_detail">Détail des coups</div>
+        <button class="shot-toggle-row" onclick="toggleShotSetting('depth')">
+          <span data-i18n="shot_setting_depth">Profondeur (Tendu / Amorti / Lob...)</span>
+          <span class="toggle-switch" id="toggleShotDepth"></span>
+        </button>
+        <button class="shot-toggle-row" onclick="toggleShotSetting('zone')">
+          <span data-i18n="shot_setting_zone">Zones du terrain (1 à 5)</span>
+          <span class="toggle-switch" id="toggleShotZone"></span>
+        </button>
+        <button class="shot-toggle-row" onclick="toggleShotSetting('side')">
+          <span data-i18n="shot_setting_side">Côté (CD / REV)</span>
+          <span class="toggle-switch" id="toggleShotSide"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="header-back" onclick="window.location.href='/historique'" data-i18n="btn_historique">📋 Historique</button>
+    <button class="header-back" onclick="window.location.href='/'" data-i18n="btn_accueil">← Accueil</button>
+  </div>
+</div>
+
+<div class="status-bar">
+  <div class="status-pill" id="setPill" data-i18n="status_warmup">Échauffement</div>
+  <div class="status-label" id="statusLabel" data-i18n="status_playing">En cours</div>
+</div>
+
+<div class="timer-wrap">
+  <div class="timer-display" id="timerDisplay">00:00</div>
+  <div class="timer-btns">
+    <button class="timer-btn start" id="timerStartBtn" onclick="timerToggle()" data-i18n="timer_start">▶ Start</button>
+    <button class="timer-btn live" id="liveShareBtn" onclick="toggleLiveShare()" data-i18n="live_btn">📡 Live</button>
+  </div>
+</div>
+
+<button type="button" class="correction-toggle" onclick="toggleCorrectionPanel()">
+  <span data-i18n="correction_toggle">⚙️ Rattraper le score</span>
+  <i class="correction-toggle-arrow" id="correctionArrow">▾</i>
+</button>
+<div class="correction-panel" id="correctionPanel">
+  <p class="correction-hint" data-i18n="correction_hint">Pour reprendre un match déjà commencé, ou rattraper un point/jeu oublié. N'affecte jamais les statistiques par coup.</p>
+  <div class="correction-grid">
+    <div class="correction-col">
+      <div class="correction-col-label a" data-i18n="team_a">Équipe A</div>
+      <div class="correction-btn-row">
+        <button class="correction-btn a minus" onclick="removeManualPoint(1)" data-i18n="minus_1pt">−1 Pt</button>
+        <button class="correction-btn a" onclick="addManualPoint(1)" data-i18n="plus_1pt">+1 Pt</button>
+      </div>
+      <div class="correction-btn-row">
+        <button class="correction-btn a minus" onclick="removeManualGame(1)" data-i18n="minus_1game">−1 Jeu</button>
+        <button class="correction-btn a" onclick="addManualGame(1)" data-i18n="plus_1game">+1 Jeu</button>
+      </div>
+    </div>
+    <div class="correction-col">
+      <div class="correction-col-label b" data-i18n="team_b">Équipe B</div>
+      <div class="correction-btn-row">
+        <button class="correction-btn b minus" onclick="removeManualPoint(2)" data-i18n="minus_1pt">−1 Pt</button>
+        <button class="correction-btn b" onclick="addManualPoint(2)" data-i18n="plus_1pt">+1 Pt</button>
+      </div>
+      <div class="correction-btn-row">
+        <button class="correction-btn b minus" onclick="removeManualGame(2)" data-i18n="minus_1game">−1 Jeu</button>
+        <button class="correction-btn b" onclick="addManualGame(2)" data-i18n="plus_1game">+1 Jeu</button>
+      </div>
+    </div>
+  </div>
+  <button type="button" class="correction-super-btn" onclick="jumpToSuperTiebreak()" data-i18n="jump_super_tb">⏩ Passer directement à 1 set partout (Super Tie-Break)</button>
+</div>
+
+<div class="server-indicator" id="serverIndicator" style="display:none">
+  <span class="server-ball">🎾</span>
+  <span data-i18n="serving_label">Au service :</span> <strong class="server-name"></strong>
+  <button type="button" class="server-change-btn" onclick="cycleServerManually()" data-i18n="btn_change">Changer</button>
+</div>
+
+<div class="server-modal-backdrop" id="serverModal">
+  <div class="server-modal-box">
+    <div class="server-modal-title" id="serverModalTitle" data-i18n="who_serves_first">Qui sert en premier ?</div>
+    <div class="server-modal-btns" id="serverModalBtns"></div>
+  </div>
+</div>
+
+<div class="server-modal-backdrop" id="zoneOrientationModal">
+  <div class="server-modal-box">
+    <div class="server-modal-title" id="zoneOrientationTitle" data-i18n="zone_orientation_title">Comment orienter les zones ?</div>
+    <p class="zone-orientation-hint" data-i18n="zone_orientation_hint">Détermine le sens de lecture de la cartographie par zone (mode Pro).</p>
+    <div class="server-modal-btns" id="zoneOrientationBtns"></div>
+  </div>
+</div>
+
+<div class="live-modal-backdrop" id="liveModalBackdrop" onclick="closeLiveModal(event)">
+  <div class="live-modal" onclick="event.stopPropagation()">
+    <div class="live-modal-title" data-i18n="live_modal_title">📡 Partage en direct</div>
+    <div class="live-modal-body" id="liveModalBody">
+      <p data-i18n="live_modal_desc">Toute personne avec ce lien peut suivre le score et les stats en direct, sans pouvoir rien modifier.</p>
+      <div class="live-link-row">
+        <input type="text" id="liveLinkInput" readonly>
+        <button onclick="copyLiveLink()" id="liveCopyBtn" data-i18n="live_copy_btn">Copier</button>
+      </div>
+      <p class="live-modal-note" data-i18n="live_modal_note">Le lien reste actif tant que tu marques des points (ou pendant 6h max).</p>
+    </div>
+    <div class="live-modal-actions">
+      <button class="live-stop-btn" onclick="stopLiveShare()" data-i18n="live_stop_btn">Arrêter le partage</button>
+      <button class="live-close-btn" onclick="closeLiveModal()" data-i18n="live_close_btn">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<div class="scoreboard">
+  <div class="score-header" id="scoreHeader">
+    <span data-i18n="header_team">Équipe</span>
+    <span>S1</span>
+    <span>S2</span>
+    <span>S3</span>
+    <span data-i18n="header_points">Points</span>
+  </div>
+  <div class="team-row team-a" id="rowA">
+    <div class="team-info">
+      <input type="text" class="team-name-input" id="teamLabelA" placeholder="Équipe A" maxlength="24" oninput="onTeamLabelInput('A')">
+      <div class="team-players" id="playersA"><span class="player-name" id="playerNameJ1">—</span><span class="player-name" id="playerNameJ2">—</span></div>
+    </div>
+    <div class="cell set-score" id="setA1">—</div>
+    <div class="cell set-score" id="setA2">—</div>
+    <div class="cell set-score" id="setA3">—</div>
+    <div class="cell point-cell" id="ptA">0</div>
+  </div>
+  <div class="team-row team-b" id="rowB">
+    <div class="team-info">
+      <input type="text" class="team-name-input" id="teamLabelB" placeholder="Équipe B" maxlength="24" oninput="onTeamLabelInput('B')">
+      <div class="team-players" id="playersB"><span class="player-name" id="playerNameJ3">—</span><span class="player-name" id="playerNameJ4">—</span></div>
+    </div>
+    <div class="cell set-score" id="setB1">—</div>
+    <div class="cell set-score" id="setB2">—</div>
+    <div class="cell set-score" id="setB3">—</div>
+    <div class="cell point-cell" id="ptB">0</div>
+  </div>
+</div>
+
+<div class="team-controls">
+  <div class="team-ctrl-label a" id="lblA">Équipe A</div>
+  <div class="ctrl-row">
+    <button class="btn-winner a" onclick="openShotModal(1,'winner')">
+      <span class="btn-icon">🎯</span>
+      <span class="btn-main" data-i18n="point_winner">Point gagnant</span>
+      <span class="btn-sub" data-i18n="point_winner_sub">Coup gagnant</span>
+    </button>
+    <button class="btn-faute a" onclick="openShotModal(2,'faute')">
+      <span class="btn-icon">💥</span>
+      <span class="btn-main" data-i18n="point_fault">Faute directe</span>
+      <span class="btn-sub" data-i18n="point_fault_sub_a">Point à B</span>
+    </button>
+  </div>
+</div>
+
+<div class="team-controls">
+  <div class="team-ctrl-label b" id="lblB">Équipe B</div>
+  <div class="ctrl-row">
+    <button class="btn-winner b" onclick="openShotModal(2,'winner')">
+      <span class="btn-icon">🎯</span>
+      <span class="btn-main" data-i18n="point_winner">Point gagnant</span>
+      <span class="btn-sub" data-i18n="point_winner_sub">Coup gagnant</span>
+    </button>
+    <button class="btn-faute b" onclick="openShotModal(1,'faute')">
+      <span class="btn-icon">💥</span>
+      <span class="btn-main" data-i18n="point_fault">Faute directe</span>
+      <span class="btn-sub" data-i18n="point_fault_sub_b">Point à A</span>
+    </button>
+  </div>
+</div>
+
+<div class="team-controls" id="joueurCtrlJ1" style="display:none">
+  <div class="team-ctrl-label-row"><div class="team-ctrl-label a" id="lblJ1"></div><button type="button" class="side-toggle-btn" id="sideToggleJ1" style="display:none" onclick="togglePlayerSide('j1')"></button></div>
+  <div class="ctrl-row">
+    <button class="btn-winner a" onclick="openShotModal(1,'winner',1)">
+      <span class="btn-icon">🎯</span>
+      <span class="btn-main" data-i18n="point_winner">Point gagnant</span>
+      <span class="btn-sub" data-i18n="point_winner_sub">Coup gagnant</span>
+    </button>
+    <button class="btn-faute a" onclick="openShotModal(2,'faute',1)">
+      <span class="btn-icon">💥</span>
+      <span class="btn-main" data-i18n="point_fault">Faute directe</span>
+      <span class="btn-sub" data-i18n="point_fault_sub_a">Point à B</span>
+    </button>
+  </div>
+</div>
+
+<div class="team-controls" id="joueurCtrlJ2" style="display:none">
+  <div class="team-ctrl-label-row"><div class="team-ctrl-label a" id="lblJ2"></div><button type="button" class="side-toggle-btn" id="sideToggleJ2" style="display:none" onclick="togglePlayerSide('j2')"></button></div>
+  <div class="ctrl-row">
+    <button class="btn-winner a" onclick="openShotModal(1,'winner',2)">
+      <span class="btn-icon">🎯</span>
+      <span class="btn-main" data-i18n="point_winner">Point gagnant</span>
+      <span class="btn-sub" data-i18n="point_winner_sub">Coup gagnant</span>
+    </button>
+    <button class="btn-faute a" onclick="openShotModal(2,'faute',2)">
+      <span class="btn-icon">💥</span>
+      <span class="btn-main" data-i18n="point_fault">Faute directe</span>
+      <span class="btn-sub" data-i18n="point_fault_sub_a">Point à B</span>
+    </button>
+  </div>
+</div>
+
+<div class="team-controls" id="joueurCtrlJ3" style="display:none">
+  <div class="team-ctrl-label-row"><div class="team-ctrl-label b" id="lblJ3"></div><button type="button" class="side-toggle-btn" id="sideToggleJ3" style="display:none" onclick="togglePlayerSide('j3')"></button></div>
+  <div class="ctrl-row">
+    <button class="btn-winner b" onclick="openShotModal(2,'winner',3)">
+      <span class="btn-icon">🎯</span>
+      <span class="btn-main" data-i18n="point_winner">Point gagnant</span>
+      <span class="btn-sub" data-i18n="point_winner_sub">Coup gagnant</span>
+    </button>
+    <button class="btn-faute b" onclick="openShotModal(1,'faute',3)">
+      <span class="btn-icon">💥</span>
+      <span class="btn-main" data-i18n="point_fault">Faute directe</span>
+      <span class="btn-sub" data-i18n="point_fault_sub_b">Point à A</span>
+    </button>
+  </div>
+</div>
+
+<div class="team-controls" id="joueurCtrlJ4" style="display:none">
+  <div class="team-ctrl-label-row"><div class="team-ctrl-label b" id="lblJ4"></div><button type="button" class="side-toggle-btn" id="sideToggleJ4" style="display:none" onclick="togglePlayerSide('j4')"></button></div>
+  <div class="ctrl-row">
+    <button class="btn-winner b" onclick="openShotModal(2,'winner',4)">
+      <span class="btn-icon">🎯</span>
+      <span class="btn-main" data-i18n="point_winner">Point gagnant</span>
+      <span class="btn-sub" data-i18n="point_winner_sub">Coup gagnant</span>
+    </button>
+    <button class="btn-faute b" onclick="openShotModal(1,'faute',4)">
+      <span class="btn-icon">💥</span>
+      <span class="btn-main" data-i18n="point_fault">Faute directe</span>
+      <span class="btn-sub" data-i18n="point_fault_sub_b">Point à A</span>
+    </button>
+  </div>
+</div>
+
+<div class="actions">
+  <button class="btn-action undo" onclick="undo()" data-i18n="btn_undo">↩ Annuler</button>
+  <button class="btn-action pdf" onclick="exportPDF()" data-i18n="btn_export_pdf">⬇ PDF</button>
+  <button class="btn-action reset" onclick="resetMatch()" data-i18n="btn_reset">⟳ Reset</button>
+</div>
+
+<div class="stats-card" id="statsCard">
+  <div class="stats-title" data-i18n="stats_detailed_title">Stats détaillées</div>
+  <div class="stats-view-switch" id="statsViewSwitch"></div>
+  <div id="statsContent"></div>
+</div>
+
+<div class="stats-card" id="zoneMapCard">
+  <div class="stats-title"><span data-i18n="zone_map_title">Cartographie par zone</span> <span class="zone-view-badge" id="zoneViewBadge"></span></div>
+  <div class="zone-tabs" id="zoneTabs"></div>
+  <div class="zone-side-tabs" id="zoneSideTabs" style="display:none">
+    <button class="zone-side-tab active" id="zoneSideTab_combined" onclick="selectZoneSideFilter('combined')" data-i18n="zone_side_combined">Combinée</button>
+    <button class="zone-side-tab" id="zoneSideTab_R" onclick="selectZoneSideFilter('R')" data-i18n="zone_side_right">➡️ Côté Droite</button>
+    <button class="zone-side-tab" id="zoneSideTab_L" onclick="selectZoneSideFilter('L')" data-i18n="zone_side_left">⬅️ Côté Gauche</button>
+  </div>
+  <div class="zone-depth-note" id="zoneDepthNote" style="display:none" data-i18n-html="zone_depth_note">Bras roulé : le terrain est découpé en 3 bandes de profondeur — <b>Amorti</b> (proche filet), <b>Tendu</b> (milieu), <b>Lob</b> (fond) — chacune divisée en 5 zones de largeur.</div>
+  <div class="zone-court-wrap" id="zoneMapGrid"></div>
+  <div class="zone-legend">
+    <span class="zl-item"><span class="zl-dot zl-win"></span><span data-i18n="zone_legend_win">Zone à dominante gagnante</span></span>
+    <span class="zl-item"><span class="zl-dot zl-flt"></span><span data-i18n="zone_legend_fault">Zone à dominante fautes</span></span>
+    <span class="zl-item"><span class="zl-dot zl-tie"></span><span data-i18n="zone_legend_tie">Égalité gagnants / fautes</span></span>
+  </div>
+</div>
+
+<div class="log-wrap">
+  <div class="log-title" data-i18n="log_title">Journal du match</div>
+  <div class="log-list" id="logList"></div>
+</div>
+
+<div class="modal-overlay" id="shotModal">
+  <div class="modal">
+    <div class="modal-context" id="modalContext">—</div>
+    <div class="shot-grid" id="shotGrid"></div>
+    <button class="modal-cancel" onclick="closeShotModal()" data-i18n="btn_cancel">Annuler</button>
+  </div>
+</div>
+
+<div class="winner-overlay" id="winnerOverlay">
+  <div class="winner-box">
+    <div class="winner-trophy">🏆</div>
+    <div class="winner-label" data-i18n="match_winner">Vainqueur du match</div>
+    <div class="winner-name" id="winnerName">—</div>
+    <div class="winner-score" id="winnerScore">—</div>
+    <div class="winner-stats">
+      <div class="ws-box">
+        <div class="ws-val a" id="ws-wA">0</div><div class="ws-lbl" data-i18n="ws_winners_a">Winners A</div>
+        <div class="ws-val b" id="ws-wB" style="margin-top:6px">0</div><div class="ws-lbl" data-i18n="ws_winners_b">Winners B</div>
+      </div>
+      <div class="ws-box">
+        <div class="ws-val a" id="ws-fA">0</div><div class="ws-lbl" data-i18n="ws_faults_a">Fautes A</div>
+        <div class="ws-val b" id="ws-fB" style="margin-top:6px">0</div><div class="ws-lbl" data-i18n="ws_faults_b">Fautes B</div>
+      </div>
+    </div>
+    <div class="winner-actions">
+      <button class="winner-btn primary" onclick="exportPDF()" data-i18n="btn_download_pdf">⬇ Télécharger PDF</button>
+      <button class="winner-btn secondary" onclick="resetMatch()" data-i18n="new_match">Nouveau match</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="winner-overlay" id="resumeOverlay">
+  <div class="winner-box">
+    <div class="winner-trophy">💾</div>
+    <div class="winner-label" data-i18n="match_in_progress">Match en cours détecté</div>
+    <div class="winner-name" id="resumeMatchup" style="font-size:22px">—</div>
+    <div class="winner-score" id="resumeScoreInfo">—</div>
+    <div class="winner-actions">
+      <button class="winner-btn primary" onclick="confirmResume()" data-i18n="resume_match">Reprendre ce match</button>
+      <button class="winner-btn secondary" onclick="discardResume()" data-i18n="new_match">Nouveau match</button>
+    </div>
+  </div>
+</div>
+
+<script src="/barlow-font.js"></script>
+<script src="/shared.js"></script>
+<script>
+// ── LANGUES (chargé en premier : tout le reste — y compris les libellés de
+// coups générés dynamiquement — en dépend) ────────────────────────────────
+const I18N = {
+  fr: {
+    settings_theme: "Thème", settings_lang: "Langue", settings_prefs: "Préférences",
+    back: "‹ Retour", prefs_match: "Match", prefs_shots: "Coups", prefs_shots_detail: "Détail des coups",
+    shot_setting_depth: "Profondeur (Tendu / Amorti / Lob...)",
+    shot_setting_zone: "Zones du terrain (1 à 5)",
+    shot_setting_side: "Côté (CD / REV)",
+    theme_dark: "Sombre", theme_light: "Clair", theme_lagoon: "Lagon", theme_eclat: "Éclat", theme_glacier: "Glacier",
+    badge_pro: "🔒 PRO",
+    btn_historique: "📋 Historique", btn_accueil: "← Accueil",
+    mode_team: "Par équipe", mode_player: "Par joueur",
+    pdf_style_bars: "Barres (nouveau)", pdf_style_classic: "Terrains (classique)",
+    status_warmup: "Échauffement", status_playing: "En cours", status_over: "Terminé",
+    status_tb: "Tie-Break", status_tb_target: "7 points, 2 d'écart", status_tb_short: "7 pts",
+    status_super_tb: "Super Tie-Break", status_super_tb_target: "10 points, 2 d'écart", status_super_tb_short: "10 pts",
+    timer_start: "▶ Start", timer_pause: "⏸ Pause",
+    live_btn: "📡 Live",
+    correction_toggle: "⚙️ Rattraper le score",
+    correction_hint: "Pour reprendre un match déjà commencé, ou rattraper un point/jeu oublié. N'affecte jamais les statistiques par coup.",
+    team_a: "Équipe A", team_b: "Équipe B",
+    minus_1pt: "−1 Pt", plus_1pt: "+1 Pt", minus_1game: "−1 Jeu", plus_1game: "+1 Jeu",
+    jump_super_tb: "⏩ Passer directement à 1 set partout (Super Tie-Break)",
+    confirm_jump_super_tb: "Passer directement à 1 set partout et démarrer le Super Tie-Break ? Cette action remplace le score actuel des sets.",
+    serving_label: "Au service :", btn_change: "Changer",
+    who_serves_first: "Qui sert en premier ?", who_serves_first_other: "Et en face, qui sert en premier ?",
+    team_prefix: "Équipe ",
+    zone_orientation_title: "Comment orienter les zones ?",
+    zone_orientation_hint: "Détermine le sens de lecture de la cartographie par zone (mode Pro).",
+    live_modal_title: "📡 Partage en direct",
+    live_modal_desc: "Toute personne avec ce lien peut suivre le score et les stats en direct, sans pouvoir rien modifier.",
+    live_copy_btn: "Copier", live_copied: "Copié !",
+    live_modal_note: "Le lien reste actif tant que tu marques des points (ou pendant 6h max).",
+    live_stop_btn: "Arrêter le partage", live_close_btn: "Fermer",
+    header_team: "Équipe", header_points: "Points",
+    btn_undo: "↩ Annuler", btn_export_pdf: "⬇ PDF", btn_reset: "⟳ Reset", btn_cancel: "Annuler",
+    stats_detailed_title: "Stats détaillées",
+    zone_map_title: "Cartographie par zone",
+    zone_side_combined: "Combinée", zone_side_right: "➡️ Côté Droite", zone_side_left: "⬅️ Côté Gauche",
+    zone_depth_note: "Bras roulé : le terrain est découpé en 3 bandes de profondeur — <b>Amorti</b> (proche filet), <b>Tendu</b> (milieu), <b>Lob</b> (fond) — chacune divisée en 5 zones de largeur.",
+    zone_legend_win: "Zone à dominante gagnante", zone_legend_fault: "Zone à dominante fautes", zone_legend_tie: "Égalité gagnants / fautes",
+    point_winner: "Point gagnant", point_winner_sub: "Coup gagnant",
+    point_fault: "Faute directe", point_fault_sub_a: "Point à B", point_fault_sub_b: "Point à A",
+    log_title: "Journal du match",
+    match_winner: "Vainqueur du match", ws_winners_a: "Winners A", ws_winners_b: "Winners B",
+    ws_faults_a: "Fautes A", ws_faults_b: "Fautes B",
+    btn_download_pdf: "⬇ Télécharger PDF", new_match: "Nouveau match",
+    match_in_progress: "Match en cours détecté", resume_match: "Reprendre ce match",
+    resume_sets_games: "Sets {s1}-{s2} · Jeux {g1}-{g2}",
+    confirm_reset: "Remettre à zéro ?",
+    log_match_created_simple: "🎾 Match créé",
+    log_match_started: "▶️ Match démarré",
+    log_wins_game: "remporte le jeu ({score})",
+    log_wins_supertb_match: "remporte le super tie-break ({score}) et le match !",
+    log_wins_set: "remporte le set ({score})",
+    log_match_winner: "🏆 VICTOIRE !",
+    log_jump_super_tb: "⏩ Passage direct au Super Tie-Break (1 set partout)",
+    log_super_tb_start3: "⚡ Super Tie-Break (3e set) !",
+    log_side_switch: "🔀 {name} passe à {side1} ({other} passe à {side2})",
+    side_right: "droite", side_left: "gauche",
+    side_toggle_right: "➡️ Droite", side_toggle_left: "⬅️ Gauche",
+    winner_score_line: "Sets {s1}-{s2} — {duration}",
+    shot_service: "Service", shot_splus1: "Service +1", shot_smash: "Smash", shot_roule: "Bras roulé",
+    shot_retour: "Retour", shot_amorti: "Amorti", shot_lob: "Lob", shot_rush: "Rush", shot_defense: "Défense",
+    var_cd: "CD", var_rev: "REV", var_amorti: "Amorti", var_lobe: "Lobé", var_tendu: "Tendu",
+    var_rainbow: "Rainbow", var_gratte: "Gratté", var_fort: "Fort", var_lob: "Lob", var_rush: "Rush", var_smash: "Smash",
+    total_match: "Total match", set_n: "Set {n}", set_current: " (en cours)",
+    stat_winning_shots: "Points gagnants", stat_faults2: "Fautes directes", stat_points_won2: "Points gagnés",
+    detail_winners: "🎯 Détail — Points gagnants", detail_faults: "💥 Détail — Fautes directes",
+    stats_player_header: "Joueur", stats_w_short: "W", stats_f_short: "F",
+    modal_winner_by: "🎯 Point gagnant par", modal_fault_by: "💥 Faute directe de",
+    zone_fixed_right: "➡️ Fixe — Zone 1 à droite", zone_fixed_left: "⬅️ Fixe — Zone 1 à gauche",
+    zone_adaptive: "🔀 Adaptatif — selon la position de chaque joueur",
+    team_who_starts_right: "Équipe {team} — qui commence à droite ?",
+    log_starts_right: "📍 {name} commence à droite, {other} à gauche (équipe {team})",
+  },
+  en: {
+    settings_theme: "Theme", settings_lang: "Language", settings_prefs: "Preferences",
+    back: "‹ Back", prefs_match: "Match", prefs_shots: "Shots", prefs_shots_detail: "Shot detail",
+    shot_setting_depth: "Depth (Deep / Drop / Lob...)",
+    shot_setting_zone: "Court zones (1 to 5)",
+    shot_setting_side: "Side (FH / BH)",
+    theme_dark: "Dark", theme_light: "Light", theme_lagoon: "Lagoon", theme_eclat: "Radiance", theme_glacier: "Glacier",
+    badge_pro: "🔒 PRO",
+    btn_historique: "📋 History", btn_accueil: "← Home",
+    mode_team: "By team", mode_player: "By player",
+    pdf_style_bars: "Bars (new)", pdf_style_classic: "Courts (classic)",
+    status_warmup: "Warm-up", status_playing: "In progress", status_over: "Finished",
+    status_tb: "Tiebreak", status_tb_target: "7 points, win by 2", status_tb_short: "7 pts",
+    status_super_tb: "Super Tiebreak", status_super_tb_target: "10 points, win by 2", status_super_tb_short: "10 pts",
+    timer_start: "▶ Start", timer_pause: "⏸ Pause",
+    live_btn: "📡 Live",
+    correction_toggle: "⚙️ Adjust score",
+    correction_hint: "To resume a match already in progress, or fix a missed point/game. Never affects shot-by-shot stats.",
+    team_a: "Team A", team_b: "Team B",
+    minus_1pt: "−1 Pt", plus_1pt: "+1 Pt", minus_1game: "−1 Game", plus_1game: "+1 Game",
+    jump_super_tb: "⏩ Jump straight to 1 set all (Super Tiebreak)",
+    confirm_jump_super_tb: "Jump straight to 1 set all and start the Super Tiebreak? This replaces the current set score.",
+    serving_label: "Serving:", btn_change: "Change",
+    who_serves_first: "Who serves first?", who_serves_first_other: "And on the other side, who serves first?",
+    team_prefix: "Team ",
+    zone_orientation_title: "How should zones be oriented?",
+    zone_orientation_hint: "Sets the reading direction of the zone map (Pro mode).",
+    live_modal_title: "📡 Live sharing",
+    live_modal_desc: "Anyone with this link can follow the score and stats live, without being able to change anything.",
+    live_copy_btn: "Copy", live_copied: "Copied!",
+    live_modal_note: "The link stays active as long as you're scoring points (or for 6h max).",
+    live_stop_btn: "Stop sharing", live_close_btn: "Close",
+    header_team: "Team", header_points: "Points",
+    btn_undo: "↩ Undo", btn_export_pdf: "⬇ PDF", btn_reset: "⟳ Reset", btn_cancel: "Cancel",
+    stats_detailed_title: "Detailed stats",
+    zone_map_title: "Zone map",
+    zone_side_combined: "Combined", zone_side_right: "➡️ Right Side", zone_side_left: "⬅️ Left Side",
+    zone_depth_note: "Groundstroke: the court is split into 3 depth bands — <b>Drop shot</b> (near net), <b>Deep</b> (mid-court), <b>Lob</b> (back) — each split into 5 width zones.",
+    zone_legend_win: "Winner-dominant zone", zone_legend_fault: "Error-dominant zone", zone_legend_tie: "Even winners / errors",
+    point_winner: "Winner", point_winner_sub: "Winning shot",
+    point_fault: "Unforced error", point_fault_sub_a: "Point to B", point_fault_sub_b: "Point to A",
+    log_title: "Match log",
+    match_winner: "Match winner", ws_winners_a: "Winners A", ws_winners_b: "Winners B",
+    ws_faults_a: "Errors A", ws_faults_b: "Errors B",
+    btn_download_pdf: "⬇ Download PDF", new_match: "New match",
+    match_in_progress: "Match in progress found", resume_match: "Resume this match",
+    resume_sets_games: "Sets {s1}-{s2} · Games {g1}-{g2}",
+    confirm_reset: "Reset to zero?",
+    log_match_created_simple: "🎾 Match created",
+    log_match_started: "▶️ Match started",
+    log_wins_game: "wins the game ({score})",
+    log_wins_supertb_match: "wins the super tiebreak ({score}) and the match!",
+    log_wins_set: "wins the set ({score})",
+    log_match_winner: "🏆 VICTORY!",
+    log_jump_super_tb: "⏩ Jumped straight to Super Tiebreak (1 set all)",
+    log_super_tb_start3: "⚡ Super Tiebreak (3rd set)!",
+    log_side_switch: "🔀 {name} moves to the {side1} ({other} moves to the {side2})",
+    side_right: "right", side_left: "left",
+    side_toggle_right: "➡️ Right", side_toggle_left: "⬅️ Left",
+    winner_score_line: "Sets {s1}-{s2} — {duration}",
+    shot_service: "Serve", shot_splus1: "Serve +1", shot_smash: "Smash", shot_roule: "Groundstroke",
+    shot_retour: "Return", shot_amorti: "Drop shot", shot_lob: "Lob", shot_rush: "Rush", shot_defense: "Defense",
+    var_cd: "FH", var_rev: "BH", var_amorti: "Drop", var_lobe: "Lobbed", var_tendu: "Deep",
+    var_rainbow: "Rainbow", var_gratte: "Scraped", var_fort: "Hard", var_lob: "Lob", var_rush: "Rush", var_smash: "Smash",
+    total_match: "Full match", set_n: "Set {n}", set_current: " (in progress)",
+    stat_winning_shots: "Winners", stat_faults2: "Unforced errors", stat_points_won2: "Points won",
+    detail_winners: "🎯 Detail — Winners", detail_faults: "💥 Detail — Unforced errors",
+    stats_player_header: "Player", stats_w_short: "W", stats_f_short: "E",
+    modal_winner_by: "🎯 Winner by", modal_fault_by: "💥 Unforced error by",
+    zone_fixed_right: "➡️ Fixed — Zone 1 on the right", zone_fixed_left: "⬅️ Fixed — Zone 1 on the left",
+    zone_adaptive: "🔀 Adaptive — based on each player's position",
+    team_who_starts_right: "Team {team} — who starts on the right?",
+    log_starts_right: "📍 {name} starts on the right, {other} on the left (team {team})",
+  },
+  pt: {
+    settings_theme: "Tema", settings_lang: "Idioma", settings_prefs: "Preferências",
+    back: "‹ Voltar", prefs_match: "Partida", prefs_shots: "Golpes", prefs_shots_detail: "Detalhe dos golpes",
+    shot_setting_depth: "Profundidade (Funda / Amortecida / Lob...)",
+    shot_setting_zone: "Zonas da quadra (1 a 5)",
+    shot_setting_side: "Lado (DIR / ESQ)",
+    theme_dark: "Escuro", theme_light: "Claro", theme_lagoon: "Lagoa", theme_eclat: "Brilho", theme_glacier: "Glaciar",
+    badge_pro: "🔒 PRO",
+    btn_historique: "📋 Histórico", btn_accueil: "← Início",
+    mode_team: "Por equipe", mode_player: "Por jogador",
+    pdf_style_bars: "Barras (novo)", pdf_style_classic: "Quadras (clássico)",
+    status_warmup: "Aquecimento", status_playing: "Em andamento", status_over: "Encerrada",
+    status_tb: "Tie-Break", status_tb_target: "7 pontos, 2 de diferença", status_tb_short: "7 pts",
+    status_super_tb: "Super Tie-Break", status_super_tb_target: "10 pontos, 2 de diferença", status_super_tb_short: "10 pts",
+    timer_start: "▶ Iniciar", timer_pause: "⏸ Pausar",
+    live_btn: "📡 Ao vivo",
+    correction_toggle: "⚙️ Corrigir placar",
+    correction_hint: "Para retomar uma partida já iniciada, ou corrigir um ponto/game esquecido. Nunca afeta as estatísticas por jogada.",
+    team_a: "Equipe A", team_b: "Equipe B",
+    minus_1pt: "−1 Pt", plus_1pt: "+1 Pt", minus_1game: "−1 Game", plus_1game: "+1 Game",
+    jump_super_tb: "⏩ Ir direto para 1 set a 1 (Super Tie-Break)",
+    confirm_jump_super_tb: "Ir direto para 1 set a 1 e começar o Super Tie-Break? Isso substitui o placar atual dos sets.",
+    serving_label: "Sacando:", btn_change: "Trocar",
+    who_serves_first: "Quem saca primeiro?", who_serves_first_other: "E do outro lado, quem saca primeiro?",
+    team_prefix: "Equipe ",
+    zone_orientation_title: "Como orientar as zonas?",
+    zone_orientation_hint: "Define o sentido de leitura do mapa de zonas (modo Pro).",
+    live_modal_title: "📡 Compartilhamento ao vivo",
+    live_modal_desc: "Qualquer pessoa com este link pode acompanhar o placar e as estatísticas ao vivo, sem poder alterar nada.",
+    live_copy_btn: "Copiar", live_copied: "Copiado!",
+    live_modal_note: "O link fica ativo enquanto você marcar pontos (ou por até 6h).",
+    live_stop_btn: "Parar compartilhamento", live_close_btn: "Fechar",
+    header_team: "Equipe", header_points: "Pontos",
+    btn_undo: "↩ Desfazer", btn_export_pdf: "⬇ PDF", btn_reset: "⟳ Reiniciar", btn_cancel: "Cancelar",
+    stats_detailed_title: "Stats detalhadas",
+    zone_map_title: "Mapa de zonas",
+    zone_side_combined: "Combinado", zone_side_right: "➡️ Lado Direito", zone_side_left: "⬅️ Lado Esquerdo",
+    zone_depth_note: "Fundo de quadra: a quadra é dividida em 3 faixas de profundidade — <b>Amortecida</b> (perto da rede), <b>Funda</b> (meio), <b>Lob</b> (fundo) — cada uma dividida em 5 zonas de largura.",
+    zone_legend_win: "Zona com predominância de winners", zone_legend_fault: "Zona com predominância de erros", zone_legend_tie: "Empate winners / erros",
+    point_winner: "Winner", point_winner_sub: "Golpe vencedor",
+    point_fault: "Erro não forçado", point_fault_sub_a: "Ponto para B", point_fault_sub_b: "Ponto para A",
+    log_title: "Histórico da partida",
+    match_winner: "Vencedor da partida", ws_winners_a: "Winners A", ws_winners_b: "Winners B",
+    ws_faults_a: "Erros A", ws_faults_b: "Erros B",
+    btn_download_pdf: "⬇ Baixar PDF", new_match: "Nova partida",
+    match_in_progress: "Partida em andamento encontrada", resume_match: "Retomar esta partida",
+    resume_sets_games: "Sets {s1}-{s2} · Games {g1}-{g2}",
+    confirm_reset: "Zerar tudo?",
+    log_match_created_simple: "🎾 Partida criada",
+    log_match_started: "▶️ Partida iniciada",
+    log_wins_game: "vence o game ({score})",
+    log_wins_supertb_match: "vence o super tie-break ({score}) e a partida!",
+    log_wins_set: "vence o set ({score})",
+    log_match_winner: "🏆 VITÓRIA!",
+    log_jump_super_tb: "⏩ Avançou direto para o Super Tie-Break (1 set a 1)",
+    log_super_tb_start3: "⚡ Super Tie-Break (3º set)!",
+    log_side_switch: "🔀 {name} vai para a {side1} ({other} vai para a {side2})",
+    side_right: "direita", side_left: "esquerda",
+    side_toggle_right: "➡️ Direita", side_toggle_left: "⬅️ Esquerda",
+    winner_score_line: "Sets {s1}-{s2} — {duration}",
+    shot_service: "Saque", shot_splus1: "Saque +1", shot_smash: "Smash", shot_roule: "Fundo de quadra",
+    shot_retour: "Retorno", shot_amorti: "Amortecida", shot_lob: "Lob", shot_rush: "Rush", shot_defense: "Defesa",
+    var_cd: "DIR", var_rev: "ESQ", var_amorti: "Amortecida", var_lobe: "Lobada", var_tendu: "Funda",
+    var_rainbow: "Rainbow", var_gratte: "Raspada", var_fort: "Forte", var_lob: "Lob", var_rush: "Rush", var_smash: "Smash",
+    total_match: "Partida toda", set_n: "Set {n}", set_current: " (em andamento)",
+    stat_winning_shots: "Winners", stat_faults2: "Erros não forçados", stat_points_won2: "Pontos ganhos",
+    detail_winners: "🎯 Detalhe — Winners", detail_faults: "💥 Detalhe — Erros não forçados",
+    stats_player_header: "Jogador", stats_w_short: "W", stats_f_short: "E",
+    modal_winner_by: "🎯 Winner de", modal_fault_by: "💥 Erro não forçado de",
+    zone_fixed_right: "➡️ Fixo — Zona 1 à direita", zone_fixed_left: "⬅️ Fixo — Zona 1 à esquerda",
+    zone_adaptive: "🔀 Adaptativo — conforme a posição de cada jogador",
+    team_who_starts_right: "Equipe {team} — quem começa à direita?",
+    log_starts_right: "📍 {name} começa à direita, {other} à esquerda (equipe {team})",
+  },
+};
+
+let currentLang = localStorage.getItem('tstats_lang');
+if (!currentLang) {
+  const nav = (navigator.language || 'fr').toLowerCase();
+  currentLang = nav.startsWith('pt') ? 'pt' : nav.startsWith('en') ? 'en' : 'fr';
+}
+
+
+function applyLanguageToDOM() {
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll('[data-lang-choice]').forEach(b => {
+    b.classList.toggle('active', b.dataset.langChoice === currentLang);
+  });
+  rebuildAllShotLabels();
+}
+
+// Reconstruit tous les libellés de coups (base, variantes, bandes de
+// profondeur, puis les clés complètes SHOT_LBL qui en dépendent) dans la
+// langue courante — jamais le PDF, qui garde ses propres copies figées en
+// français (SHOT_BASE_LBL_PDF, DEPTH_BAND_SHOTS_PDF).
+function rebuildAllShotLabels() {
+  if (typeof SHOT_BASE_LBL === 'undefined') return; // pas encore déclaré au tout premier appel
+  Object.assign(SHOT_BASE_LBL, {
+    service: t('shot_service'), splus1: t('shot_splus1'), smash: t('shot_smash'), roule: t('shot_roule'),
+    retour: t('shot_retour'), amorti: t('shot_amorti'), lob: t('shot_lob'), rush: t('shot_rush'), defense: t('shot_defense'),
+  });
+  Object.assign(VARIANT_LBL, {
+    cd: t('var_cd'), rev: t('var_rev'), amorti: t('var_amorti'), lobe: t('var_lobe'), tendu: t('var_tendu'),
+    rainbow: t('var_rainbow'), gratte: t('var_gratte'), fort: t('var_fort'), lob: t('var_lob'), rush: t('var_rush'), smash: t('var_smash'),
+  });
+  Object.values(DEPTH_BAND_SHOTS).forEach(bands => {
+    bands.forEach(b => {
+      const lbl = VARIANT_LBL[b.variant] || b.variant;
+      b.label = lbl;
+      b.short = lbl.toUpperCase();
+    });
+  });
+  // Reconstruit SHOT_LBL (les clés complètes coup+variante+zone) à partir
+  // des libellés de base tout juste mis à jour ci-dessus — mêmes clés,
+  // seul le texte affiché change.
+  if (typeof BASE_SHOTS !== 'undefined' && typeof SHOT_LBL !== 'undefined') {
+    BASE_SHOTS.forEach(s => {
+      const variants = SHOT_VARIANTS[s];
+      const prefixes = variants.length ? variants.map(v => s + '_' + v) : [s];
+      const labels = variants.length ? variants.map(v => SHOT_BASE_LBL[s] + ' ' + variantLabel(v)) : [SHOT_BASE_LBL[s]];
+      prefixes.forEach((prefix, i) => {
+        ZONES.forEach(z => {
+          const key = prefix + '_' + z;
+          SHOT_LBL[key] = labels[i] + ' Z' + z;
+        });
+      });
+    });
+  }
+}
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('tstats_lang', lang);
+  applyLanguageToDOM();
+  document.getElementById('langSubmenu')?.classList.remove('open');
+  document.getElementById('statusLabel').textContent = matchOver ? t('status_over') : (inSuperTiebreak ? t('status_super_tb_target') : (inTiebreak ? t('status_tb_target') : t('status_playing')));
+  document.getElementById('timerStartBtn').textContent = timerRunning ? t('timer_pause') : t('timer_start');
+  if (typeof initNames === 'function') initNames();
+  if (typeof renderStats === 'function') renderStats();
+  if (typeof renderStatsViewSwitch === 'function') renderStatsViewSwitch();
+  if (typeof initZoneTabs === 'function') initZoneTabs();
+  if (typeof renderZoneMap === 'function') renderZoneMap();
+  if (typeof renderPlayerSideToggles === 'function') renderPlayerSideToggles();
+}
+
+// ── CONFIGURATION DES COUPS ──────────────────────────────────────────────────
+const BASE_SHOTS = ['service', 'splus1', 'retour', 'smash', 'roule', 'amorti', 'lob', 'rush', 'defense'];
+const SHOT_ICO = {service:'🎾', splus1:'🚀', smash:'💥', roule:'🔄', retour:'↩️', amorti:'🪶', lob:'🎣', rush:'⚡', defense:'🛡️'};
+const SHOT_BASE_LBL = {service:'Service', splus1:'Service +1', smash:'Smash', roule:'Bras roulé', retour:'Retour', amorti:'Amorti', lob:'Lob', rush:'Rush', defense:'Défense'};
+// Copie figée en français : utilisée uniquement dans le PDF exporté (jamais
+// traduit, voir ailleurs dans le projet), pendant que SHOT_BASE_LBL lui-même
+// devient traduisible pour l'interface en direct.
+const SHOT_BASE_LBL_PDF = Object.assign({}, SHOT_BASE_LBL);
+const ZONES = ['1', '2', '3', '4', '5'];
+
+// Pour la défense uniquement : sélection à 2 niveaux avant la zone — d'abord
+// le côté (coup droit / revers), puis la profondeur (amorti / tendu / lob).
+// SHOT_VARIANTS.defense liste alors les 6 combinaisons "côté_profondeur".
+const TWO_LEVEL_VARIANTS = {
+  defense: { level1: ['cd', 'rev'], level2: ['amorti', 'tendu', 'lob'] }
+};
+
+// Variantes (côté / type) disponibles pour chaque coup avant le choix de la zone.
+// Un tableau vide = pas de variante, on passe direct au choix de la zone.
+const SHOT_VARIANTS = {
+  service: [],
+  splus1: ['amorti', 'rush', 'lob', 'smash'],
+  smash: ['gratte', 'fort', 'lob'],
+  retour: ['cd', 'rev'],
+  roule: ['amorti', 'lobe', 'tendu'],
+  amorti: ['cd', 'rev'],
+  lob: ['cd', 'rev', 'rainbow'],
+  rush: ['cd', 'rev', 'rainbow'],
+  defense: TWO_LEVEL_VARIANTS.defense.level1.flatMap(side =>
+    TWO_LEVEL_VARIANTS.defense.level2.map(depth => side + '_' + depth)
+  ) // -> ['cd_amorti','cd_tendu','cd_lob','rev_amorti','rev_tendu','rev_lob']
+};
+const VARIANT_LBL = { cd: 'CD', rev: 'REV', amorti: 'Amorti', lobe: 'Lobé', tendu: 'Tendu', rainbow: 'Rainbow', gratte: 'Gratté', fort: 'Fort', lob: 'Lob', rush: 'Rush', smash: 'Smash' };
+// Libellé d'une variante, simple ('cd' -> 'CD') ou composée ('cd_amorti' -> 'CD Amorti').
+function variantLabel(v) { return v.split('_').map(p => VARIANT_LBL[p] || p).join(' '); }
+
+// Cartographie par zone "à bandes de profondeur" : pour ces coups, la
+// cartographie affiche plusieurs bandes empilées (une par variante) plutôt
+// qu'un seul terrain plat — chaque bande étant elle-même divisée en 5 zones
+// de largeur (comme les autres coups). L'ordre va du filet (proche) vers le
+// fond de terrain (loin). Le bras roulé, le smash, la défense (3 bandes,
+// coup droit + revers confondus) et le service +1 (4 bandes) utilisent ce
+// même mécanisme générique.
+const DEPTH_BAND_SHOTS = {
+  roule: [
+    { variant: 'amorti', label: 'Amorti', short: 'AMORTI' },
+    { variant: 'tendu',  label: 'Tendu',  short: 'TENDU' },
+    { variant: 'lobe',   label: 'Lob',    short: 'LOB' }
+  ],
+  smash: [
+    { variant: 'gratte', label: 'Gratté', short: 'GRATTÉ' },
+    { variant: 'fort',   label: 'Fort',   short: 'FORT' },
+    { variant: 'lob',    label: 'Lob',    short: 'LOB' }
+  ],
+  defense: [
+    { variant: 'amorti', label: 'Amorti', short: 'AMORTI' },
+    { variant: 'tendu',  label: 'Tendu',  short: 'TENDU' },
+    { variant: 'lob',    label: 'Lob',    short: 'LOB' }
+  ],
+  splus1: [
+    { variant: 'amorti', label: 'Amorti', short: 'AMORTI' },
+    { variant: 'rush',   label: 'Rush',   short: 'RUSH' },
+    { variant: 'lob',    label: 'Lob',    short: 'LOB' },
+    { variant: 'smash',  label: 'Smash',  short: 'SMASH' }
+  ],
+};
+// Conservé pour compatibilité : équivalent à DEPTH_BAND_SHOTS.roule.
+const ROULE_DEPTH_VARIANTS = DEPTH_BAND_SHOTS.roule;
+// Copie figée en français des bandes de profondeur, réservée au PDF —
+// DEPTH_BAND_SHOTS lui-même devient traduisible pour l'interface en direct
+// (voir rebuildDepthBandLabels()).
+const DEPTH_BAND_SHOTS_PDF = JSON.parse(JSON.stringify(DEPTH_BAND_SHOTS));
+
+// ── RÉGLAGES DE SAISIE DES COUPS (menu Préférences > Coups) ──────────────
+// Permet de personnaliser le niveau de détail demandé à la saisie : par
+// défaut tout est activé (comportement complet), mais chaque dimension peut
+// être désactivée indépendamment pour accélérer la saisie. Une dimension
+// désactivée disparaît aussi des statistiques et du PDF (agrégée avec les
+// autres valeurs de cette dimension), pas seulement de la saisie.
+const DEFAULT_SHOT_SETTINGS = { depth: true, zone: true, side: true };
+let shotSettings = Object.assign({}, DEFAULT_SHOT_SETTINGS, (() => {
+  try { return JSON.parse(localStorage.getItem('tstats_shot_settings') || '{}'); }
+  catch(e) { return {}; }
+})());
+const DEFAULT_ZONE = '3'; // zone médiane, utilisée par défaut si les zones sont désactivées
+
+
+// Liste à plat de TOUTES les combinaisons coup+variante ("feuilles" de l'arbre
+// de saisie), utilisée pour les toiles d'araignée du PDF — un point par coup
+// précis (ex: "Défense CD Amorti"), sans jamais entrer dans le détail des
+// zones (c'est justement le rôle de ces graphiques : donner une vue globale
+// ou par zone, sans la grille de 5 zones × 9 coups qui surchargeait le PDF).
+// Liste dynamique des catégories affichées dans le PDF (barres de
+// distribution) : une entrée par combinaison coup+variante ENCORE visible
+// selon les réglages actuels (Préférences > Coups). Quand une dimension est
+// désactivée, les variantes correspondantes fusionnent en une seule
+// catégorie (ex: "Retour" au lieu de "Retour CD"/"Retour REV"), avec une
+// fonction "match" qui sait retrouver toutes les clés de stats concernées
+// pour l'agrégation, même quand le préfixe littéral ne suffit plus (le cas
+// de la Défense, où le côté et la profondeur ne sont pas adjacents dans la
+// clé une fois l'un des deux retiré : "defense_cd_amorti" vs "defense_amorti").
+function computeLeafShotCategories() {
+  const categories = [];
+  BASE_SHOTS.forEach(s => {
+    if (s === 'defense') {
+      const sideOn = shotSettings.side, depthOn = shotSettings.depth;
+      if (sideOn && depthOn) {
+        SHOT_VARIANTS.defense.forEach(v => categories.push({
+          key: s + '_' + v, label: SHOT_BASE_LBL[s] + ' ' + variantLabel(v),
+          match: k => k.indexOf(s + '_' + v + '_') === 0,
+        }));
+      } else if (sideOn && !depthOn) {
+        TWO_LEVEL_VARIANTS.defense.level1.forEach(side => categories.push({
+          key: s + '_' + side, label: SHOT_BASE_LBL[s] + ' ' + variantLabel(side),
+          match: k => k.indexOf(s + '_' + side + '_') === 0,
+        }));
+      } else if (!sideOn && depthOn) {
+        TWO_LEVEL_VARIANTS.defense.level2.forEach(depth => categories.push({
+          key: s + '_' + depth, label: SHOT_BASE_LBL[s] + ' ' + variantLabel(depth),
+          match: k => k.indexOf(s + '_') === 0 && k.indexOf('_' + depth + '_') > 0,
+        }));
+      } else {
+        categories.push({ key: s, label: SHOT_BASE_LBL[s], match: k => k.indexOf(s + '_') === 0 });
+      }
+      return;
+    }
+
+    const variants = SHOT_VARIANTS[s];
+    if (!variants.length) {
+      categories.push({ key: s, label: SHOT_BASE_LBL[s], match: k => k.indexOf(s + '_') === 0 || k === s });
+      return;
+    }
+
+    const isDepthShot = !!DEPTH_BAND_SHOTS[s];
+    const dimensionOn = isDepthShot ? shotSettings.depth : shotSettings.side;
+    if (dimensionOn) {
+      variants.forEach(v => categories.push({
+        key: s + '_' + v, label: SHOT_BASE_LBL[s] + ' ' + variantLabel(v),
+        match: k => k.indexOf(s + '_' + v + '_') === 0,
+      }));
+    } else {
+      categories.push({ key: s, label: SHOT_BASE_LBL[s], match: k => k.indexOf(s + '_') === 0 });
+    }
+  });
+  return categories;
+}
+
+// Chaque coup se termine toujours par la zone où il a été réalisé (1 à 5).
+// Génération automatique de toutes les clés + libellés à partir de la config ci-dessus.
+const SHOT_LBL = {};
+const ALL_SHOT_KEYS = [];
+const SHOT_ZONE_KEYS = {}; // { service: {1:['service_1'], ...}, amorti: {1:['amorti_cd_1','amorti_rev_1'], ...}, ... }
+BASE_SHOTS.forEach(s => {
+  const variants = SHOT_VARIANTS[s];
+  const prefixes = variants.length ? variants.map(v => s + '_' + v) : [s];
+  const labels = variants.length ? variants.map(v => SHOT_BASE_LBL[s] + ' ' + variantLabel(v)) : [SHOT_BASE_LBL[s]];
+  SHOT_ZONE_KEYS[s] = {};
+  ZONES.forEach(z => SHOT_ZONE_KEYS[s][z] = []);
+  prefixes.forEach((prefix, i) => {
+    ZONES.forEach(z => {
+      const key = prefix + '_' + z;
+      SHOT_LBL[key] = labels[i] + ' Z' + z;
+      ALL_SHOT_KEYS.push(key);
+      SHOT_ZONE_KEYS[s][z].push(key);
+    });
+  });
+});
+
+// ── STATS MODE (lu depuis l'URL passée par index.html) ──────────────────────
+const _p = new URLSearchParams(window.location.search);
+// Si l'URL ne contient pas les noms (ex: retour sur cette page via le
+// bouton "Reprendre le match" de l'historique, sans paramètres), on relit
+// mode + noms depuis la dernière progression sauvegardée pour ce mode —
+// pour ne jamais perdre l'identité du match en cours.
+let _savedIdentity = null;
+if (!_p.get('j1')) {
+  try {
+    const raw = localStorage.getItem('tstats_inprogress_pro');
+    if (raw) _savedIdentity = JSON.parse(raw);
+  } catch(e) {}
+}
+let statsMode = _p.get('mode') || (_savedIdentity && _savedIdentity.statsMode) || 'equipe'; // 'equipe' | 'joueur'
+
+// ── PLAYER NAMES ─────────────────────────────────────────────────────────────
+const players = {
+  j1: _p.get('j1') || (_savedIdentity && _savedIdentity.players && _savedIdentity.players.j1) || 'Joueur 1',
+  j2: _p.get('j2') || (_savedIdentity && _savedIdentity.players && _savedIdentity.players.j2) || 'Joueur 2',
+  j3: _p.get('j3') || (_savedIdentity && _savedIdentity.players && _savedIdentity.players.j3) || 'Joueur 3',
+  j4: _p.get('j4') || (_savedIdentity && _savedIdentity.players && _savedIdentity.players.j4) || 'Joueur 4'
+};
+const nameA = players.j1 + ' / ' + players.j2;
+const nameB = players.j3 + ' / ' + players.j4;
+
+// ── NOM D'ÉQUIPE PERSONNALISÉ ────────────────────────────────────────────
+// Optionnel : si laissé vide, le champ affiche simplement le placeholder
+// "Équipe A" / "Équipe B" — aucune valeur n'est alors envoyée nulle part.
+let teamLabelA = _p.get('teamA') || '';
+let teamLabelB = _p.get('teamB') || '';
+
+
+function initNames() {
+  document.getElementById('playerNameJ1').textContent = players.j1;
+  document.getElementById('playerNameJ2').textContent = players.j2;
+  document.getElementById('playerNameJ3').textContent = players.j3;
+  document.getElementById('playerNameJ4').textContent = players.j4;
+  document.getElementById('teamLabelA').value = teamLabelA;
+  document.getElementById('teamLabelB').value = teamLabelB;
+  const shortA = players.j1.split(' ')[0] + ' & ' + players.j2.split(' ')[0];
+  const shortB = players.j3.split(' ')[0] + ' & ' + players.j4.split(' ')[0];
+  document.getElementById('lblA').textContent = t('team_a') + ' — ' + shortA;
+  document.getElementById('lblB').textContent = t('team_b') + ' — ' + shortB;
+  document.getElementById('lblJ1').textContent = players.j1;
+  document.getElementById('lblJ2').textContent = players.j2;
+  document.getElementById('lblJ3').textContent = players.j3;
+  document.getElementById('lblJ4').textContent = players.j4;
+  applyStatsModeVisibility();
+}
+
+// Bascule l'affichage entre panneaux "équipe" et panneaux "par joueur" — dans
+// les deux sens, contrairement à l'ancienne logique qui ne gérait que le cas
+// "joueur" (l'état par défaut du HTML étant déjà "équipe"). Réutilisée à la
+// fois au chargement et lors d'un changement de mode en direct depuis les
+// Préférences (sans jamais perdre les données déjà enregistrées : le modèle
+// de stats garde toujours les deux dimensions équipe ET joueur en parallèle).
+function applyStatsModeVisibility() {
+  const teamA = document.getElementById('lblA').closest('.team-controls');
+  const teamB = document.getElementById('lblB').closest('.team-controls');
+  const joueurPanels = ['joueurCtrlJ1','joueurCtrlJ2','joueurCtrlJ3','joueurCtrlJ4'];
+  if (statsMode === 'joueur') {
+    teamA.style.display = 'none';
+    teamB.style.display = 'none';
+    joueurPanels.forEach(id => document.getElementById(id).style.display = '');
+  } else {
+    teamA.style.display = '';
+    teamB.style.display = '';
+    joueurPanels.forEach(id => document.getElementById(id).style.display = 'none');
+  }
+}
+
+// Change de mode ("par équipe" / "par joueur") directement depuis les
+// Préférences, sans jamais avoir à retourner à l'accueil. Le mode choisi est
+// mémorisé dans la progression du match (survit à un rechargement) et sera
+// utilisé pour l'entrée d'historique une fois le match terminé.
+function switchStatsMode(newMode) {
+  if (statsMode !== newMode) {
+    statsMode = newMode;
+    applyStatsModeVisibility();
+    renderStats();
+    renderZoneMap();
+    saveProgress();
+  }
+  refreshPrefsMenuUI();
+  document.getElementById('prefsMenu')?.classList.remove('open');
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let p1=0, p2=0, g1=0, g2=0, s1=0, s2=0;
+let setHistory=[];
+let inTiebreak=false, inSuperTiebreak=false, matchOver=false;
+
+// ── SERVICE (qui sert actuellement) ──────────────────────────────────────
+let firstServingTeam = null;
+let serverTeamAFirst = null;
+let serverTeamBFirst = null;
+let matchGameCount = 0;
+let serverManualAdjustment = 0;
+let pendingCycleAdjustment = null; // cran en attente si "Changer" a dû poser une question avant de l'appliquer
+
+// ── ORIENTATION DES ZONES (cartographie) ─────────────────────────────────
+// 'right' | 'left' : convention fixe pour tout le match (zone 1 toujours du
+// même côté physique). 'adaptive' : chaque joueur a son propre côté
+// (droite/gauche), modifiable à tout moment — la zone saisie est alors
+// normalisée à l'enregistrement (zone 1 = toujours "le long de la ligne" du
+// joueur, peu importe son côté physique), et un marquage par côté est
+// conservé en plus pour permettre les vues séparées de la cartographie.
+let zoneOrientation = null;
+let playerSide = { j1: null, j2: null, j3: null, j4: null }; // 'R' | 'L', mode adaptatif uniquement
+let pendingSide = null; // côté utilisé pour le coup en cours de saisie
+let zoneMapSideFilter = 'combined'; // 'combined' | 'R' | 'L'
+
+function emptyStats(){
+  const base = {pA:0, pB:0};
+  for(const t of ['A','B']) {
+    for(const tp of ['w','f']) {
+      for(const s of ALL_SHOT_KEYS) base[tp+t+'_'+s]=0;
+    }
+  }
+  for(const n of [1,2,3,4]) {
+    for(const tp of ['w','f']) {
+      for(const s of ALL_SHOT_KEYS) base[tp+n+'_'+s]=0;
+    }
+  }
+  return base;
+}
+let stats = emptyStats();
+let history = [];
+let matchLog = [];
+const TP = ['0','15','30','40'];
+
+// ── VUE DES STATS : TOTAL DU MATCH OU PAR SET ───────────────────────────────
+// `stats` cumule toujours l'ensemble du match. À chaque set terminé, on
+// capture une photo de `stats` à cet instant ; les stats d'un set donné sont
+// alors la différence entre deux photos consécutives. Seul le panneau "Stats
+// détaillées" bascule sur cette vue ; la cartographie par zone et le PDF
+// restent basés sur les stats totales du match.
+let setSnapshots = [];        // stats cumulées à la fin de chaque set terminé
+let statsViewMode = 'total';  // 'total' | 'set'
+let statsViewSetIdx = 1;      
+// Réduit un objet stats (détaillé par coup/zone) à ses totaux Winners/Fautes/Points
+// par équipe — utilisé pour le récap "Détail par set" du PDF et pour l'historique.
+function aggregateStats(s) {
+  return {
+    wA: ALL_SHOT_KEYS.reduce((t,sh)=>t+(s['wA_'+sh]||0),0),
+    wB: ALL_SHOT_KEYS.reduce((t,sh)=>t+(s['wB_'+sh]||0),0),
+    fA: ALL_SHOT_KEYS.reduce((t,sh)=>t+(s['fA_'+sh]||0),0),
+    fB: ALL_SHOT_KEYS.reduce((t,sh)=>t+(s['fB_'+sh]||0),0),
+    pA: s.pA || 0,
+    pB: s.pB || 0,
+  };
+}
+
+
+function renderStatsViewSwitch() {
+  const wrap = document.getElementById('statsViewSwitch');
+  if (!wrap) return;
+  const finishedSets = setSnapshots.length;
+  const showCurrent = !matchOver;
+  const totalChips = finishedSets + (showCurrent ? 1 : 0);
+
+  let html = `<button class="sv-chip${statsViewMode==='total'?' active':''}" onclick="setStatsView('total')">${t('total_match')}</button>`;
+  for (let i = 1; i <= totalChips; i++) {
+    const isCurrent = i === finishedSets + 1 && showCurrent;
+    html += `<button class="sv-chip${statsViewMode==='set'&&statsViewSetIdx===i?' active':''}" onclick="setStatsView('set',${i})">${t('set_n',{n:i})}${isCurrent?t('set_current'):''}</button>`;
+  }
+  wrap.innerHTML = html;
+}
+
+function setStatsView(mode, idx) {
+  statsViewMode = mode;
+  if (mode === 'set') statsViewSetIdx = idx;
+  renderStatsViewSwitch();
+  renderStats();
+  renderZoneMap();
+}
+
+// ── PARTAGE EN DIRECT ────────────────────────────────────────────────────
+// Un simple lien de lecture seule : on pousse régulièrement l'état du match
+// vers le Worker (qui le stocke temporairement), et quiconque a le lien peut
+// le consulter via /live?code=xxxxxx sans pouvoir interagir avec le match.
+let liveShareCode = null;
+let liveSocket = null;
+let liveSharePushTimer = null;
+let livePendingPayload = null; 
+function buildLiveState() {
+  const agg = aggregateStats(stats);
+  return {
+    kind: 'shots',
+    nameA, nameB,
+    teamLabelA, teamLabelB,
+    s1, s2, g1, g2, p1, p2,
+    inTiebreak, inSuperTiebreak, matchOver, matchStarted,
+    winner: matchOver ? (s1 > s2 ? nameA : nameB) : null,
+    setHistory,
+    stats: agg,
+  };
+}
+
+
+// Anti-rebond léger : purement pour regrouper plusieurs mises à jour d'état
+// survenant dans le même instant (ex: un point qui termine aussi le jeu et
+// le set), pas pour économiser un quota — avec les WebSockets, le coût d'un
+// message est négligeable.
+let liveSharePushDebounceTimer = null;
+
+// ── SAVE STATE ────────────────────────────────────────────────────────────────
+function saveState() {
+  history.push({
+    p1,p2,g1,g2,s1,s2,inTiebreak,inSuperTiebreak,matchGameCount,setHistory: JSON.parse(JSON.stringify(setHistory)),
+    stats: JSON.parse(JSON.stringify(stats)),
+    setSnapshots: JSON.parse(JSON.stringify(setSnapshots)),
+    pill: document.getElementById('setPill').innerText,
+    status: document.getElementById('statusLabel').innerText
+  });
+}
+
+
+ let pendingShot = null;
+ let zoneMapShot = 'service';
+function scorePoint(player, type) {
+  if (matchOver) return;
+  saveState();
+
+  const shot = pendingShot || 'service_1';
+  const side = pendingSide;
+  pendingShot = null;
+  pendingSide = null;
+
+  if (player === 1) {
+    stats.pA++;
+    if (type === 'winner') stats['wA_'+shot]++; else stats['fB_'+shot]++;
+  } else {
+    stats.pB++;
+    if (type === 'winner') stats['wB_'+shot]++; else stats['fA_'+shot]++;
+  }
+  const playerNumForLog = pendingPlayerNum;
+  if (pendingPlayerNum) {
+    if (type === 'winner') stats['w'+pendingPlayerNum+'_'+shot]++;
+    else stats['f'+pendingPlayerNum+'_'+shot]++;
+
+    // Marquage par côté (mode adaptatif uniquement) : en plus du décompte
+    // normalisé ci-dessus (utilisé partout ailleurs : PDF, détail par set,
+    // détail par joueur...), on garde une trace séparée par côté pour
+    // permettre les vues "Côté Droite" / "Côté Gauche" de la cartographie.
+    if (side) {
+      const sideKey = (type === 'winner' ? 'w' : 'f') + pendingPlayerNum + '_' + shot + '_' + side;
+      stats[sideKey] = (stats[sideKey] || 0) + 1;
+    }
+    pendingPlayerNum = null;
+  }
+
+  const teamName = player === 1 ? nameA : nameB;
+  const scoreLabel = scoreSnapshot(player);
+  logPoint(teamName, type, shot, playerNumForLog, scoreLabel);
+
+  advancePoint(player);
+}
+
+
+// Raccourci pour rejoindre un match déjà à 1 set partout : place directement
+// le score sur 1-1 et démarre le Super Tie-Break, sans avoir à rejouer les
+// jeux/points des 2 sets précédents un par un.
+function jumpToSuperTiebreak() {
+  if (matchOver) return;
+  if (!confirm(t('confirm_jump_super_tb'))) return;
+  saveState();
+  s1 = 1; s2 = 1;
+  g1 = 0; g2 = 0; p1 = 0; p2 = 0;
+  inTiebreak = false; inSuperTiebreak = true;
+  document.getElementById('setPill').textContent = t('status_super_tb');
+  document.getElementById('statusLabel').textContent = t('status_super_tb_target');
+  logEvent('', '⏩ Passage direct au Super Tie-Break (1 set partout)');
+  updateDisplay();
+}
+
+function winGame(player) {
+  const wasTiebreak = inTiebreak;
+  p1=0; p2=0; inTiebreak=false;
+  if (player === 1) g1++; else g2++;
+  logEvent(player===1 ? nameA : nameB, t('log_wins_game', {score: g1+'-'+g2}));
+
+  matchGameCount++;
+  if (matchGameCount === 1 && firstServingTeam && !matchOver) {
+    const otherKnown = firstServingTeam === 'A' ? serverTeamBFirst : serverTeamAFirst;
+    if (!otherKnown) askSecondTeamServer();
+  }
+
+  if (wasTiebreak) { winSet(player); return; }
+  const maxG = Math.max(g1,g2), minG = Math.min(g1,g2);
+  if (maxG >= 6 && maxG - minG >= 2) { winSet(player); return; }
+
+  if (g1 === 6 && g2 === 6) {
+    if (s1 === 1 && s2 === 1) {
+      inSuperTiebreak=true; p1=0; p2=0;
+      document.getElementById('setPill').textContent = t('status_super_tb');
+      document.getElementById('statusLabel').textContent = t('status_super_tb_short');
+    } else {
+      inTiebreak=true; p1=0; p2=0;
+      document.getElementById('setPill').textContent = t('status_tb');
+      document.getElementById('statusLabel').textContent = t('status_tb_short');
+    }
+  }
+  updateDisplay();
+}
+
+// ── SERVICE : calcul du serveur actuel ───────────────────────────────────
+// Index de tour de service continu depuis le début du match : +1 à chaque
+// jeu normal terminé, et +1 tous les 2 points pendant un tie-break/super
+// tie-break (le tout premier point d'un tie-break ne compte qu'à lui seul,
+// comme au vrai tennis). Le reste (mod 4) alterne entre l'équipe qui sert en
+// premier (firstServingTeam) et l'autre, chacune alternant ses 2 joueurs à
+// chaque fois que c'est son tour.
+function computeCurrentServer() {
+  if (!firstServingTeam) return null;
+
+  let tiebreakOffset = 0;
+  if (inTiebreak || inSuperTiebreak) {
+    const played = p1 + p2;
+    tiebreakOffset = played === 0 ? 0 : 1 + Math.floor((played - 1) / 2);
+  }
+
+  const turnIndex = matchGameCount + tiebreakOffset + serverManualAdjustment;
+  const residue = ((turnIndex % 4) + 4) % 4;
+
+  const secondTeam = firstServingTeam === 'A' ? 'B' : 'A';
+  const team = (residue % 2 === 0) ? firstServingTeam : secondTeam;
+  const withinTeamTurn = Math.floor(residue / 2) % 2;
+
+  const secondA = serverTeamAFirst === 'j1' ? 'j2' : (serverTeamAFirst === 'j2' ? 'j1' : null);
+  const secondB = serverTeamBFirst === 'j3' ? 'j4' : (serverTeamBFirst === 'j4' ? 'j3' : null);
+
+  if (team === 'A') {
+    if (!serverTeamAFirst) return { team: 'A', key: null };
+    return { team: 'A', key: withinTeamTurn === 0 ? serverTeamAFirst : secondA };
+  }
+  if (!serverTeamBFirst) return { team: 'B', key: null };
+  return { team: 'B', key: withinTeamTurn === 0 ? serverTeamBFirst : secondB };
+}
+
+
+// ── ORIENTATION DES ZONES (question de tout début de match) ─────────────
+function zoneOrientationNeeded() {
+  return !zoneOrientation;
+}
+
+function askZoneOrientation() {
+  const modal = document.getElementById('zoneOrientationModal');
+  const title = document.getElementById('zoneOrientationTitle');
+  const btnsWrap = document.getElementById('zoneOrientationBtns');
+  if (!modal) return;
+  title.textContent = t('zone_orientation_title');
+  btnsWrap.innerHTML = '';
+
+  const mkBtn = (label, onClick) => {
+    const btn = document.createElement('button');
+    btn.className = 'server-modal-btn';
+    btn.textContent = label;
+    btn.onclick = onClick;
+    btnsWrap.appendChild(btn);
+  };
+
+  mkBtn(t('zone_fixed_right'), () => finishZoneOrientation('right'));
+  mkBtn(t('zone_fixed_left'), () => finishZoneOrientation('left'));
+  if (statsMode === 'joueur') {
+    mkBtn(t('zone_adaptive'), startAdaptiveZoneSetup);
+  }
+
+  modal.classList.add('show');
+}
+
+function finishZoneOrientation(mode) {
+  zoneOrientation = mode;
+  document.getElementById('zoneOrientationModal').classList.remove('show');
+  saveProgress();
+  if (!firstServingTeam) askInitialServer();
+}
+
+// Mode adaptatif : on demande, pour chaque équipe, qui commence à droite
+// (l'autre joueur de la paire est alors automatiquement à gauche).
+function askTeamSideSetup(team) {
+  const modal = document.getElementById('zoneOrientationModal');
+  const title = document.getElementById('zoneOrientationTitle');
+  const btnsWrap = document.getElementById('zoneOrientationBtns');
+  const keys = team === 'A' ? ['j1','j2'] : ['j3','j4'];
+  title.textContent = t('team_who_starts_right', {team});
+  btnsWrap.innerHTML = '';
+  keys.forEach(key => {
+    const other = keys.find(k => k !== key);
+    const btn = document.createElement('button');
+    btn.className = 'server-modal-btn team-' + team.toLowerCase();
+    btn.textContent = players[key];
+    btn.onclick = () => {
+      playerSide[key] = 'R';
+      playerSide[other] = 'L';
+      logEvent('', t('log_starts_right', {name: players[key], other: players[other], team}));
+      if (team === 'A') {
+        askTeamSideSetup('B');
+      } else {
+        modal.classList.remove('show');
+        renderPlayerSideToggles();
+        saveProgress();
+        if (!firstServingTeam) askInitialServer();
+      }
+    };
+    btnsWrap.appendChild(btn);
+  });
+  modal.classList.add('show');
+}
+
+function startAdaptiveZoneSetup() {
+  zoneOrientation = 'adaptive';
+  askTeamSideSetup('A');
+}
+
+// Bascule le côté d'un joueur à tout moment pendant le match (son partenaire
+// passe automatiquement du côté opposé).
+function togglePlayerSide(key) {
+  const teamKeys = (key === 'j1' || key === 'j2') ? ['j1','j2'] : ['j3','j4'];
+  const other = teamKeys.find(k => k !== key);
+  const newSide = playerSide[key] === 'R' ? 'L' : 'R';
+  playerSide[key] = newSide;
+  playerSide[other] = newSide === 'R' ? 'L' : 'R';
+  // Trace dans le journal du match (déjà inclus dans le PDF exporté) pour
+  // pouvoir retrouver QUAND chaque changement de côté a eu lieu.
+  logEvent('', t('log_side_switch', {
+    name: players[key], other: players[other],
+    side1: newSide === 'R' ? t('side_right') : t('side_left'),
+    side2: newSide === 'R' ? t('side_left') : t('side_right'),
+  }));
+  renderPlayerSideToggles();
+  saveProgress();
+}
+
+function renderPlayerSideToggles() {
+  ['j1','j2','j3','j4'].forEach(key => {
+    const el = document.getElementById('sideToggle' + key.toUpperCase());
+    if (!el) return;
+    if (zoneOrientation !== 'adaptive') { el.style.display = 'none'; return; }
+    el.style.display = 'inline-block';
+    const side = playerSide[key];
+    el.textContent = side === 'R' ? t('side_toggle_right') : t('side_toggle_left');
+    el.className = 'side-toggle-btn ' + (side === 'R' ? 'side-r' : 'side-l');
+  });
+  const sideTabs = document.getElementById('zoneSideTabs');
+  if (sideTabs) sideTabs.style.display = zoneOrientation === 'adaptive' ? 'flex' : 'none';
+}
+
+// Inverse la zone (dernier segment de la clé) : 1↔5, 2↔4, 3 reste au centre.
+function mirrorShotZone(shotKey) {
+  const parts = shotKey.split('_');
+  const z = parseInt(parts[parts.length - 1], 10);
+  parts[parts.length - 1] = String(6 - z);
+  return parts.join('_');
+}
+
+function askInitialServer() {
+  const modal = document.getElementById('serverModal');
+  const title = document.getElementById('serverModalTitle');
+  const btnsWrap = document.getElementById('serverModalBtns');
+  if (!modal) return;
+  title.textContent = t('who_serves_first');
+  btnsWrap.innerHTML = '';
+  // On ne demande QUE le 1er serveur de l'équipe qui commence : on ne sait
+  // pas toujours à l'avance qui servira côté adverse (souvent décidé plus
+  // tard, à leur tour). La question "en face" n'arrive donc que juste avant
+  // le 2e jeu (voir winGame) — ou plus tôt si "Changer" en a besoin avant ça.
+  buildServerTeamGroup(btnsWrap, 'A', ['j1','j2'], (team, key) => {
+    firstServingTeam = team; serverTeamAFirst = key;
+    modal.classList.remove('show');
+    updateServerBadge(); saveProgress();
+  });
+  buildServerTeamGroup(btnsWrap, 'B', ['j3','j4'], (team, key) => {
+    firstServingTeam = team; serverTeamBFirst = key;
+    modal.classList.remove('show');
+    updateServerBadge(); saveProgress();
+  });
+  modal.classList.add('show');
+}
+
+function askSecondTeamServer() {
+  const team = firstServingTeam === 'A' ? 'B' : 'A';
+  const modal = document.getElementById('serverModal');
+  const title = document.getElementById('serverModalTitle');
+  const btnsWrap = document.getElementById('serverModalBtns');
+  if (!modal) return;
+  title.textContent = t('who_serves_first_other');
+  btnsWrap.innerHTML = '';
+  buildServerTeamGroup(btnsWrap, team, team === 'A' ? ['j1','j2'] : ['j3','j4'], (t, key) => {
+    if (t === 'A') serverTeamAFirst = key; else serverTeamBFirst = key;
+    modal.classList.remove('show');
+    // Si cette question a été déclenchée par "Changer" (le cran suivant
+    // tombait sur cette équipe inconnue), on applique maintenant ce cran —
+    // sinon la personne se retrouverait sans changement visible après avoir
+    // répondu, alors qu'elle avait cliqué "Changer".
+    if (pendingCycleAdjustment !== null) {
+      serverManualAdjustment = pendingCycleAdjustment;
+      pendingCycleAdjustment = null;
+    }
+    updateServerBadge(); saveProgress();
+  });
+  modal.classList.add('show');
+}
+
+
+function winSet(player, scoreOverride){
+  const wasSuperTiebreak = inSuperTiebreak;
+  setHistory.push(scoreOverride || {a:g1,b:g2});
+  setSnapshots.push(JSON.parse(JSON.stringify(stats)));
+  p1=0; p2=0; g1=0; g2=0; 
+  inTiebreak=false; 
+  inSuperTiebreak=false;
+
+  if(player===1) s1++; else s2++;
+  if (wasSuperTiebreak) {
+    logEvent(player===1?nameA:nameB,t('log_wins_supertb_match', {score: scoreOverride.a+"-"+scoreOverride.b}));
+  } else {
+    logEvent(player===1?nameA:nameB,t('log_wins_set', {score: s1+"-"+s2}));
+  }
+
+  // Si une équipe a 2 sets, elle gagne le match
+  if(s1===2 || s2===2){
+    winMatch(player); 
+    return;
+  }
+
+  // SI ON EST À 1-1 : On active immédiatement le Super Tie-Break pour le 3ème set
+  if(s1===1 && s2===1){
+    inSuperTiebreak = true;
+    document.getElementById('setPill').textContent = t('status_super_tb');
+    document.getElementById('statusLabel').textContent = t('status_super_tb_target');
+    logEvent("", t('log_super_tb_start3'));
+  } else {
+    // Passage au set 2 normal
+    document.getElementById('setPill').textContent = "Set "+(s1+s2+1);
+    document.getElementById('statusLabel').textContent = t('status_playing');
+  }
+  
+  updateDisplay();
+}
+
+function winMatch(player) {
+  matchOver = true;
+  if(timerRunning) timerToggle();
+  const winner = player === 1 ? nameA : nameB;
+  document.getElementById('winnerName').textContent = winner;
+  document.getElementById('winnerScore').textContent = t('winner_score_line', {s1, s2, duration: formatDuration(timerSeconds)});
+  
+  const _totWA = ALL_SHOT_KEYS.reduce((s,sh)=>s+stats['wA_'+sh],0);
+  const _totWB = ALL_SHOT_KEYS.reduce((s,sh)=>s+stats['wB_'+sh],0);
+  const _totFA = ALL_SHOT_KEYS.reduce((s,sh)=>s+stats['fA_'+sh],0);
+  const _totFB = ALL_SHOT_KEYS.reduce((s,sh)=>s+stats['fB_'+sh],0);
+  
+  document.getElementById('ws-wA').textContent = _totWA;
+  document.getElementById('ws-wB').textContent = _totWB;
+  document.getElementById('ws-fA').textContent = _totFA;
+  document.getElementById('ws-fB').textContent = _totFB;
+  document.getElementById('winnerOverlay').classList.add('show');
+  logEvent(winner, t('log_match_winner'));
+  saveMatchToHistory(winner, _totWA, _totWB, _totFA, _totFB);
+  clearProgress();
+  updateDisplay();
+}
+
+// ── SAUVEGARDE DE L'HISTORIQUE (localStorage) ────────────────────────────────
+function saveMatchToHistory(winner, totWA, totWB, totFA, totFB) {
+  const record = {
+    id: Date.now(),
+    date: new Date().toISOString(),
+    page: 'Spro',
+    nameA, nameB,
+    teamLabelA, teamLabelB,
+    winner,
+    sets: s1 + '-' + s2,
+    setDetail: setHistory.map(sh => sh.a + '/' + sh.b).join('  '),
+    setHistory: JSON.parse(JSON.stringify(setHistory)),
+    matchLog: JSON.parse(JSON.stringify(matchLog)),
+    players: JSON.parse(JSON.stringify(players)),
+    mode: statsMode,
+    duration: formatDuration(timerSeconds),
+    // Stats agrégées (compatibilité + affichage rapide de la liste des matchs)
+    stats: { wA: totWA, wB: totWB, fA: totFA, fB: totFB, pA: stats.pA, pB: stats.pB },
+    // Données complètes (tous les coups/zones) : nécessaires pour régénérer,
+    // depuis l'historique, le même PDF détaillé (détail par coup, cartographie
+    // par zone) que celui téléchargeable en direct depuis le match.
+    statsFull: JSON.parse(JSON.stringify(stats)),
+    setSnapshotsFull: JSON.parse(JSON.stringify(setSnapshots)),
+    setSnapshots: setSnapshots.map(sn => aggregateStats(sn))
+  };
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem('tstats_history')) || []; } catch(e) { hist = []; }
+  hist.push(record);
+
+  // Le stockage local du navigateur est limité (souvent 5-10 Mo). Les données
+  // complètes (statsFull/setSnapshotsFull) rendent chaque match assez lourd,
+  // surtout en mode Pro : si l'espace vient à manquer, on ne doit JAMAIS
+  // perdre le match silencieusement. On retente en 3 niveaux, du plus complet
+  // au plus léger, avant d'avertir clairement en dernier recours.
+  const trySaveHistory = (arr) => {
+    try { localStorage.setItem('tstats_history', JSON.stringify(arr)); return true; }
+    catch(e) { return false; }
+  };
+
+  if (trySaveHistory(hist)) return;
+
+  // Niveau 2 : on retire le détail complet de CE match (le PDF régénéré
+  // depuis l'historique sera alors la version simple, mais le match reste).
+  const last = hist[hist.length - 1];
+  delete last.statsFull;
+  delete last.setSnapshotsFull;
+  if (trySaveHistory(hist)) {
+    console.warn('Stockage presque plein : match sauvegardé en version allégée (sans détail complet).');
+    return;
+  }
+
+  // Niveau 3 : on libère de la place en retirant le détail complet des plus
+  // anciens matchs (du plus vieux au plus récent), un par un.
+  for (let i = 0; i < hist.length - 1; i++) {
+    if (hist[i].statsFull || hist[i].setSnapshotsFull) {
+      delete hist[i].statsFull;
+      delete hist[i].setSnapshotsFull;
+      if (trySaveHistory(hist)) {
+        console.warn("Stockage plein : détail complet retiré d'anciens matchs pour faire de la place.");
+        return;
+      }
+    }
+  }
+
+  // Rien n'a fonctionné : le match n'a vraiment pas pu être sauvegardé.
+  // On prévient clairement plutôt que de le perdre en silence.
+  alert("Ton match n'a pas pu être sauvegardé : la mémoire de stockage de ton navigateur est pleine.\n\nVa dans l'Historique et utilise « Exporter » pour sauvegarder tes matchs dans un fichier, puis « Tout effacer » pour libérer de la place.");
+}
+
+
+function updateDisplay() {
+  saveProgress();
+  if (liveShareCode) pushLiveState();
+  updateServerBadge();
+  let ptA, ptB;
+  if (inSuperTiebreak || inTiebreak) {
+    ptA=p1; ptB=p2;
+  } else {
+    ptA=TP[p1]||'0'; ptB=TP[p2]||'0';
+    if (p1===3 && p2===3) { ptA='40'; ptB='40'; }
+  }
+  document.getElementById('ptA').textContent = ptA;
+  document.getElementById('ptB').textContent = ptB;
+  for(let i=1;i<=3;i++){
+    const cellA=document.getElementById('setA'+i);
+    const cellB=document.getElementById('setB'+i);
+    if(i-1 < setHistory.length){
+      const sh=setHistory[i-1];
+      cellA.textContent=sh.a; cellB.textContent=sh.b;
+      cellA.className='cell set-score '+(sh.a>sh.b?'won':'');
+      cellB.className='cell set-score '+(sh.b>sh.a?'won':'');
+    } else if(i-1 === setHistory.length){
+      cellA.textContent=g1; cellB.textContent=g2;
+      cellA.className='cell set-score active';
+      cellB.className='cell set-score active';
+    } else {
+      cellA.textContent='—'; cellB.textContent='—';
+      cellA.className='cell set-score'; cellB.className='cell set-score';
+    }
+  }
+  renderStatsViewSwitch();
+  renderStats();
+  renderZoneMap();
+}
+
+function logPoint(winnerTeam, type, shot, playerNum, scoreLabel) {
+  const isA = winnerTeam === nameA;
+  const time = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  const label = (type === 'winner' ? '🎯 ' : '💥 ') + SHOT_LBL[shot];
+  const dotClass = type === 'winner' ? (isA ? 'dot-a' : 'dot-b') : (isA ? 'dot-b' : 'dot-a');
+  const playerNames = { 1: players.j1, 2: players.j2, 3: players.j3, 4: players.j4 };
+  const displayTeam = playerNum
+    ? playerNames[playerNum]
+    : (type === 'winner' ? winnerTeam : (isA ? nameB : nameA));
+
+  const entry = {team: displayTeam, type, shot, time, msg: label, score: scoreLabel};
+  const className = 'log-entry ' + dotClass;
+  const html = `<span class="dot"></span><span>${time} — <strong>${escapeHtml(displayTeam)}</strong> <span style="color:var(--gold);font-family:Barlow Condensed,sans-serif;font-weight:700">${scoreLabel}</span></span><span class="log-tag ${type}">${label}</span>`;
+  entry._dom = {className, html};
+  matchLog.unshift(entry);
+  const list = document.getElementById('logList');
+  const div = document.createElement('div');
+  div.className = className;
+  div.innerHTML = html;
+  list.prepend(div);
+}
+
+
+// ── SAUVEGARDE DU MATCH EN COURS (protège d'un rafraîchissement accidentel) ──
+const PROGRESS_KEY = 'tstats_inprogress_pro';
+
+function saveProgress() {
+  if (matchOver) { clearProgress(); return; }
+  const snapshot = {
+    p1, p2, g1, g2, s1, s2, setHistory, inTiebreak, inSuperTiebreak, matchOver,
+    stats, setSnapshots, history, matchLog, timerSeconds, matchStarted,
+    teamLabelA, teamLabelB,
+    firstServingTeam, serverTeamAFirst, serverTeamBFirst, matchGameCount, serverManualAdjustment,
+    zoneOrientation, playerSide, zoneMapSideFilter,
+    players, statsMode,
+    liveShareCode,
+    nameA, nameB, savedAt: Date.now(),
+  };
+  try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(snapshot)); } catch(e) {}
+}
+
+
+function applyProgress(snap) {
+  p1=snap.p1; p2=snap.p2; g1=snap.g1; g2=snap.g2; s1=snap.s1; s2=snap.s2;
+  setHistory = snap.setHistory || [];
+  inTiebreak = snap.inTiebreak; inSuperTiebreak = snap.inSuperTiebreak; matchOver = snap.matchOver;
+  stats = snap.stats || stats;
+  setSnapshots = snap.setSnapshots || [];
+  history = snap.history || [];
+  matchLog = snap.matchLog || [];
+  timerSeconds = snap.timerSeconds || 0;
+  matchStarted = snap.matchStarted !== undefined ? snap.matchStarted : true;
+  teamLabelA = snap.teamLabelA || ''; teamLabelB = snap.teamLabelB || '';
+  firstServingTeam = snap.firstServingTeam || null;
+  serverTeamAFirst = snap.serverTeamAFirst || null;
+  serverTeamBFirst = snap.serverTeamBFirst || null;
+  matchGameCount = snap.matchGameCount || 0;
+  serverManualAdjustment = snap.serverManualAdjustment || 0;
+  zoneOrientation = snap.zoneOrientation || null;
+  playerSide = snap.playerSide || { j1: null, j2: null, j3: null, j4: null };
+  zoneMapSideFilter = snap.zoneMapSideFilter || 'combined';
+  document.getElementById('teamLabelA').value = teamLabelA;
+  document.getElementById('teamLabelB').value = teamLabelB;
+  document.getElementById('setPill').textContent = !matchStarted ? t('status_warmup') : (inSuperTiebreak ? t('status_super_tb') : 'Set '+(s1+s2+1));
+  document.getElementById('statusLabel').textContent = matchOver ? t('status_over') : t('status_playing');
+  rebuildLog();
+  const m = String(Math.floor(timerSeconds / 60)).padStart(2,'0');
+  const s = String(timerSeconds % 60).padStart(2,'0');
+  document.getElementById('timerDisplay').textContent = m + ':' + s;
+  renderPlayerSideToggles();
+  if (snap.liveShareCode) {
+    liveShareCode = snap.liveShareCode;
+    document.getElementById('liveShareBtn')?.classList.add('active');
+    connectLiveSocket();
+    pushLiveState();
+    liveSharePushTimer = setInterval(pushLiveState, 45000);
+  }
+  updateDisplay();
+}
+
+
+function discardResume() {
+  clearProgress();
+  document.getElementById('resumeOverlay').classList.remove('show');
+  updateDisplay();
+  logEvent('', t('log_match_created_simple'));
+}
+
+
+function resetMatch() {
+  if (!confirm(t('confirm_reset'))) return;
+  clearProgress();
+  p1=0;p2=0;g1=0;g2=0;s1=0;s2=0;
+  inTiebreak=false;inSuperTiebreak=false;matchOver=false;
+  setHistory=[]; timerReset(); stats=emptyStats();
+  setSnapshots=[]; statsViewMode='total'; statsViewSetIdx=1;
+  history=[]; matchLog=[];
+  matchStarted=false;
+  firstServingTeam=null; serverTeamAFirst=null; serverTeamBFirst=null; matchGameCount=0; serverManualAdjustment=0;
+  zoneOrientation=null; playerSide={j1:null,j2:null,j3:null,j4:null}; zoneMapSideFilter='combined';
+  teamLabelA=''; teamLabelB='';
+  document.getElementById('teamLabelA').value='';
+  document.getElementById('teamLabelB').value='';
+  document.getElementById('setPill').textContent=t('status_warmup');
+  document.getElementById('logList').innerHTML='';
+  document.getElementById('winnerOverlay').classList.remove('show');
+  renderPlayerSideToggles();
+  updateDisplay();
+  logEvent('', t('log_match_created_simple'));
+}
+
+// ── SHOT MODAL (MIS À JOUR) ──────────────────────────────────────────────────
+let pendingPlayer = null;
+let pendingType = null;
+let pendingPlayerNum = null;
+
+function openShotModal(player, type, playerNum) {
+  if (matchOver) return;
+  ensureTimerRunning();
+
+  // Tant qu'on ne sait pas comment orienter les zones, ni qui sert, on
+  // affiche la question correspondante et on bloque.
+  if (zoneOrientationNeeded()) { askZoneOrientation(); return; }
+  const pending = serverQuestionNeeded();
+  if (pending === 'initial') { askInitialServer(); return; }
+  if (pending === 'second') { askSecondTeamServer(); return; }
+
+  pendingPlayer = player;
+  pendingType = type;
+  pendingPlayerNum = playerNum || null;
+  
+  const isWinner = type === 'winner';
+  const teamName = player === 1 ? nameA : nameB;
+  const actionTeam = isWinner ? teamName : (player === 1 ? nameB : nameA);
+  const playerNames = { 1: players.j1, 2: players.j2, 3: players.j3, 4: players.j4 };
+  const displayName = playerNum ? playerNames[playerNum] : actionTeam;
+
+  document.getElementById('modalContext').innerHTML = `<span>${isWinner ? t('modal_winner_by') : t('modal_fault_by')}</span>${escapeHtml(displayName)}`;
+  
+  renderShotCategories();
+  document.getElementById('shotModal').classList.add('show');
+}
+
+// ── ÉTAPE 1 : grandes catégories ─────────────────────────────────────────────
+// Détermine quels coups proposer selon qui sert actuellement : le serveur
+// n'a pas de "Retour" (il ne peut pas se retourner son propre service), son
+// partenaire n'a que le "Service +1" (ni Service, ni Retour), et l'équipe qui
+// reçoit n'a ni "Service" ni "Service +1". En mode équipe (pas de joueur
+// précis), le filtrage se fait au niveau de l'équipe entière.
+function getAllowedBaseShots() {
+  const server = computeCurrentServer();
+  if (!server || !server.key) return BASE_SHOTS; // service pas encore configuré : rien à filtrer
+
+  // Important : "pendingPlayer" désigne qui GAGNE le point (convention utilisée
+  // pour le score), pas forcément qui a réellement joué le coup. Pour un point
+  // gagnant, l'auteur du coup est l'équipe de pendingPlayer. Pour une faute,
+  // c'est l'INVERSE (le bouton "Faute directe" de l'équipe A appelle
+  // openShotModal(2,'faute',...), puisque c'est A qui gagne le point suite à
+  // la faute de B). Il faut donc déterminer la VRAIE équipe/joueur auteur du
+  // coup avant de filtrer les catégories disponibles.
+  let actingTeam;
+  if (pendingPlayerNum) {
+    actingTeam = (pendingPlayerNum === 1 || pendingPlayerNum === 2) ? 'A' : 'B';
+  } else {
+    const pendingTeam = pendingPlayer === 1 ? 'A' : 'B';
+    actingTeam = pendingType === 'winner' ? pendingTeam : (pendingTeam === 'A' ? 'B' : 'A');
+  }
+  const isServingTeam = actingTeam === server.team;
+
+  if (pendingPlayerNum) {
+    const isServer = ('j' + pendingPlayerNum) === server.key;
+    if (isServer) return BASE_SHOTS.filter(s => s !== 'retour');
+    if (isServingTeam) return BASE_SHOTS.filter(s => s !== 'service' && s !== 'retour');
+    return BASE_SHOTS.filter(s => s !== 'service' && s !== 'splus1');
+  }
+
+  // Mode équipe : pas de distinction serveur / partenaire au sein de l'équipe.
+  return isServingTeam
+    ? BASE_SHOTS.filter(s => s !== 'retour')
+    : BASE_SHOTS.filter(s => s !== 'service' && s !== 'splus1');
+}
+
+function renderShotCategories() {
+  const grid = document.getElementById('shotGrid');
+  grid.innerHTML = '';
+
+  getAllowedBaseShots().forEach(s => {
+    const group = document.createElement('div');
+    group.className = 'shot-group';
+    group.innerHTML = `<button class="shot-btn type-${pendingType}" onclick="selectShotCategory('${s}')">
+      <span class="s-ico">${SHOT_ICO[s]}</span>${SHOT_BASE_LBL[s]}
+    </button>`;
+    grid.appendChild(group);
+  });
+}
+
+// Point d'entrée unique une fois la variante déterminée (choisie par
+// l'utilisateur, ou remplie automatiquement car désactivée dans Réglages >
+// Coups) : affiche l'étape zone si activée, sinon confirme directement avec
+// une zone par défaut (jamais montrée à l'utilisateur, purement technique).
+function proceedToZoneOrConfirm(s, variant, backOnClick) {
+  const prefix = variant ? (s + '_' + variant) : s;
+  const label = variant ? (SHOT_BASE_LBL[s] + ' ' + variantLabel(variant)) : SHOT_BASE_LBL[s];
+  if (!shotSettings.zone) {
+    confirmShot(prefix + '_' + DEFAULT_ZONE);
+    return;
+  }
+  renderZoneStep(prefix, label, SHOT_ICO[s], backOnClick);
+}
+
+// ── ÉTAPE 2 : variante (côté / type) du coup, si le coup en a une ───────────
+function selectShotCategory(s) {
+  const twoLevel = TWO_LEVEL_VARIANTS[s];
+  if (twoLevel) {
+    if (!shotSettings.side && !shotSettings.depth) {
+      // Ni côté ni profondeur : variante fixe par défaut, direct à la zone.
+      proceedToZoneOrConfirm(s, twoLevel.level1[0] + '_' + twoLevel.level2[0], 'renderShotCategories()');
+      return;
+    }
+    if (!shotSettings.side) {
+      // Côté désactivé : on saute directement à l'étape profondeur, avec
+      // le premier côté comme valeur par défaut silencieuse.
+      selectShotSide(s, twoLevel.level1[0]);
+      return;
+    }
+    renderShotSideStep(s, twoLevel);
+    return;
+  }
+
+  const variants = SHOT_VARIANTS[s];
+  if (!variants.length) { proceedToZoneOrConfirm(s, null, 'renderShotCategories()'); return; }
+
+  const isDepthShot = !!DEPTH_BAND_SHOTS[s];
+  const dimensionEnabled = isDepthShot ? shotSettings.depth : shotSettings.side;
+  if (!dimensionEnabled) {
+    // Dimension désactivée : première variante par défaut, direct à la zone.
+    proceedToZoneOrConfirm(s, variants[0], 'renderShotCategories()');
+    return;
+  }
+
+  const grid = document.getElementById('shotGrid');
+  grid.innerHTML = `
+    <button class="shot-back" onclick="renderShotCategories()">← Retour</button>
+    <div class="shot-group" style="grid-column:1 / -1">
+      <div class="shot-group-title">${SHOT_ICO[s]} ${SHOT_BASE_LBL[s]}</div>
+      <div class="shot-sub-row">
+        ${variants.map(v => `<button class="shot-btn type-${pendingType}" onclick="selectShotVariant('${s}','${v}')">${variantLabel(v)}</button>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ── ÉTAPE 2a (coups à 2 niveaux, ex: Défense) : d'abord le côté ─────────────
+function renderShotSideStep(s, twoLevel) {
+  const grid = document.getElementById('shotGrid');
+  grid.innerHTML = `
+    <button class="shot-back" onclick="renderShotCategories()">← Retour</button>
+    <div class="shot-group" style="grid-column:1 / -1">
+      <div class="shot-group-title">${SHOT_ICO[s]} ${SHOT_BASE_LBL[s]}</div>
+      <div class="shot-sub-row">
+        ${twoLevel.level1.map(side => `<button class="shot-btn type-${pendingType}" onclick="selectShotSide('${s}','${side}')">${variantLabel(side)}</button>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ── ÉTAPE 2b (coups à 2 niveaux) : ensuite la profondeur ────────────────────
+function selectShotSide(s, side) {
+  const twoLevel = TWO_LEVEL_VARIANTS[s];
+  if (!shotSettings.depth) {
+    // Profondeur désactivée : première profondeur par défaut, direct à la zone.
+    proceedToZoneOrConfirm(s, side + '_' + twoLevel.level2[0], 'renderShotCategories()');
+    return;
+  }
+  const grid = document.getElementById('shotGrid');
+  grid.innerHTML = `
+    <button class="shot-back" onclick="selectShotCategory('${s}')">← Retour</button>
+    <div class="shot-group" style="grid-column:1 / -1">
+      <div class="shot-group-title">${SHOT_ICO[s]} ${SHOT_BASE_LBL[s]} ${variantLabel(side)}</div>
+      <div class="shot-sub-row">
+        ${twoLevel.level2.map(depth => `<button class="shot-btn type-${pendingType}" onclick="selectShotVariant('${s}','${side}_${depth}')">${variantLabel(depth)}</button>`).join('')}
+      </div>
+    </div>`;
+}
+
+function selectShotVariant(s, v) {
+  const twoLevel = TWO_LEVEL_VARIANTS[s];
+  const backOnClick = twoLevel ? `selectShotSide('${s}','${v.split('_')[0]}')` : `selectShotCategory('${s}')`;
+  proceedToZoneOrConfirm(s, v, backOnClick);
+}
+
+// ── ÉTAPE 3 : zone du terrain où le coup a été réalisé (toujours en dernier) ─
+function renderZoneStep(prefix, label, icon, backOnClick) {
+  const grid = document.getElementById('shotGrid');
+  const btns = ZONES.map(z =>
+    `<button class="shot-btn type-${pendingType}" onclick="confirmShot('${prefix}_${z}')">Zone ${z}</button>`
+  ).join('');
+  grid.innerHTML = `
+    <button class="shot-back" onclick="${backOnClick}">← Retour</button>
+    <div class="shot-group" style="grid-column:1 / -1">
+      <div class="shot-group-title">${icon} ${label}</div>
+      <div class="shot-sub-row">${btns}</div>
+    </div>`;
+}
+
+function closeShotModal() {
+  document.getElementById('shotModal').classList.remove('show');
+}
+
+function confirmShot(shotKey) {
+  // Mode fixe "gauche" : la zone saisie est inversée pour que la zone 1
+  // représente toujours "le long de la ligne" du joueur. En mode adaptatif, la
+  // saisie est déjà relative au joueur (voir plus bas), rien à inverser.
+  let finalShot = shotKey;
+  pendingSide = null;
+
+  if (zoneOrientation === 'left') {
+    finalShot = mirrorShotZone(shotKey);
+  } else if (zoneOrientation === 'adaptive' && pendingPlayerNum) {
+    // En mode adaptatif, la zone saisie est celle du joueur : zone 1 = son
+    // côté "long de ligne", qu'il soit à droite ou à gauche. Elle est donc
+    // enregistrée telle quelle (Combinée = tout ensemble ; Côté Gauche = même
+    // numérotation, dessinée en miroir). On garde seulement le côté en mémoire.
+    pendingSide = playerSide['j' + pendingPlayerNum];
+  }
+
+  pendingShot = finalShot;
+  closeShotModal();
+  scorePoint(pendingPlayer, pendingType);
+}
+
+// ── RENDER STATS (MIS À JOUR) ────────────────────────────────────────────────
+function renderStats() {
+  if (statsMode === 'joueur') { renderStatsParJoueur(); return; }
+
+  const el = document.getElementById('statsContent');
+  const ds = getDisplayStats();
+
+  const totWA = ALL_SHOT_KEYS.reduce((s,sh)=>s+(ds['wA_'+sh]||0),0);
+  const totWB = ALL_SHOT_KEYS.reduce((s,sh)=>s+(ds['wB_'+sh]||0),0);
+  const totFA = ALL_SHOT_KEYS.reduce((s,sh)=>s+(ds['fA_'+sh]||0),0);
+  const totFB = ALL_SHOT_KEYS.reduce((s,sh)=>s+(ds['fB_'+sh]||0),0);
+
+  // Même présentation que le mode "Stats de base" : gros chiffres + barre
+  // pleine largeur, pour rester lisible même avec le détail par coup.
+  const statRow = (a, b, label) => {
+    const t = a + b || 1;
+    const pctA = Math.round(a / t * 100);
+    return `
+      <div class="stat-row">
+        <div class="stat-val a">${a}</div>
+        <div class="stat-name">${label}</div>
+        <div class="stat-val b">${b}</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-bar-wrap"><div class="stat-bar-a" style="width:${pctA}%"></div><div class="stat-bar-b" style="width:${100-pctA}%"></div></div>
+      </div>`;
+  };
+
+  let html = '';
+  html += statRow(totWA, totWB, t('stat_winning_shots'));
+  html += statRow(totFA, totFB, t('stat_faults2'));
+  html += statRow(ds.pA||0, ds.pB||0, t('stat_points_won2'));
+
+  // Agrégation par catégorie générale (Service, Rush, Défense...), sans le
+  // détail des zones ni des variantes — même niveau que le PDF "Détail par
+  // joueur", pour rester lisible même avec beaucoup de coups enregistrés.
+  const baseShotTotals = (prefixA, prefixB) => BASE_SHOTS.map(shotKey => {
+    let a = 0, b = 0;
+    ALL_SHOT_KEYS.forEach(sh => {
+      if (sh.indexOf(shotKey + '_') === 0) {
+        a += ds[prefixA + sh] || 0;
+        b += ds[prefixB + sh] || 0;
+      }
+    });
+    return { shotKey, a, b };
+  }).filter(t => t.a > 0 || t.b > 0);
+
+  const winnerRows = baseShotTotals('wA_', 'wB_');
+  if (winnerRows.length) {
+    html += `<div class="stats-title" style="margin-top:1.3rem">${t('detail_winners')}</div>`;
+    winnerRows.forEach(t => { html += statRow(t.a, t.b, SHOT_BASE_LBL[t.shotKey]); });
+  }
+
+  const fauteRows = baseShotTotals('fA_', 'fB_');
+  if (fauteRows.length) {
+    html += `<div class="stats-title" style="margin-top:1.3rem">${t('detail_faults')}</div>`;
+    fauteRows.forEach(t => { html += statRow(t.a, t.b, SHOT_BASE_LBL[t.shotKey]); });
+  }
+
+  el.innerHTML = html;
+}
+
+function renderStatsParJoueur() {
+  const el = document.getElementById('statsContent');
+  const ds = getDisplayStats();
+
+  // [nom, clé equipe A ou B, couleur CSS]
+  const playerDefs = [
+    { name: players.j1, team: 'A', cls: 'var(--blue)', num: 1 },
+    { name: players.j2, team: 'A', cls: 'var(--blue)', num: 2 },
+    { name: players.j3, team: 'B', cls: 'var(--orange)', num: 3 },
+    { name: players.j4, team: 'B', cls: 'var(--orange)', num: 4 },
+  ];
+
+  // Détail par type de coup pour un joueur, dans le même style "gros chiffre"
+  // que le reste (plus lisible qu'un mini-tableau compact).
+  const buildPlayerDetail = (p, type) => {
+    const tp = type === 'winner' ? 'w' : 'f';
+    const key = tp + p.num + '_';
+    // Agrégation par catégorie générale (Service, Rush, Défense...), sans le
+    // détail des zones ni des variantes — même niveau que le PDF "Détail par
+    // joueur", pour rester lisible même avec beaucoup de coups enregistrés.
+    const rows = BASE_SHOTS.map(shotKey => {
+      let v = 0;
+      ALL_SHOT_KEYS.forEach(sh => { if (sh.indexOf(shotKey + '_') === 0) v += ds[key + sh] || 0; });
+      return { shotKey, v };
+    }).filter(r => r.v > 0);
+    if (!rows.length) return '';
+
+    let html = `<div style="margin-top:.6rem">
+      <div class="stat-name" style="text-align:left;color:${p.cls};margin-bottom:.4rem">${escapeHtml(p.name)}</div>`;
+    rows.forEach(r => {
+      const maxV = Math.max(1, ...[1,2,3,4].map(n => {
+        let s = 0;
+        ALL_SHOT_KEYS.forEach(sh => { if (sh.indexOf(r.shotKey + '_') === 0) s += ds[tp+n+'_'+sh] || 0; });
+        return s;
+      }));
+      const pct = Math.round(r.v / maxV * 100);
+      html += `
+        <div class="stat-row" style="grid-template-columns:1fr auto;margin-bottom:.35rem">
+          <div class="stat-name" style="text-align:left">${SHOT_BASE_LBL[r.shotKey]}</div>
+          <div class="stat-val" style="color:${p.cls};font-size:18px">${r.v}</div>
+        </div>
+        <div class="stat-row" style="margin-bottom:.35rem">
+          <div class="stat-bar-wrap"><div style="width:${pct}%;background:${p.cls};transition:width .4s"></div></div>
+        </div>`;
+    });
+    html += `</div>`;
+    return html;
+  };
+
+  const totWA = ALL_SHOT_KEYS.reduce((s,sh)=>s+(ds['wA_'+sh]||0),0);
+  const totWB = ALL_SHOT_KEYS.reduce((s,sh)=>s+(ds['wB_'+sh]||0),0);
+  const totFA = ALL_SHOT_KEYS.reduce((s,sh)=>s+(ds['fA_'+sh]||0),0);
+  const totFB = ALL_SHOT_KEYS.reduce((s,sh)=>s+(ds['fB_'+sh]||0),0);
+
+  const statRow = (a, b, label) => {
+    const t = a + b || 1;
+    const pctA = Math.round(a / t * 100);
+    return `
+      <div class="stat-row">
+        <div class="stat-val a">${a}</div>
+        <div class="stat-name">${label}</div>
+        <div class="stat-val b">${b}</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-bar-wrap"><div class="stat-bar-a" style="width:${pctA}%"></div><div class="stat-bar-b" style="width:${100-pctA}%"></div></div>
+      </div>`;
+  };
+
+  let html = statRow(totWA, totWB, t('stat_winning_shots')) + statRow(totFA, totFB, t('stat_faults2')) + statRow(ds.pA||0, ds.pB||0, t('stat_points_won2'));
+
+  // Récap rapide par joueur — même présentation que le mode "Stats de base".
+  html += `<div class="stat-row" style="grid-template-columns:1fr 60px 60px;margin-top:1.2rem;margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:5px">
+    <div class="stat-name" style="text-align:left">${t('stats_player_header')}</div>
+    <div class="stat-name">W</div>
+    <div class="stat-name">F</div>
+  </div>`;
+  playerDefs.forEach(p => {
+    const w = ALL_SHOT_KEYS.reduce((s,sh)=>s+(ds['w'+p.num+'_'+sh]||0),0);
+    const f = ALL_SHOT_KEYS.reduce((s,sh)=>s+(ds['f'+p.num+'_'+sh]||0),0);
+    html += `<div class="stat-row" style="grid-template-columns:1fr 60px 60px;align-items:center">
+      <div class="stat-name" style="text-align:left;color:var(--text);font-size:13px">${escapeHtml(p.name)}</div>
+      <div class="stat-val" style="text-align:center;color:var(--green);font-size:20px">${w}</div>
+      <div class="stat-val" style="text-align:center;color:var(--red);font-size:20px">${f}</div>
+    </div>`;
+  });
+
+  // Détail par type de coup, par joueur
+  const winnerDetail = playerDefs.map(p => buildPlayerDetail(p, 'winner')).join('');
+  if (winnerDetail) {
+    html += `<div class="stats-title" style="margin-top:1.3rem">${t('detail_winners')}</div>${winnerDetail}`;
+  }
+  const fauteDetail = playerDefs.map(p => buildPlayerDetail(p, 'faute')).join('');
+  if (fauteDetail) {
+    html += `<div class="stats-title" style="margin-top:1.3rem">${t('detail_faults')}</div>${fauteDetail}`;
+  }
+
+  el.innerHTML = html;
+}
+
+// ── CARTOGRAPHIE PAR ZONE (schéma en direct : vert = gagnants, rouge = fautes) ──
+function initZoneTabs() {
+  const tabsEl = document.getElementById('zoneTabs');
+  if (!tabsEl) return;
+  tabsEl.innerHTML = BASE_SHOTS.map(s =>
+    `<button class="zone-tab${s===zoneMapShot?' active':''}" id="zoneTab_${s}" onclick="selectZoneMapShot('${s}')">${SHOT_ICO[s]} <span class="zt-label">${SHOT_BASE_LBL[s]}</span></button>`
+  ).join('');
+}
+
+function selectZoneMapShot(s) {
+  zoneMapShot = s;
+  document.querySelectorAll('.zone-tab').forEach(b => b.classList.remove('active'));
+  const activeTab = document.getElementById('zoneTab_'+s);
+  if (activeTab) activeTab.classList.add('active');
+  renderZoneMap();
+}
+
+function computeZoneData(wPrefix, fPrefix, sideSuffix) {
+  sideSuffix = sideSuffix || '';
+  const ds = getDisplayStats();
+  return ZONES.map(z => {
+    const keys = SHOT_ZONE_KEYS[zoneMapShot][z];
+    let w = 0, f = 0;
+    keys.forEach(k => {
+      w += ds[wPrefix+k+sideSuffix] || 0;
+      f += ds[fPrefix+k+sideSuffix] || 0;
+    });
+    return { z: parseInt(z,10), w, f };
+  });
+}
+
+// Données de zone pour une variante de profondeur précise d'un coup à bandes
+// (ex: bras roulé amorti/tendu/lobe, smash gratté/fort/lob...), zone par
+// zone de largeur (1 à 5).
+function computeDepthZoneData(shotKey, wPrefix, fPrefix, variant, sideSuffix) {
+  sideSuffix = sideSuffix || '';
+  const ds = getDisplayStats();
+  // Agrège toutes les clés qui se terminent par "_<profondeur>_<zone>", même
+  // quand il y a un niveau intermédiaire (ex: défense CD+REV confondus dans
+  // la bande "Amorti" : defense_cd_amorti_1 ET defense_rev_amorti_1).
+  return ZONES.map(z => {
+    const suffix = '_' + variant + '_' + z;
+    let w = 0, f = 0;
+    ALL_SHOT_KEYS.forEach(k => {
+      if (k.indexOf(shotKey + '_') === 0 && k.endsWith(suffix)) {
+        w += ds[wPrefix+k+sideSuffix] || 0;
+        f += ds[fPrefix+k+sideSuffix] || 0;
+      }
+    });
+    return { z: parseInt(z,10), w, f };
+  });
+}
+
+// Terrain de beach tennis, vue demi-terrain (côté où le coup atterrit) : 8m de
+// large, découpés en 5 zones (zone 1 à droite, zone 5 à gauche). Le filet est
+// en bas du schéma, puisque c'est la limite la plus proche de la frappe.
+// Détermine si la cartographie d'un joueur/équipe doit être inversée
+// (zone 1 affichée à gauche plutôt qu'à droite) : toujours en mode fixe
+// "gauche", jamais en mode fixe "droite", et selon le côté ACTUEL du joueur
+// en mode adaptatif (playerKey = 'j1'..'j4' ; null en mode équipe).
+// Détermine si la cartographie doit être inversée (zone 1 affichée à
+// gauche plutôt qu'à droite) : toujours en mode fixe "gauche", jamais en
+// mode fixe "droite", et en mode adaptatif selon l'ONGLET DE VUE
+// actuellement sélectionné (zoneMapSideFilter) — pas selon le côté propre
+// à chaque joueur. "Combinée" et "Côté Droite" gardent la zone 1 à droite
+// pour tout le monde ; "Côté Gauche" la met à gauche pour tout le monde.
+function shouldMirrorZoneDisplay() {
+  if (zoneOrientation === 'left') return true;
+  if (zoneOrientation === 'adaptive') return zoneMapSideFilter === 'L';
+  return false;
+}
+
+function buildCourtSVG(data, mirror) {
+  const maxTotal = Math.max(1, ...data.map(d => d.w + d.f));
+  const W = 260, courtL = 256, ZW = W / 5, L = courtL + 30;
+
+  let cols = '', dividers = '';
+  data.forEach(d => {
+    // Zone 1 collée au bord droit par défaut, ou au bord gauche si la
+    // cartographie doit être inversée pour ce joueur (voir shouldMirrorZoneDisplay).
+    const xStart = mirror ? (d.z - 1) * ZW : W - d.z * ZW;
+    const total = d.w + d.f;
+    let fill;
+    if (total === 0) {
+      fill = 'rgba(30,53,96,.35)';
+    } else {
+      const alpha = (0.22 + 0.58 * (total / maxTotal)).toFixed(2);
+      if (d.w === d.f) fill = `rgba(245,197,24,${alpha})`;
+      else fill = d.w > d.f ? `rgba(34,197,94,${alpha})` : `rgba(239,68,68,${alpha})`;
+    }
+    cols += `<rect x="${xStart}" y="2" width="${ZW}" height="${courtL-4}" fill="${fill}"/>`;
+    cols += `<text x="${xStart+ZW/2}" y="30" text-anchor="middle" class="zc-lbl">Z${d.z}</text>`;
+    cols += `<text x="${xStart+ZW/2}" y="56" text-anchor="middle" class="zc-count">
+      <tspan class="w">${d.w}</tspan><tspan class="sep"> / </tspan><tspan class="f">${d.f}</tspan>
+    </text>`;
+  });
+  for (let k = 1; k < 5; k++) {
+    dividers += `<line x1="${k*ZW}" y1="0" x2="${k*ZW}" y2="${courtL}" stroke="var(--border)" stroke-width="1"/>`;
+  }
+
+  return `
+    <svg viewBox="0 0 ${W} ${L}" class="zone-court-svg" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="1" width="${W-2}" height="${courtL-2}" fill="none" stroke="var(--border)" stroke-width="2" rx="4"/>
+      ${cols}
+      ${dividers}
+      <line x1="0" y1="${courtL}" x2="${W}" y2="${courtL}" stroke="var(--gold)" stroke-width="3" stroke-dasharray="8,5"/>
+      <text x="${W/2}" y="${courtL+18}" text-anchor="middle" class="zc-net-lbl">Filet</text>
+    </svg>`;
+}
+
+// Cartographie "à bandes de profondeur" (bras roulé, smash, défense, service
+// +1), vue demi-terrain : N bandes empilées (une par variante), filet en bas.
+// Chaque bande est divisée en 5 zones de largeur, comme les autres coups.
+function buildDepthBandCourtSVG(shotKey, wPrefix, fPrefix, sideSuffix, mirror) {
+  const bandsConfig = DEPTH_BAND_SHOTS[shotKey];
+  const n = bandsConfig.length;
+  const W = 260, ZW = W / 5, bandH = 148, gap = 8, TOPPAD = 4, LBLPAD = 26;
+  const L = TOPPAD + bandH * n + gap * (n - 1) + LBLPAD;
+
+  // Filet en bas -> ordre visuel de haut en bas : du fond vers le filet.
+  const visualOrder = [...bandsConfig].reverse();
+  const dataByVariant = {};
+  bandsConfig.forEach(dv => { dataByVariant[dv.variant] = computeDepthZoneData(shotKey, wPrefix, fPrefix, dv.variant, sideSuffix); });
+  const maxTotal = Math.max(1, ...Object.values(dataByVariant).flat().map(d => d.w + d.f));
+
+  let bands = '';
+  visualOrder.forEach((dv, bi) => {
+    const data = dataByVariant[dv.variant];
+    const yStart = TOPPAD + bi * (bandH + gap);
+    let cols = '', dividers = '';
+    data.forEach(d => {
+      const xStart = mirror ? (d.z - 1) * ZW : W - d.z * ZW;
+      const total = d.w + d.f;
+      let fill;
+      if (total === 0) {
+        fill = 'rgba(30,53,96,.35)';
+      } else {
+        const alpha = (0.22 + 0.58 * (total / maxTotal)).toFixed(2);
+        if (d.w === d.f) fill = `rgba(245,197,24,${alpha})`;
+        else fill = d.w > d.f ? `rgba(34,197,94,${alpha})` : `rgba(239,68,68,${alpha})`;
+      }
+      cols += `<rect x="${xStart}" y="${yStart}" width="${ZW}" height="${bandH}" fill="${fill}"/>`;
+      cols += `<text x="${xStart+ZW/2}" y="${yStart+22}" text-anchor="middle" class="zc-lbl">Z${d.z}</text>`;
+      cols += `<text x="${xStart+ZW/2}" y="${yStart+44}" text-anchor="middle" class="zc-count">
+        <tspan class="w">${d.w}</tspan><tspan class="sep"> / </tspan><tspan class="f">${d.f}</tspan>
+      </text>`;
+    });
+    for (let k = 1; k < 5; k++) {
+      dividers += `<line x1="${k*ZW}" y1="${yStart}" x2="${k*ZW}" y2="${yStart+bandH}" stroke="var(--border)" stroke-width="1"/>`;
+    }
+    bands += `<rect x="1" y="${yStart}" width="${W-2}" height="${bandH}" fill="none" stroke="var(--border)" stroke-width="1.5" rx="3"/>`;
+    bands += cols + dividers;
+    bands += `<text x="${W/2}" y="${yStart+bandH-8}" text-anchor="middle" class="zc-band-lbl">${escapeHtml(dv.label)}</text>`;
+  });
+
+  const netY = TOPPAD + bandH * n + gap * (n - 1);
+  return `
+    <svg viewBox="0 0 ${W} ${L}" class="zone-court-svg" xmlns="http://www.w3.org/2000/svg">
+      ${bands}
+      <line x1="0" y1="${netY}" x2="${W}" y2="${netY}" stroke="var(--gold)" stroke-width="3" stroke-dasharray="8,5"/>
+      <text x="${W/2}" y="${netY+18}" text-anchor="middle" class="zc-net-lbl">Filet</text>
+    </svg>`;
+}
+
+function renderZoneMap() {
+  const grid = document.getElementById('zoneMapGrid');
+  if (!grid) return;
+
+  // Une bande de profondeur ne s'affiche que si le coup en a une ET que le
+  // réglage "Profondeur" est activé (Préférences > Coups) — sinon on retombe
+  // sur le terrain plat classique, qui agrège déjà correctement toutes les
+  // variantes de profondeur (voir computeZoneData/SHOT_ZONE_KEYS).
+  const hasDepthBands = shotSettings.depth && !!DEPTH_BAND_SHOTS[zoneMapShot];
+
+  const depthNote = document.getElementById('zoneDepthNote');
+  if (depthNote) depthNote.style.display = hasDepthBands ? 'block' : 'none';
+
+  // Les vues séparées par côté n'ont de sens qu'en mode adaptatif (seul mode
+  // où chaque joueur a un côté individuel, modifiable en cours de match).
+  const sideTabs = document.getElementById('zoneSideTabs');
+  if (sideTabs) {
+    sideTabs.style.display = zoneOrientation === 'adaptive' ? 'flex' : 'none';
+    if (zoneOrientation !== 'adaptive') zoneMapSideFilter = 'combined';
+  }
+  const sideSuffix = zoneMapSideFilter === 'combined' ? '' : '_' + zoneMapSideFilter;
+
+  const badge = document.getElementById('zoneViewBadge');
+  if (badge) {
+    if (statsViewMode === 'total') {
+      badge.textContent = t('total_match');
+    } else {
+      const isCurrent = statsViewSetIdx === setSnapshots.length + 1 && !matchOver;
+      badge.textContent = t('set_n', {n: statsViewSetIdx}) + (isCurrent ? t('set_current') : '');
+    }
+  }
+
+  const entries = statsMode === 'joueur'
+    ? [
+        { label: players.j1, color: 'var(--blue)',   wp: 'w1_', fp: 'f1_' },
+        { label: players.j2, color: 'var(--blue)',   wp: 'w2_', fp: 'f2_' },
+        { label: players.j3, color: 'var(--orange)', wp: 'w3_', fp: 'f3_' },
+        { label: players.j4, color: 'var(--orange)', wp: 'w4_', fp: 'f4_' },
+      ]
+    : [
+        { label: nameA, color: 'var(--blue)',   wp: 'wA_', fp: 'fA_' },
+        { label: nameB, color: 'var(--orange)', wp: 'wB_', fp: 'fB_' },
+      ];
+
+  // Le miroir dépend uniquement de la vue actuellement sélectionnée
+  // (Combinée / Côté Droite / Côté Gauche), pas du joueur affiché — donc
+  // calculé une seule fois pour toute la grille, pas par entité.
+  const mirror = shouldMirrorZoneDisplay();
+
+  grid.innerHTML = entries.map(e => {
+    const svg = hasDepthBands
+      ? buildDepthBandCourtSVG(zoneMapShot, e.wp, e.fp, sideSuffix, mirror)
+      : buildCourtSVG(computeZoneData(e.wp, e.fp, sideSuffix), mirror);
+    return `<div class="zone-court-item">
+      <div class="zone-court-title" style="color:${e.color}">${escapeHtml(e.label)}</div>
+      ${svg}
+    </div>`;
+  }).join('');
+}
+
+// Affiche ou masque la section "Cartographie par zone" en direct : elle n'a
+// de sens que si le réglage "Zones" est activé (Préférences > Coups).
+function updateZoneMapVisibility() {
+  const card = document.getElementById('zoneMapCard');
+  if (card) card.style.display = shotSettings.zone ? '' : 'none';
+}
+
+// Change la vue de la cartographie : combinée (normalisée, toutes données),
+// ou filtrée sur les points marqués quand le joueur était à droite / gauche.
+function selectZoneSideFilter(filter) {
+  zoneMapSideFilter = filter;
+  ['combined','R','L'].forEach(f => {
+    const tab = document.getElementById('zoneSideTab_' + f);
+    if (tab) tab.classList.toggle('active', f === filter);
+  });
+  renderZoneMap();
+}
+
+// ── TIMER ────────────────────────────────────────────────────────────────────
+let timerSeconds = 0, timerInterval = null, timerRunning = false;
+let matchStarted = false; 
+function timerToggle() {
+  if (timerRunning) {
+    clearInterval(timerInterval); timerRunning = false;
+    document.getElementById('timerStartBtn').textContent = t('timer_start');
+    document.getElementById('timerStartBtn').className = 'timer-btn start';
+  } else {
+    timerRunning = true;
+    document.getElementById('timerStartBtn').textContent = t('timer_pause');
+    document.getElementById('timerStartBtn').className = 'timer-btn pause';
+    if (!matchStarted) {
+      matchStarted = true;
+      document.getElementById('setPill').textContent = 'Set 1';
+      logEvent('', t('log_match_started'));
+      if (zoneOrientationNeeded()) { askZoneOrientation(); }
+      else if (!firstServingTeam) { askInitialServer(); }
+    }
+    timerInterval = setInterval(() => {
+      timerSeconds++;
+      const m = String(Math.floor(timerSeconds / 60)).padStart(2,'0');
+      const s = String(timerSeconds % 60).padStart(2,'0');
+      document.getElementById('timerDisplay').textContent = m + ':' + s;
+    }, 1000);
+  }
+}
+function timerReset() { clearInterval(timerInterval); timerRunning = false; timerSeconds = 0; document.getElementById('timerDisplay').textContent = '00:00'; }
+function formatDuration(secs){
+  const m=Math.floor(secs/60), s=secs%60;
+  return String(m).padStart(2,'0') + 'm ' + String(s).padStart(2,'0') + 's';
+}
+
+
+let _titleFontReady = false;
+
+// Extrait les couleurs ET leur position (%) d'une valeur CSS (dégradé ou
+// couleur unie), pour reconstruire fidèlement un dégradé à N points dans le
+// PDF — plutôt que de se limiter à un simple dégradé à 2 couleurs (début/fin)
+// qui donnerait un aplat plat pour un thème comme Éclat, dont le dégradé
+// commence ET finit en blanc avec des teintes pastel entre les deux.
+function extractColorStopsWithPositions(cssValue) {
+  const re = /(#[0-9a-fA-F]{3,6})(?:\s+(\d+(?:\.\d+)?)%)?/g;
+  const stops = [];
+  let m;
+  while ((m = re.exec(cssValue)) !== null) {
+    stops.push({ color: hexToRgb(m[1]), pos: m[2] !== undefined ? parseFloat(m[2]) : null });
+  }
+  if (!stops.length) return null;
+  const anyPos = stops.some(s => s.pos !== null);
+  if (!anyPos) {
+    // Aucune position explicite (couleur unie, ou liste simple) : répartition
+    // uniforme sur 0-100%.
+    stops.forEach((s, i) => { s.pos = stops.length > 1 ? (i / (stops.length - 1)) * 100 : 0; });
+  } else {
+    let lastPos = 0;
+    stops.forEach(s => { if (s.pos === null) s.pos = lastPos; lastPos = s.pos; });
+  }
+  return stops;
+}
+
+
+function readLiveThemeForPDF() {
+  const cs = getComputedStyle(document.documentElement);
+  const readStopsWithPos = (varName, fallbackHex) => {
+    const raw = cs.getPropertyValue(varName);
+    return extractColorStopsWithPositions(raw) || [{ color: hexToRgb(fallbackHex), pos: 0 }];
+  };
+  const readSolid = (varName, fallbackHex) => readStopsWithPos(varName, fallbackHex)[0].color;
+
+  const bgStops = readStopsWithPos('--bg', '#080f1e');
+  const cardStops = readStopsWithPos('--card', '#111e35');
+  const surfaceStops = readStopsWithPos('--surface', '#0d1829');
+  const green = readSolid('--green', '#22c55e');
+  const red = readSolid('--red', '#ef4444');
+
+  return {
+    bg: bgStops[0].color,
+    bgTop: bgStops[0].color,
+    bgBottom: bgStops[bgStops.length - 1].color,
+    bgStops: bgStops, // dégradé complet (N points), pour un rendu fidèle
+    surface: surfaceStops[0].color,
+    card: cardStops[0].color,
+    border: readSolid('--border', '#1e3560'),
+    gold: readSolid('--gold', '#f5c518'),
+    blue: readSolid('--blue', '#3b82f6'),
+    orange: readSolid('--orange', '#f97316'),
+    green: green,
+    greenLight: lightenRgb(green, 0.4),
+    greenDark: darkenRgb(green, 0.32),
+    red: red,
+    redLight: lightenRgb(red, 0.35),
+    redDark: darkenRgb(red, 0.28),
+    text: readSolid('--text', '#e2eaf8'),
+    muted: readSolid('--muted', '#4a6494'),
+  };
+}
+
+function getThemeColors() { return readLiveThemeForPDF(); }
+
+function exportPDF() {
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+  embedTitleFont(doc);
+  const TF = titleFontName();
+  const theme = getThemeColors();
+  const W=210, M=20;
+  let y=M;
+
+  const newPage = () => {
+    doc.addPage();
+    fillPageBackground();
+    y = M;
+  };
+
+  const ensureSpace = (needed) => { if (y + needed > 282) newPage(); };
+
+  // Fond en dégradé vertical fidèle au thème actif (N points, pas juste 2)
+  // — un thème comme Éclat, qui commence ET finit en blanc avec des teintes
+  // pastel entre les deux, doit garder ces teintes dans le PDF plutôt que de
+  // s'aplatir en blanc uni. Pour les thèmes sombres dont le dégradé traverse
+  // un point très clair au milieu (ex: Sunset autour de 60%), on atténue cet
+  // écart de luminosité vers la couleur d'ancrage du thème — sinon le texte,
+  // calibré pour un fond sombre, deviendrait illisible à cet endroit précis
+  // de la page. Cette limite ne s'applique que dans le sens qui poserait un
+  // problème de lisibilité (ex: jamais pour Éclat, déjà clair partout).
+  // Partagée avec sectionTitle() pour que le fondu des bandeaux de titre se
+  // fonde exactement dans la même couleur que celle réellement peinte.
+  function luminance(rgb) { return (0.299*rgb[0] + 0.587*rgb[1] + 0.114*rgb[2]) / 255; }
+
+  const _isDarkTheme = luminance(theme.text) > 0.6;
+  const _anchorLum = luminance(theme.bgTop);
+  const _maxLumDelta = 0.22;
+
+  function safeBgColorAt(t) {
+    let [r, g, b] = colorAtStop(theme.bgStops, t);
+    const lum = luminance([r, g, b]);
+    if (_isDarkTheme && lum > _anchorLum + _maxLumDelta) {
+      const amt = Math.min(1, (lum - (_anchorLum + _maxLumDelta)) / Math.max(0.01, 1 - _anchorLum));
+      r = Math.round(r + (theme.bgTop[0]-r)*amt);
+      g = Math.round(g + (theme.bgTop[1]-g)*amt);
+      b = Math.round(b + (theme.bgTop[2]-b)*amt);
+    } else if (!_isDarkTheme && lum < _anchorLum - _maxLumDelta) {
+      const amt = Math.min(1, ((_anchorLum - _maxLumDelta) - lum) / Math.max(0.01, _anchorLum));
+      r = Math.round(r + (theme.bgTop[0]-r)*amt);
+      g = Math.round(g + (theme.bgTop[1]-g)*amt);
+      b = Math.round(b + (theme.bgTop[2]-b)*amt);
+    }
+    return [r, g, b];
+  }
+
+  function fillPageBackground() {
+    const bands = 60;
+    const bandH = 297 / bands;
+    for (let i = 0; i < bands; i++) {
+      const t = (i / (bands - 1)) * 100;
+      const [r, g, b] = safeBgColorAt(t);
+      doc.setFillColor(r, g, b);
+      doc.rect(0, i*bandH, W, bandH+0.3, 'F');
+    }
+  }
+
+  // Les polices standards de jsPDF (Helvetica) ne supportent pas les emojis :
+  // on les retire avant toute écriture dans le PDF pour éviter les caractères
+  // corrompus (les emojis restent affichés normalement dans l'application).
+  const stripEmoji = (str) => String(str)
+    .replace(/[\u{1F1E6}-\u{1FFFF}\u{2300}-\u{27BF}\u{2B00}-\u{2BFF}\u{2190}-\u{21FF}\uFE0F\u200D]/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const sectionTitle = (title, color) => {
+    ensureSpace(18);
+    // Bandeau en dégradé (plus opaque à gauche, qui s'estompe vers la droite)
+    // + barre verticale arrondie. Le fondu se rapproche de la vraie couleur
+    // LOCALE du fond à cette position précise de la page (et non une couleur
+    // fixe), pour rester cohérent même sur un dégradé multicolore comme Éclat
+    // — sans ce calcul, le bandeau jurerait dès qu'il apparaît sur une teinte
+    // différente de celle du tout en haut de la page.
+    const bandW = W - 2*M + 8;
+    const steps = 22;
+    const stepW = bandW / steps;
+    const bgRef = safeBgColorAt((y / 297) * 100);
+    for (let i = 0; i < steps; i++) {
+      const t = i / (steps - 1);
+      const intensity = 0.30 * (1 - t*0.85);
+      const r = Math.round(bgRef[0] + (color[0]-bgRef[0])*intensity);
+      const g = Math.round(bgRef[1] + (color[1]-bgRef[1])*intensity);
+      const b = Math.round(bgRef[2] + (color[2]-bgRef[2])*intensity);
+      doc.setFillColor(r, g, b);
+      doc.rect(M-4 + i*stepW, y-6, stepW+0.3, 12, 'F');
+    }
+    doc.setFillColor(...color);
+    doc.roundedRect(M-4, y-6, 1.8, 12, 0.7, 0.7, 'F');
+    doc.setFont(TF,'bold'); doc.setFontSize(13); doc.setTextColor(...color);
+    doc.text(title, M+2, y+1.8);
+    y += 12;
+  };
+
+  // Fond alterné discret pour une ligne de tableau (lisibilité des longues listes)
+  const stripe = (rowY, h) => {
+    doc.setFillColor(...theme.surface);
+    doc.rect(M-2, rowY-4.2, W-2*M+4, h, 'F');
+  };
+
+  // ── Fond ──
+  fillPageBackground();
+
+  // ── Titre ──
+  doc.setFont(TF,'bold');
+  doc.setFontSize(30); doc.setTextColor(...theme.gold);
+  doc.text('TENNIS', W/2, y+9, {align:'center'});
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(11); doc.setTextColor(...theme.muted);
+  doc.text('STATS PRO', W/2, y+17, {align:'center'});
+  y+=27;
+
+  // ── Date ──
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(10); doc.setTextColor(...theme.muted);
+  doc.text(new Date().toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'}), W/2, y, {align:'center'});
+  y+=10;
+  doc.setDrawColor(...theme.border); doc.line(M,y,W-M,y); y+=10;
+
+  const totWA = ALL_SHOT_KEYS.reduce((s,sh)=>s+stats['wA_'+sh],0);
+  const totWB = ALL_SHOT_KEYS.reduce((s,sh)=>s+stats['wB_'+sh],0);
+  const totFA = ALL_SHOT_KEYS.reduce((s,sh)=>s+stats['fA_'+sh],0);
+  const totFB = ALL_SHOT_KEYS.reduce((s,sh)=>s+stats['fB_'+sh],0);
+
+  // ══ 1. VAINQUEUR ET SCORE (pas de titre, juste le nom et le score) ═════════
+  ensureSpace(40);
+
+  const winnerIsA = s1 > s2;
+  const winnerName = winnerIsA ? nameA : nameB;
+  const scoreStr = setHistory.map(sh => {
+    const wG = winnerIsA ? sh.a : sh.b;
+    const lG = winnerIsA ? sh.b : sh.a;
+    return wG + '/' + lG;
+  }).join('   -   ');
+
+  doc.setFont(TF,'bold'); doc.setFontSize(22); doc.setTextColor(...theme.gold);
+  doc.text(winnerName, W/2, y, {align:'center'}); y+=9;
+  doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(...theme.text);
+  doc.text(scoreStr || '—', W/2, y, {align:'center'}); y+=8;
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(...theme.muted);
+  doc.text('Durée du match : '+formatDuration(timerSeconds), W/2, y, {align:'center'});
+  y+=12;
+
+  [{label:'ÉQUIPE A', color:theme.blue, name:nameA, sets:s1, idx:0},
+   {label:'ÉQUIPE B', color:theme.orange,  name:nameB, sets:s2, idx:1}].forEach(t => {
+    // Carte bordurée par équipe : sépare nettement chaque bloc du reste.
+    const cardTop = y - 4;
+    doc.setFillColor(...theme.card); doc.roundedRect(M-3, cardTop, W-2*M+6, (setHistory.length? 24:20), 1.5, 1.5, 'F');
+    doc.setDrawColor(...t.color); doc.setLineWidth(0.5);
+    doc.roundedRect(M-3, cardTop, W-2*M+6, (setHistory.length? 24:20), 1.5, 1.5, 'S');
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...t.color);
+    doc.text(t.label, M, y);
+    doc.setFont('helvetica','normal'); doc.setFontSize(13); doc.setTextColor(...theme.text);
+    doc.text(t.name, M, y+7);
+    // Score par set
+    let setStr = setHistory.map((sh,i) => {
+      const sc  = t.idx===0 ? sh.a : sh.b;
+      const opp = t.idx===0 ? sh.b : sh.a;
+      return 'S'+(i+1)+': '+sc+(sc>opp?'*':'');
+    }).join('  ');
+    if (setStr) { doc.setFontSize(9); doc.setTextColor(...theme.muted); doc.text(setStr, M, y+13); }
+    doc.setFont(TF,'bold'); doc.setFontSize(22); doc.setTextColor(...theme.gold);
+    doc.text(t.sets+' set'+(t.sets>1?'s':''), W-M, y+6, {align:'right'});
+    y += setStr ? 26 : 22;
+  });
+  y+=6;
+
+  // ══ 2. STATS DE POINTS GAGNANTS & FAUTES DIRECTES PAR ÉQUIPE ═══════════════
+  sectionTitle('POINTS GAGNANTS & FAUTES DIRECTES — PAR ÉQUIPE', theme.gold);
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...theme.muted);
+  doc.text('Statistique', M, y);
+  doc.text('Éq.A', W/2, y, {align:'center'});
+  doc.text('Éq.B', W-M, y, {align:'right'});
+  y+=4; doc.setDrawColor(...theme.border); doc.line(M,y,W-M,y); y+=5;
+  [['Points gagnants', totWA, totWB], ['Fautes directes', totFA, totFB], ['Points gagnés', stats.pA, stats.pB]].forEach(r => {
+    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(...theme.text); doc.text(r[0], M, y);
+    doc.setFont('helvetica','bold');
+    doc.setTextColor(...theme.blue);  doc.text(String(r[1]), W/2, y, {align:'center'});
+    doc.setTextColor(...theme.orange); doc.text(String(r[2]), W-M, y, {align:'right'});
+    y+=7;
+  });
+  doc.setDrawColor(...theme.border); doc.line(M,y,W-M,y); y+=10;
+
+  // ══ 3. DÉTAIL PAR SET ════════════════════════════════════════════════════
+  if (setSnapshots.length > 0 || !matchOver) {
+    sectionTitle('DÉTAIL PAR SET', theme.gold);
+
+    const playerNamesShort = [players.j1, players.j2, players.j3, players.j4];
+
+    // Regroupe les stats d'un diff brut (par coup + zone) en simples totaux
+    // par TYPE de coup (service, smash, bras roulé...), sans entrer dans le
+    // détail des zones/variantes — exactement ce qu'on veut afficher en petit.
+    const shotTypeTotals = (rawDiff, wp, fp) => {
+      return BASE_SHOTS.map(shotKey => {
+        let w = 0, f = 0;
+        ALL_SHOT_KEYS.forEach(k => {
+          if (k.indexOf(shotKey + '_') === 0) {
+            w += rawDiff[wp+k] || 0;
+            f += rawDiff[fp+k] || 0;
+          }
+        });
+        return { shotKey, w, f };
+      }).filter(x => x.w > 0 || x.f > 0);
+    };
+
+    // Entités affichées pour chaque set : 4 joueurs, ou les 2 équipes.
+    const setEntities = statsMode === 'joueur'
+      ? [1,2,3,4].map(n => ({ name: playerNamesShort[n-1], color: n<=2?theme.blue:theme.orange, wp:'w'+n+'_', fp:'f'+n+'_' }))
+      : [ {name:'ÉQUIPE A', color:theme.blue, wp:'wA_', fp:'fA_'}, {name:'ÉQUIPE B', color:theme.orange, wp:'wB_', fp:'fB_'} ];
+
+    const setRow = (label, sh, idx, rawDiff) => {
+      ensureSpace(14);
+      if (idx > 0) { doc.setDrawColor(...theme.border); doc.setLineWidth(0.2); doc.line(M, y-3, W-M, y-3); }
+      doc.setFont(TF,'bold'); doc.setFontSize(11); doc.setTextColor(...theme.gold);
+      doc.text(label + (sh ? ' (' + sh.a + '-' + sh.b + ')' : ''), M, y);
+      y += 8;
+
+      setEntities.forEach(ent => {
+        const totals = shotTypeTotals(rawDiff, ent.wp, ent.fp);
+        const totW = totals.reduce((s,t)=>s+t.w,0);
+        const totF = totals.reduce((s,t)=>s+t.f,0);
+
+        // Ligne 1 : gros chiffres bien visibles (Winners / Fautes)
+        ensureSpace(10);
+        doc.setFont(TF,'bold'); doc.setFontSize(11); doc.setTextColor(...ent.color);
+        doc.text(stripEmoji(ent.name) + '  —  Winners : ' + totW + '   Fautes : ' + totF, M+2, y);
+        y += 5.5;
+
+        // Ligne 2 : détail par type de coup, en petit, sans entrer dans le détail des zones
+        doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...theme.muted);
+        const line = totals.length
+          ? totals.map(t => SHOT_BASE_LBL_PDF[t.shotKey] + ' : ' + t.w + 'W/' + t.f + 'F').join('   •   ')
+          : 'Aucun coup enregistré sur ce set';
+        const wrapped = doc.splitTextToSize(line, W-2*M-4);
+        wrapped.forEach(l => {
+          ensureSpace(4);
+          doc.text(l, M+2, y);
+          y += 4;
+        });
+        y += 3;
+      });
+
+      y += 2;
+    };
+
+    setSnapshots.forEach((snap, i) => {
+      const prevSnap = setSnapshots[i-1] || {};
+      const rawDiff = diffStats(snap, prevSnap);
+      setRow('Set ' + (i+1), setHistory[i], i, rawDiff);
+    });
+    if (!matchOver) {
+      const prevSnap = setSnapshots[setSnapshots.length-1] || {};
+      const rawDiff = diffStats(stats, prevSnap);
+      setRow('Set ' + (setSnapshots.length+1) + ' (en cours)', null, setSnapshots.length, rawDiff);
+    }
+    doc.setDrawColor(...theme.border); doc.line(M,y,W-M,y); y+=10;
+  }
+
+  // ══ 4. DÉTAIL — PAR JOUEUR OU PAR ÉQUIPE (selon le mode choisi) ═════════════
+
+  // Regroupement par TYPE de coup uniquement (service, smash, bras roulé...),
+  // sans le détail des zones — celles-ci restent visibles dans la cartographie.
+  const shotTypeTotalsFull = (src, wp, fp) => {
+    return BASE_SHOTS.map(shotKey => {
+      let w = 0, f = 0;
+      ALL_SHOT_KEYS.forEach(k => {
+        if (k.indexOf(shotKey + '_') === 0) {
+          w += src[wp+k] || 0;
+          f += src[fp+k] || 0;
+        }
+      });
+      return { shotKey, w, f };
+    }).filter(x => x.w > 0 || x.f > 0);
+  };
+
+  const detailEntities = statsMode === 'joueur'
+    ? [
+        {name:players.j1, color:theme.blue,  wp:'w1_', fp:'f1_'},
+        {name:players.j2, color:theme.blue,  wp:'w2_', fp:'f2_'},
+        {name:players.j3, color:theme.orange, wp:'w3_', fp:'f3_'},
+        {name:players.j4, color:theme.orange, wp:'w4_', fp:'f4_'},
+      ]
+    : [
+        {name:'ÉQUIPE A', color:theme.blue,   wp:'wA_', fp:'fA_'},
+        {name:'ÉQUIPE B', color:theme.orange, wp:'wB_', fp:'fB_'},
+      ];
+
+  sectionTitle(statsMode === 'joueur' ? 'DÉTAIL PAR JOUEUR' : 'DÉTAIL PAR ÉQUIPE', theme.gold);
+  detailEntities.forEach(ent => {
+    const totals = shotTypeTotalsFull(stats, ent.wp, ent.fp);
+    const totW = totals.reduce((s,t)=>s+t.w,0);
+    const totF = totals.reduce((s,t)=>s+t.f,0);
+    if (totW+totF === 0) return;
+    ensureSpace(14);
+    doc.setFont(TF,'bold'); doc.setFontSize(11); doc.setTextColor(...ent.color);
+    doc.text(stripEmoji(ent.name)+'  —  Winners : '+totW+'   Fautes : '+totF, M, y); y+=7;
+    totals.forEach(t => {
+      ensureSpace(6);
+      doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...theme.text);
+      doc.text(SHOT_BASE_LBL_PDF[t.shotKey], M+4, y);
+      doc.setTextColor(...theme.green);  doc.text('W:'+t.w, W/2-10, y, {align:'center'});
+      doc.setTextColor(...theme.red); doc.text('F:'+t.f, W-M, y, {align:'right'});
+      y+=5;
+    });
+    y+=4;
+  });
+
+  // ══ 5. DÉTAIL DES COUPS — 2 styles au choix (réglage "Préférences") ═════
+  // Les terrains n'ont pas de sens sans zones : garde-fou en plus du
+  // basculement automatique déjà appliqué quand on désactive le réglage.
+  const effectivePdfStyle = (pdfStyle === 'classic' && !shotSettings.zone) ? 'bars' : pdfStyle;
+  if (effectivePdfStyle === 'classic') {
+    // ── Style classique : terrains par zone, reskinné sur le thème clair ──
+    sectionTitle('CARTOGRAPHIE PAR ZONE', theme.gold);
+
+    // Couleurs fixes et bien saturées pour les zones : la lisibilité
+    // fonctionnelle (vert/orange/rouge) prime ici, indépendamment de la
+    // palette générale du PDF. Le "vide" est calculé à partir de la bordure
+    // du thème actif, fondue vers la couleur de carte — reste discret mais
+    // visible quel que soit le thème (contrairement à un gris fixe qui ne
+    // conviendrait qu'à un fond clair).
+    const blendToward = (color, target, amt) => color.map((c, i) => Math.round(c + (target[i] - c) * amt));
+    const ZONE_WIN   = [34, 160, 92];
+    const ZONE_TIE   = [214, 138, 20];
+    const ZONE_FAULT = [196, 58, 52];
+    const ZONE_EMPTY = blendToward(theme.border, theme.card, 0.6);
+    const zoneTextColor = (w, f) => (w === 0 && f === 0) ? theme.muted : [255, 255, 255];
+
+    const drawZoneLegend = (yPos) => {
+      const items = [
+        {color: ZONE_WIN,   label: 'Gagnante'},
+        {color: ZONE_TIE,   label: 'Égalité'},
+        {color: ZONE_FAULT, label: 'Fautes'},
+        {color: ZONE_EMPTY, label: 'Aucune donnée'},
+      ];
+      doc.setFont('helvetica','normal'); doc.setFontSize(8);
+      let lx = M;
+      items.forEach(it => {
+        doc.setFillColor(...it.color);
+        doc.setDrawColor(...theme.border); doc.setLineWidth(0.2);
+        doc.rect(lx, yPos-3.2, 3.6, 3.6, 'FD');
+        doc.setTextColor(...theme.muted);
+        doc.text(it.label, lx+5, yPos);
+        lx += 5 + doc.getTextWidth(it.label) + 7;
+      });
+    };
+    drawZoneLegend(y);
+    y += 8;
+
+    const zoneEntities = statsMode === 'joueur'
+      ? [
+          {label: players.j1, color:theme.blue, wp:'w1_', fp:'f1_'},
+          {label: players.j2, color:theme.blue, wp:'w2_', fp:'f2_'},
+          {label: players.j3, color:theme.orange, wp:'w3_', fp:'f3_'},
+          {label: players.j4, color:theme.orange, wp:'w4_', fp:'f4_'},
+        ]
+      : [
+          {label: nameA, color:theme.blue, wp:'wA_', fp:'fA_'},
+          {label: nameB, color:theme.orange, wp:'wB_', fp:'fB_'},
+        ];
+
+    const zcGap = 8;
+    const zcNetGap = 5;
+    const NON_ROULE_RATIO = 1.8;
+    const PER_BAND_RATIO = 2/3;
+
+    const zoneColor = (w, f) => {
+      if (w === 0 && f === 0) return ZONE_EMPTY;
+      if (w === f) return ZONE_TIE;
+      return w > f ? ZONE_WIN : ZONE_FAULT;
+    };
+
+    // Un terrain n'a d'intérêt que s'il contient au moins une donnée (gagnant
+    // ou faute), toutes zones/variantes confondues pour ce coup — sinon
+    // c'est juste une grille vide qui n'apporte rien et surcharge le PDF.
+    const entityHasDataForShot = (ent, shotKey) => {
+      let total = 0;
+      ALL_SHOT_KEYS.forEach(k => {
+        if (k === shotKey || k.indexOf(shotKey + '_') === 0) {
+          total += (stats[ent.wp+k] || 0) + (stats[ent.fp+k] || 0);
+        }
+      });
+      return total > 0;
+    };
+
+    // On ne garde que les coups où AU MOINS UNE entité a des données — un
+    // coup jamais joué par personne n'a pas sa place dans le PDF du tout.
+    const shotsWithData = BASE_SHOTS.filter(shotKey =>
+      zoneEntities.some(ent => entityHasDataForShot(ent, shotKey))
+    );
+
+    if (!shotsWithData.length) {
+      doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...theme.muted);
+      doc.text('Aucun coup enregistré pour ce match.', M, y);
+      y += 10;
+    }
+
+    shotsWithData.forEach((shotKey, shotIdx) => {
+      // Au sein d'un coup qui a au moins une donnée quelque part, certaines
+      // entités (joueurs/équipes) peuvent quand même n'avoir rien joué de ce
+      // coup précis — leur terrain vide est alors aussi sauté.
+      const activeEntities = zoneEntities.filter(ent => entityHasDataForShot(ent, shotKey));
+      const gridCols = activeEntities.length > 2 ? 2 : activeEntities.length;
+      const gridRows = Math.ceil(activeEntities.length / gridCols);
+
+      const depthBands = shotSettings.depth ? DEPTH_BAND_SHOTS_PDF[shotKey] : undefined;
+      const nBands = depthBands ? depthBands.length : 0;
+
+      const maxCourtLFromHeight = (244 / gridRows) - 22;
+      const maxWFromHeight = depthBands ? maxCourtLFromHeight / (PER_BAND_RATIO * nBands) : maxCourtLFromHeight / NON_ROULE_RATIO;
+      const maxWFromWidth = (W - 2*M - (gridCols-1)*zcGap) / gridCols;
+      const zcCourtW = Math.min(maxWFromWidth, maxWFromHeight);
+      const courtL = depthBands ? zcCourtW * PER_BAND_RATIO * nBands : zcCourtW * NON_ROULE_RATIO;
+      const bandH = depthBands ? courtL / nBands : null;
+      const visualOrder = depthBands ? [...depthBands].reverse() : null;
+
+      const blockHeight = 10 + gridRows * (courtL + 22) + 8;
+      ensureSpace(blockHeight);
+
+      doc.setFont(TF,'bold'); doc.setFontSize(12); doc.setTextColor(...theme.gold);
+      doc.text(SHOT_BASE_LBL_PDF[shotKey].toUpperCase(), M, y);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...theme.muted);
+      doc.text('Coup ' + (shotIdx+1) + ' / ' + shotsWithData.length, W-M, y, {align:'right'});
+      y += 10;
+
+      activeEntities.forEach((ent, i) => {
+        const col = i % gridCols, row = Math.floor(i / gridCols);
+        const x0 = M + col * (zcCourtW + zcGap);
+        const rowLabelY = y + row * (courtL + 22);
+        const courtTop = rowLabelY + 5;
+        const zw = zcCourtW / 5;
+
+        doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...ent.color);
+        doc.text(stripEmoji(ent.label), x0 + zcCourtW/2, rowLabelY, {align:'center'});
+
+        if (depthBands) {
+          visualOrder.forEach((dv, bi) => {
+            const bandTop = courtTop + bi * bandH;
+            ZONES.forEach(z => {
+              const zi = parseInt(z, 10);
+              const suffix = '_' + dv.variant + '_' + z;
+              let w = 0, f = 0;
+              ALL_SHOT_KEYS.forEach(k => {
+                if (k.indexOf(shotKey + '_') === 0 && k.endsWith(suffix)) {
+                  w += stats[ent.wp+k] || 0;
+                  f += stats[ent.fp+k] || 0;
+                }
+              });
+              const zx = x0 + zcCourtW - zi * zw;
+              doc.setFillColor(...zoneColor(w, f));
+              doc.rect(zx, bandTop, zw, bandH, 'F');
+              const tc = zoneTextColor(w, f);
+              doc.setFont('helvetica','bold'); doc.setFontSize(zw > 14 ? 9 : 6); doc.setTextColor(...tc);
+              doc.text(String(zi), zx + zw/2, bandTop + Math.min(bandH - 2, 9), {align:'center'});
+              doc.setFont('helvetica','normal'); doc.setFontSize(zw > 14 ? 6.5 : 5); doc.setTextColor(...tc);
+              doc.text(`${w}/${f}`, zx + zw/2, bandTop + Math.min(bandH - 2, 9) + 5, {align:'center'});
+            });
+            doc.setDrawColor(...theme.border); doc.setLineWidth(0.25);
+            for (let k = 1; k < 5; k++) { const lx = x0 + k*zw; doc.line(lx, bandTop, lx, bandTop+bandH); }
+            doc.setDrawColor(...theme.gold); doc.setLineWidth(0.35);
+            doc.rect(x0, bandTop, zcCourtW, bandH);
+            doc.setFont('helvetica','normal'); doc.setFontSize(6); doc.setTextColor(...theme.gold);
+            doc.text(dv.short, x0 + zcCourtW/2, bandTop + bandH - 2, {align:'center'});
+          });
+          doc.setDrawColor(...theme.border); doc.setLineWidth(0.35); doc.rect(x0, courtTop, zcCourtW, courtL);
+          doc.setDrawColor(...theme.gold); doc.setLineWidth(0.5);
+          doc.line(x0, courtTop+courtL+zcNetGap, x0+zcCourtW, courtTop+courtL+zcNetGap);
+          doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor(...theme.gold);
+          doc.text('FILET', x0, courtTop+courtL+zcNetGap+5);
+        } else {
+          ZONES.forEach(z => {
+            const keys = SHOT_ZONE_KEYS[shotKey][z];
+            let w = 0, f = 0;
+            keys.forEach(k => { w += stats[ent.wp+k] || 0; f += stats[ent.fp+k] || 0; });
+            const zi = parseInt(z, 10);
+            const zx = x0 + zcCourtW - zi * zw;
+            doc.setFillColor(...zoneColor(w, f));
+            doc.rect(zx, courtTop, zw, courtL, 'F');
+            const tc = zoneTextColor(w, f);
+            doc.setFont('helvetica','bold'); doc.setFontSize(zw > 14 ? 10 : 7); doc.setTextColor(...tc);
+            doc.text(String(zi), zx + zw/2, courtTop + (zw > 14 ? 10 : 7), {align:'center'});
+            doc.setFont('helvetica','normal'); doc.setFontSize(zw > 14 ? 7 : 5); doc.setTextColor(...tc);
+            doc.text(`${w}/${f}`, zx + zw/2, courtTop + (zw > 14 ? 18 : 13), {align:'center'});
+          });
+          doc.setDrawColor(...theme.border); doc.setLineWidth(0.25);
+          for (let k = 1; k < 5; k++) { const lx = x0 + k*zw; doc.line(lx, courtTop, lx, courtTop+courtL); }
+          doc.setDrawColor(...theme.border); doc.setLineWidth(0.35); doc.rect(x0, courtTop, zcCourtW, courtL);
+          doc.setDrawColor(...theme.gold); doc.setLineWidth(0.5);
+          doc.line(x0, courtTop+courtL+zcNetGap, x0+zcCourtW, courtTop+courtL+zcNetGap);
+          doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor(...theme.gold);
+          doc.text('FILET', x0, courtTop+courtL+zcNetGap+5);
+        }
+      });
+
+      y += gridRows * (courtL + 22) + 4;
+      doc.setDrawColor(...theme.border); doc.setLineWidth(0.2);
+      doc.line(M, y, W-M, y);
+      y += 8;
+    });
+
+  } else {
+  // ── Style nouveau (par défaut) : barres de distribution ──
+  // Une barre horizontale par coup précis (27 catégories : Service, S+1 ×4,
+  // Retour ×2, Smash ×3, Bras roulé ×3, Amorti ×2, Lob ×3, Rush ×3,
+  // Défense ×6), triées du meilleur au moins bon taux de réussite. La
+  // longueur de la barre montre la fréquence d'utilisation, sa composition
+  // (vert/rouge) le taux de réussite — c'est ce qui permet de repérer en un
+  // coup d'œil les coups qui fonctionnent et ceux à travailler, y compris
+  // par zone. 6 vues au total (globale, puis Zone 1 à 5).
+  sectionTitle('DISTRIBUTION & TAUX DE RÉUSSITE PAR COUP', theme.gold);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...theme.muted);
+  const introText2 = "Chaque ligne représente un type de coup précis, trié du meilleur au moins bon taux de réussite. La longueur de la barre indique le nombre total de fois où ce coup a été joué.";
+  const introLines2 = doc.splitTextToSize(introText2, W - 2*M);
+  introLines2.forEach(l => { ensureSpace(5); doc.text(l, M, y); y += 4.2; });
+  y += 2;
+
+  ensureSpace(8);
+  doc.setFillColor(...theme.green); doc.circle(M+1.5, y-1.6, 1.5, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(...theme.green);
+  doc.text('Coups gagnants', M+6, y);
+  const legendGap2 = M + 6 + doc.getTextWidth('Coups gagnants') + 10;
+  doc.setFillColor(...theme.red); doc.circle(legendGap2+1.5, y-1.6, 1.5, 'F');
+  doc.setTextColor(...theme.red);
+  doc.text('Fautes directes', legendGap2+6, y);
+  y += 9;
+
+  const barEntities = statsMode === 'joueur'
+    ? [
+        {label: players.j1, color:theme.blue, wp:'w1_', fp:'f1_'},
+        {label: players.j2, color:theme.blue, wp:'w2_', fp:'f2_'},
+        {label: players.j3, color:theme.orange, wp:'w3_', fp:'f3_'},
+        {label: players.j4, color:theme.orange, wp:'w4_', fp:'f4_'},
+      ]
+    : [
+        {label: nameA, color:theme.blue, wp:'wA_', fp:'fA_'},
+        {label: nameB, color:theme.orange, wp:'wB_', fp:'fB_'},
+      ];
+
+  // Totaux par catégorie de coup pour une entité, toutes zones confondues ou
+  // filtrés sur une zone précise (zoneFilter = null -> vue globale). Les
+  // catégories dynamiques (voir computeLeafShotCategories) savent déjà
+  // reconnaître toutes les clés qui leur correspondent, même quand une
+  // dimension a été fusionnée par les réglages.
+  const dynamicShotCategories = computeLeafShotCategories();
+  const computeCategoryTotals2 = (wp, fp, zoneFilter) => {
+    const zones = zoneFilter ? [zoneFilter] : ZONES;
+    return dynamicShotCategories.map(cat => {
+      let w = 0, f = 0;
+      ALL_SHOT_KEYS.forEach(k => {
+        if (!cat.match(k)) return;
+        const zone = k.slice(k.lastIndexOf('_') + 1);
+        if (zones.includes(zone)) {
+          w += stats[wp+k] || 0;
+          f += stats[fp+k] || 0;
+        }
+      });
+      return { ...cat, w, f };
+    });
+  };
+
+  // Les vues "par zone" n'ont de sens que si les zones sont activées
+  // (Préférences > Coups) — sinon on ne garde que la vue globale.
+  const barViews = shotSettings.zone
+    ? [
+        { label: 'VUE GLOBALE — TOUTES ZONES CONFONDUES', zoneFilter: null },
+        ...ZONES.map(z => ({ label: 'ZONE ' + z, zoneFilter: z })),
+      ]
+    : [
+        { label: 'VUE GLOBALE', zoneFilter: null },
+      ];
+
+  const labelColW = 40;
+  const pctColW = 20;
+  const barRowH = 6.4;
+  const barGap = 1.2;
+
+  barViews.forEach((view, viewIdx) => {
+    ensureSpace(16);
+    doc.setFont(TF,'bold'); doc.setFontSize(12); doc.setTextColor(...theme.gold);
+    doc.text(view.label, M, y);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...theme.muted);
+    doc.text('Vue ' + (viewIdx+1) + ' / ' + barViews.length, W-M, y, {align:'right'});
+    y += 10;
+
+    barEntities.forEach((ent, entIdx) => {
+      const totals = computeCategoryTotals2(ent.wp, ent.fp, view.zoneFilter)
+        .filter(c => (c.w + c.f) > 0)
+        .sort((a, b) => (b.w / (b.w + b.f)) - (a.w / (a.w + a.f)));
+      const totW = totals.reduce((s,c)=>s+c.w,0);
+      const totF = totals.reduce((s,c)=>s+c.f,0);
+
+      ensureSpace(14);
+      doc.setFont(TF,'bold'); doc.setFontSize(10.5); doc.setTextColor(...ent.color);
+      doc.text(stripEmoji(ent.label) + '  —  Coups gagnants : ' + totW + '   Fautes directes : ' + totF, M, y);
+      y += 7;
+
+      if (!totals.length) {
+        doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...theme.muted);
+        doc.text('Aucun coup enregistré sur cette vue', M+2, y);
+        y += 7;
+      } else {
+        const maxTotal = Math.max(...totals.map(c => c.w + c.f));
+        const barAreaX = M + labelColW;
+        const barAreaMaxW = W - M - barAreaX - pctColW;
+
+        // Barre "pilule" avec dégradé doux (clair en haut, plus soutenu en bas)
+        // et extrémités arrondies, plutôt qu'un aplat aux angles vifs.
+        const drawGradientSegment = (sx, sw, colorLight, colorDark) => {
+          if (sw <= 0) return;
+          const bands = 6;
+          const bandH = barRowH / bands;
+          for (let bi = 0; bi < bands; bi++) {
+            const t = bi / (bands - 1);
+            const r = Math.round(colorLight[0] + (colorDark[0]-colorLight[0])*t);
+            const g = Math.round(colorLight[1] + (colorDark[1]-colorLight[1])*t);
+            const b = Math.round(colorLight[2] + (colorDark[2]-colorLight[2])*t);
+            doc.setFillColor(r, g, b);
+            doc.rect(sx, y + bi*bandH, sw, bandH + 0.2, 'F');
+          }
+        };
+        const drawPillBar = (x0, greenW2, redW2) => {
+          const totalW = greenW2 + redW2;
+          if (totalW <= 0.5) return;
+          drawGradientSegment(x0, greenW2, theme.greenLight, theme.greenDark);
+          drawGradientSegment(x0 + greenW2, redW2, theme.redLight, theme.redDark);
+          const capR = barRowH / 2;
+          doc.setFillColor(...(greenW2 > 0 ? theme.greenDark : theme.redDark));
+          doc.circle(x0, y + barRowH/2, capR, 'F');
+          doc.setFillColor(...(redW2 > 0 ? theme.redDark : theme.greenDark));
+          doc.circle(x0 + totalW, y + barRowH/2, capR, 'F');
+        };
+
+        totals.forEach(cat => {
+          ensureSpace(barRowH + barGap);
+          const total = cat.w + cat.f;
+          const pct = total > 0 ? (cat.w / total * 100) : 0;
+          const barW = maxTotal > 0 ? (total / maxTotal) * barAreaMaxW : 0;
+          const greenW = total > 0 ? barW * (cat.w / total) : 0;
+          const redW = barW - greenW;
+
+          doc.setFont('helvetica','normal'); doc.setFontSize(6.8); doc.setTextColor(...theme.text);
+          doc.text(cat.label, M, y + barRowH/2 + 1.3, {maxWidth: labelColW - 3});
+
+          if (barW > 0.5) {
+            drawPillBar(barAreaX, greenW, redW);
+            doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(255,255,255);
+            if (greenW > 6) doc.text(String(cat.w), barAreaX + greenW/2, y + barRowH/2 + 1.2, {align:'center'});
+            if (redW > 6) doc.text(String(cat.f), barAreaX + greenW + redW/2, y + barRowH/2 + 1.2, {align:'center'});
+          }
+
+          doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...(pct >= 50 ? theme.green : theme.red));
+          doc.text(Math.round(pct) + '%', barAreaX + barW + barRowH/2 + 1.8, y + barRowH/2 + 1.2);
+
+          y += barRowH + barGap;
+        });
+      }
+      y += 5;
+      if (entIdx < barEntities.length - 1) {
+        doc.setDrawColor(...theme.border); doc.setLineWidth(0.15); doc.line(M, y-3, W-M, y-3);
+      }
+    });
+
+    if (viewIdx < barViews.length - 1) {
+      doc.setDrawColor(...theme.gold); doc.setLineWidth(0.4);
+      doc.line(M, y, W-M, y);
+      y += 8;
+    }
+  });
+  y += 4;
+  } // fin du else (style "barres")
+
+  // ══ 6. JOURNAL DU MATCH COMPLET ══════════════════════════════════════════
+  sectionTitle('JOURNAL DU MATCH COMPLET', theme.gold);
+  let logIdx = 0;
+  [...matchLog].reverse().forEach(entry => {
+    ensureSpace(7);
+    if (logIdx % 2 === 0) stripe(y, 6.5);
+    logIdx++;
+    let cleanMsg = stripEmoji(entry.msg);
+    if (entry.type === 'winner') cleanMsg = 'Point gagnant — ' + cleanMsg;
+    else if (entry.type === 'faute') cleanMsg = 'Faute — ' + cleanMsg;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    doc.setTextColor(...theme.muted); doc.text(entry.time, M, y);
+    doc.setTextColor(...theme.text);
+    doc.text((entry.team ? stripEmoji(entry.team)+' — ':'')+cleanMsg, M+16, y);
+    y+=6.5;
+  });
+
+  doc.save('Tstats_Pro_'+new Date().toISOString().slice(0,10)+'.pdf');
+}
+
+
+initNames();
+initZoneTabs();
+const _savedProgress = loadProgress();
+if (_savedProgress) {
+  checkResumeOnLoad();
+} else {
+  updateDisplay();
+  logEvent('', t('log_match_created_simple'));
+}
+// ── THÈMES ────────────────────────────────────────────────────────────────
+const PRO_THEMES = ['neon', 'sunset', 'lagoon', 'eclat', 'glacier'];
+let userTier = null;
+
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.theme-switch-wrap')) {
+    ALL_MENU_IDS.forEach(id => document.getElementById(id)?.classList.remove('open'));
+  }
+});
+
+// ── PRÉFÉRENCES (style du PDF exporté) ───────────────────────────────────
+// 'bars' = nouvelle version (barres de distribution triées par taux de
+// réussite), 'classic' = ancienne version (terrains par zone), reskinée sur
+// le thème clair actuel. Choix mémorisé pour tous les exports futurs.
+let pdfStyle = localStorage.getItem('tstats_pdf_style') || 'bars';
+
+function refreshPrefsMenuUI() {
+  document.querySelectorAll('[data-pdf-style-choice]').forEach(b => {
+    b.classList.toggle('active', b.dataset.pdfStyleChoice === pdfStyle);
+  });
+  document.querySelectorAll('[data-stats-mode-choice]').forEach(b => {
+    b.classList.toggle('active', b.dataset.statsModeChoice === statsMode);
+  });
+}
+
+// ── RÉGLAGES > COUPS ──────────────────────────────────────────────────────
+function refreshShotSettingsUI() {
+  document.getElementById('toggleShotDepth')?.classList.toggle('on', shotSettings.depth);
+  document.getElementById('toggleShotZone')?.classList.toggle('on', shotSettings.zone);
+  document.getElementById('toggleShotSide')?.classList.toggle('on', shotSettings.side);
+}
+
+function toggleShotSetting(key) {
+  shotSettings[key] = !shotSettings[key];
+  try { localStorage.setItem('tstats_shot_settings', JSON.stringify(shotSettings)); } catch(e) {}
+  refreshShotSettingsUI();
+
+  // Les terrains (style PDF "classique") n'ont plus de sens sans zones :
+  // on bascule automatiquement sur le style "barres" si besoin.
+  if (key === 'zone' && !shotSettings.zone && pdfStyle === 'classic') {
+    pdfStyle = 'bars';
+    try { localStorage.setItem('tstats_pdf_style', 'bars'); } catch(e) {}
+  }
+
+  // La cartographie par zone en direct n'a de sens que si les zones sont
+  // activées — on l'affiche/masque en conséquence, sans jamais casser le
+  // reste de l'interface.
+  if (key === 'zone') updateZoneMapVisibility();
+}
+
+const ALL_MENU_IDS = ['gearMenu','themeSubmenu','langSubmenu','prefsMenu','pdfMenu','matchMenu','shotsMenu'];
+
+function toggleGearMenu(e) {
+  e.stopPropagation();
+  ALL_MENU_IDS.filter(id => id !== 'gearMenu').forEach(id => document.getElementById(id)?.classList.remove('open'));
+  document.getElementById('gearMenu')?.classList.toggle('open');
+}
+
+
+function openPrefsMenu(e) {
+  e.stopPropagation();
+  document.getElementById('gearMenu')?.classList.remove('open');
+  document.getElementById('prefsMenu')?.classList.add('open');
+}
+
+
+function openPdfMenu(e) {
+  e.stopPropagation();
+  document.getElementById('prefsMenu')?.classList.remove('open');
+  document.getElementById('pdfMenu')?.classList.add('open');
+  refreshPrefsMenuUI();
+}
+
+function openMatchMenu(e) {
+  e.stopPropagation();
+  document.getElementById('prefsMenu')?.classList.remove('open');
+  document.getElementById('matchMenu')?.classList.add('open');
+  refreshPrefsMenuUI();
+}
+
+function openShotsMenu(e) {
+  e.stopPropagation();
+  document.getElementById('prefsMenu')?.classList.remove('open');
+  document.getElementById('shotsMenu')?.classList.add('open');
+  refreshShotSettingsUI();
+}
+
+function backToPrefsMenu(e) {
+  e.stopPropagation();
+  ['pdfMenu','matchMenu','shotsMenu'].forEach(id => document.getElementById(id)?.classList.remove('open'));
+  document.getElementById('prefsMenu')?.classList.add('open');
+}
+
+function setPdfStyle(style) {
+  pdfStyle = style;
+  try { localStorage.setItem('tstats_pdf_style', style); } catch(e) {}
+  refreshPrefsMenuUI();
+  document.getElementById('prefsMenu')?.classList.remove('open');
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  const current = localStorage.getItem('tstats_theme') || 'dark';
+  document.querySelectorAll('.theme-swatch[data-theme-choice]').forEach(b => b.classList.toggle('active', b.dataset.themeChoice === current));
+  refreshPrefsMenuUI();
+  refreshShotSettingsUI();
+  updateZoneMapVisibility();
+  checkTier();
+  applyLanguageToDOM();
+});
+
+</script>
+<script src="/sync.js"></script>
+</body>
+</html>

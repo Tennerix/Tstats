@@ -1,0 +1,2047 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script>(function(){var t=localStorage.getItem('tstats_theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#090f1a">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tstats">
+<title>Tennis – Stats de Base</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#080f1e;
+  --surface:#0d1829;
+  --card:#111e35;
+  --border:#1e3560;
+  --hover:#162040;
+  --gold:#f5c518;
+  --blue:#3b82f6;
+  --orange:#f97316;
+  --green:#22c55e;
+  --red:#ef4444;
+  --purple:#a855f7;
+  --text:#e2eaf8;
+  --muted:#4a6494;
+}
+[data-theme="light"]{
+  --bg:#eef1f6; --surface:#e7ecf3; --card:#f7f9fc; --hover:#dde4ee; --border:#aebad2;
+  --gold:#b3860f; --blue:#3b66c4; --orange:#c9601e; --green:#1f8a4c; --purple:#7c4bc4;
+  --red:#c23a3a; --text:#2c3646; --muted:#748094;
+}
+[data-theme="neon"]{
+  --bg:#050214; --surface:#0d0620; --card:#140a2e; --hover:#1c0f3d; --border:#3d1a6b;
+  --gold:#ffe600; --blue:#00e5ff; --orange:#ff2e97; --green:#39ff14; --purple:#c644ff;
+  --red:#ff2e5f; --text:#f2ecff; --muted:#8c6bc9;
+}
+[data-theme="sunset"]{
+  --bg:linear-gradient(180deg,#200a12 0%,#4a1f16 22%,#b8531f 48%,#f0c542 62%,#6b2a52 84%,#241130 100%);
+  --surface:linear-gradient(135deg,#3c1a14 0%,#6b3420 100%);
+  --card:linear-gradient(150deg,#481f18 0%,#7a3f22 100%);
+  --hover:linear-gradient(135deg,#5c2a1c 0%,#8a4a26 100%);
+  --border:#a35a35;
+  --gold:#ffcb3d; --blue:#5ec8f5; --orange:#ff7f3f; --green:#3fd9ae; --purple:#e488a8;
+  --red:#ef4a4a; --text:#fff8ec; --muted:#e0b89f;
+}
+[data-theme="lagoon"]{
+  --bg:linear-gradient(180deg,#02141a 0%,#053b3f 22%,#0a6e6e 48%,#17d6d0 62%,#0a4a5c 84%,#02121e 100%);
+  --surface:linear-gradient(135deg,#04262b 0%,#0a4a4a 100%);
+  --card:linear-gradient(150deg,#063339 0%,#0d5555 100%);
+  --hover:linear-gradient(135deg,#0a4045 0%,#116868 100%);
+  --border:#1ec9c9;
+  --gold:#ffd166; --blue:#22d3ee; --orange:#ff8c42; --green:#2dd4a7; --purple:#7c83fd;
+  --red:#ff5c5c; --text:#e0fbfc; --muted:#5fa8ac;
+}
+[data-theme="eclat"]{
+  --bg:linear-gradient(180deg,#ffffff 0%,#fff3d1 18%,#ffe0ee 36%,#e3f3ff 54%,#dffbe8 72%,#fff9f0 88%,#ffffff 100%);
+  --surface:linear-gradient(135deg,#fffaf0 0%,#ffeaf3 100%);
+  --card:linear-gradient(150deg,#ffffff 0%,#fff3fa 100%);
+  --hover:linear-gradient(135deg,#ffeedd 0%,#ffdcee 100%);
+  --border:#ffb4d1;
+  --gold:#ffb100; --blue:#0080ff; --orange:#ff5400; --green:#00c853; --purple:#a600ff;
+  --red:#ff1744; --text:#14171f; --muted:#66707f;
+}
+[data-theme="glacier"]{
+  --bg:linear-gradient(180deg,#020a12 0%,#062038 22%,#0f3f5c 48%,#63d8ff 62%,#123048 84%,#02101c 100%);
+  --surface:linear-gradient(135deg,#04182a 0%,#0a3550 100%);
+  --card:linear-gradient(150deg,#082238 0%,#0e3d5c 100%);
+  --hover:linear-gradient(135deg,#0c2d46 0%,#155070 100%);
+  --border:#3fa0cf;
+  --gold:#d6faff; --blue:#7fd8ff; --orange:#ffb4a8; --green:#9dfcd8; --purple:#b8c6ff;
+  --red:#ff8fa3; --text:#eaf9ff; --muted:#6f93ab;
+}
+/* ── SÉLECTEUR DE THÈME ── */
+body{transition:background-color .25s ease,color .25s ease}
+.theme-switch-wrap{position:relative}
+.theme-menu{position:absolute;top:calc(100% + 8px);left:0;background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:8px;display:none;flex-direction:column;gap:2px;z-index:30;min-width:170px;
+  box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.theme-menu.open{display:flex}
+.theme-swatch{display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--text);
+  font-family:Barlow,sans-serif;font-size:13px;padding:7px 8px;border-radius:6px;cursor:pointer;text-align:left;width:100%}
+.theme-swatch:hover{background:var(--surface)}
+.theme-swatch.active{outline:1px solid var(--gold)}
+.theme-swatch.locked{opacity:.55}
+.theme-swatch .lock-badge{margin-left:auto;font-size:9px;font-weight:900;letter-spacing:.5px;color:var(--gold);display:none;align-items:center;gap:2px;flex-shrink:0}
+.theme-swatch.locked .lock-badge{display:flex}
+.prefs-menu-label{font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:var(--muted);padding:4px 8px 2px}
+.gear-menu-item{justify-content:space-between}
+.menu-chevron{margin-left:auto;color:var(--muted);font-size:15px;font-weight:700}
+.prefs-back-btn{display:flex;align-items:center;gap:4px;background:none;border:none;color:var(--muted);
+  font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:6px 8px;border-radius:6px;cursor:pointer;text-align:left;width:100%;margin-bottom:4px}
+.prefs-back-btn:hover{background:var(--surface);color:var(--gold)}
+.sw{width:14px;height:14px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.25)}
+.sw-dark{background:linear-gradient(135deg,#080f1e,#3b82f6)}
+.sw-light{background:linear-gradient(135deg,#f7f9fc,#3b66c4)}
+.sw-neon{background:linear-gradient(135deg,#050214,#ff2e97)}
+.sw-sunset{background:linear-gradient(135deg,#2a130f,#ff6b1a)}
+.sw-lagoon{background:linear-gradient(135deg,#02141a,#17d6d0)}
+.sw-eclat{background:linear-gradient(135deg,#ffe0ee,#ff5400 55%,#0080ff)}
+.sw-glacier{background:linear-gradient(135deg,#020a12,#63d8ff)}
+
+body{
+  font-family:Barlow,sans-serif;
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:0 1rem 4rem;
+}
+
+/* ── HEADER ── */
+.header{
+  width:100%;max-width:580px;
+  display:flex;flex-direction:column;gap:.6rem;
+  padding:1.2rem 0 1rem;
+  border-bottom:1px solid var(--border);
+  margin-bottom:1.2rem;}
+.header-top-row{display:flex;align-items:center;justify-content:space-between;width:100%}
+.header-gear-btn{background:none;border:1px solid var(--border);color:var(--muted);
+  width:34px;height:34px;border-radius:50%;cursor:pointer;transition:all .18s;
+  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.header-gear-btn:hover{border-color:var(--gold);color:var(--gold);transform:rotate(25deg)}
+.theme-menu-right{left:auto;right:0}
+.header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
+@media(max-width:480px){
+  .header-logo{font-size:18px}
+  .header-back{font-size:11px;padding:5px 9px}
+}
+.header-logo{font-family:Barlow Condensed,sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:var(--gold)}
+.header-logo span{color:var(--text);opacity:.5}
+.header-back{background:none;border:1px solid var(--border);color:var(--muted);font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all .18s}
+.header-back:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── STATUS BAR ── */
+.status-bar{
+  width:100%;max-width:580px;
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:.75rem 1.4rem;display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-bottom:1rem;
+}
+.status-pill{font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--bg);background:var(--gold);padding:4px 14px;border-radius:20px}
+[data-theme="glacier"] .status-pill{color:#0a2e52}
+[data-theme="sunset"] .status-pill{color:#3a140a}
+[data-theme="lagoon"] .status-pill{color:#04302c}
+[data-theme="eclat"] .status-pill{color:#14171f}
+.status-label{font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+
+/* ── SCOREBOARD ── */
+.scoreboard{
+  width:100%;max-width:580px;
+  background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;
+  box-shadow:0 8px 48px rgba(0,0,0,.5);margin-bottom:1rem;
+}
+.score-header{
+  display:grid;grid-template-columns:1fr 44px 44px 44px 80px;
+  padding:.6rem 1.4rem;background:var(--surface);border-bottom:1px solid var(--border);
+}
+.score-header span{font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:center}
+.score-header span:first-child{text-align:left}
+.team-row{
+  display:grid;grid-template-columns:1fr 44px 44px 44px 80px;align-items:center;
+  padding:1rem 1.4rem;border-bottom:1px solid var(--border);transition:background .15s;
+}
+.team-row:last-child{border-bottom:none}
+.team-info{display:flex;flex-direction:column;gap:3px}
+.team-name{font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+.team-name-input{
+  font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  background:none;border:none;border-bottom:1px dashed transparent;color:var(--muted);width:100%;padding:0 0 1px;
+  outline:none;transition:border-color .15s;
+}
+.team-name-input::placeholder{color:inherit;opacity:1}
+.team-name-input:hover,.team-name-input:focus{border-bottom-color:var(--muted)}
+.team-players{font-size:15px;color:var(--text);font-weight:900;font-family:Barlow Condensed,sans-serif;
+  letter-spacing:.3px;display:flex;flex-direction:column;line-height:1.25}
+.team-players .serving-ball{display:inline-block;margin-left:3px;font-size:13px}
+.team-row.team-a .team-players{color:var(--blue)}
+.team-row.team-b .team-players{color:var(--orange)}
+.cell{text-align:center;font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900}
+.cell.sets-cell span{display:inline-block;width:28px;height:28px;line-height:28px;border-radius:50%;font-size:14px;font-weight:900}
+.cell.sets-cell span.won{background:var(--gold);color:var(--bg)}
+[data-theme="glacier"] .cell.sets-cell span.won{color:#0a2e52}
+[data-theme="sunset"] .cell.sets-cell span.won{color:#3a140a}
+[data-theme="lagoon"] .cell.sets-cell span.won{color:#04302c}
+[data-theme="eclat"] .cell.sets-cell span.won{color:#14171f}
+.cell.set-score{
+  font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:900;
+  text-align:center;color:var(--muted);
+}
+.cell.set-score.active{color:var(--text)}
+.cell.set-score.won{color:var(--gold)}
+.cell.point-cell{font-size:36px;color:var(--gold);font-style:italic}
+
+/* ── STATS CARD ── */
+.stats-card{
+  width:100%;max-width:580px;
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:1.2rem 1.4rem;margin-bottom:1rem;
+}
+.stats-title{
+  font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+  margin-bottom:1rem;display:flex;align-items:center;gap:8px;
+}
+.stats-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.stats-view-switch{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.sv-chip{background:var(--surface);border:1px solid var(--border);color:var(--muted);
+  font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;padding:.4rem .75rem;border-radius:20px;cursor:pointer;transition:all .15s}
+.sv-chip:hover{color:var(--text);border-color:var(--muted)}
+.sv-chip.active{background:var(--gold);border-color:var(--gold);color:#0a0f1a}
+
+.stat-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin-bottom:.7rem}
+.stat-row:last-child{margin-bottom:0}
+.stat-val{
+  font-family:Barlow Condensed,sans-serif;font-size:24px;font-weight:900;
+}
+.stat-val.a{color:var(--blue);text-align:right}
+.stat-val.b{color:var(--orange);text-align:left}
+.stat-name{
+  font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:center;
+  white-space:nowrap;
+}
+.stat-bar-wrap{grid-column:1/-1;display:flex;height:4px;border-radius:4px;overflow:hidden;background:var(--surface)}
+.stat-bar-a{background:var(--blue);transition:width .4s}
+.stat-bar-b{background:var(--orange);transition:width .4s}
+
+/* ── ACTIONS ── */
+.team-controls{width:100%;max-width:580px;margin-bottom:.8rem}
+.team-ctrl-label{
+  font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;margin-bottom:6px;padding-left:4px;
+}
+.team-ctrl-label.a{color:var(--blue)}
+.team-ctrl-label.b{color:var(--orange)}
+.ctrl-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-winner,.btn-faute{
+  padding:.9rem .8rem;border-radius:14px;border:2px solid;cursor:pointer;
+  transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1;
+  font-family:Barlow Condensed,sans-serif;
+}
+.btn-winner:active,.btn-faute:active{transform:scale(.96)}
+.btn-icon{font-size:22px}
+.btn-main{font-size:16px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+.btn-sub{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;opacity:.6}
+.btn-winner.a{background:rgba(34,197,94,.1);border-color:var(--green);color:var(--green)}
+.btn-winner.a:hover{background:rgba(34,197,94,.22);transform:scale(1.02)}
+.btn-winner.b{background:rgba(34,197,94,.1);border-color:var(--green);color:var(--green)}
+.btn-winner.b:hover{background:rgba(34,197,94,.22);transform:scale(1.02)}
+.btn-faute.a{background:rgba(239,68,68,.08);border-color:var(--red);color:var(--red)}
+.btn-faute.a:hover{background:rgba(239,68,68,.2);transform:scale(1.02)}
+.btn-faute.b{background:rgba(239,68,68,.08);border-color:var(--red);color:var(--red)}
+.btn-faute.b:hover{background:rgba(239,68,68,.2);transform:scale(1.02)}
+
+.actions{width:100%;max-width:580px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1rem}
+.btn-action{
+  padding:.75rem;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);
+  font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-action:hover{background:var(--hover);border-color:var(--muted)}
+.btn-action.undo{border-color:#f59e0b;color:#f59e0b}
+.btn-action.undo:hover{background:rgba(245,158,11,.12)}
+.btn-action.reset{border-color:var(--red);color:var(--red)}
+.btn-action.reset:hover{background:rgba(239,68,68,.12)}
+.btn-action.pdf{border-color:var(--green);color:var(--green)}
+.btn-action.pdf:hover{background:rgba(34,197,94,.12)}
+
+/* ── LOG ── */
+.log-wrap{width:100%;max-width:580px}
+.log-title{font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;padding-left:4px}
+.log-list{display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto}
+.log-entry{
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:.45rem 1rem;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;
+}
+.log-entry .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.log-entry.dot-a .dot{background:var(--blue)}
+.log-entry.dot-b .dot{background:var(--orange)}
+.log-entry.dot-w .dot{background:var(--green)}
+.log-entry.dot-f .dot{background:var(--red)}
+.log-entry.event .dot{background:var(--gold)}
+.log-tag{
+  margin-left:auto;font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:10px;
+}
+.log-tag.winner{background:rgba(34,197,94,.15);color:var(--green)}
+.log-tag.faute{background:rgba(239,68,68,.15);color:var(--red)}
+
+/* ── WINNER OVERLAY ── */
+.winner-overlay{
+  display:none;position:fixed;inset:0;background:rgba(8,15,30,.92);z-index:100;
+  align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;padding:2rem;
+}
+.winner-overlay.show{display:flex}
+.winner-box{
+  background:var(--card);border:2px solid var(--gold);border-radius:24px;
+  padding:2.5rem 2rem;text-align:center;max-width:400px;width:100%;
+  box-shadow:0 0 80px rgba(245,197,24,.2);
+}
+.winner-trophy{font-size:60px;margin-bottom:1rem}
+.winner-label{font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);opacity:.7;margin-bottom:.5rem}
+.winner-name{font-family:Barlow Condensed,sans-serif;font-size:32px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#fff;margin-bottom:.4rem}
+.winner-score{font-family:Barlow Condensed,sans-serif;font-size:16px;color:var(--muted);letter-spacing:1px;margin-bottom:1.2rem}
+.winner-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.4rem}
+.ws-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.8rem}
+.ws-val{font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:900}
+.ws-val.a{color:var(--blue)}
+.ws-val.b{color:var(--orange)}
+.ws-lbl{font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.winner-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.winner-btn{padding:.7rem 1.4rem;border-radius:10px;border:1.5px solid;font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.winner-btn.primary{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.1)}
+.winner-btn.primary:hover{background:rgba(245,197,24,.25)}
+.winner-btn.secondary{border-color:var(--border);color:var(--muted);background:none}
+.winner-btn.secondary:hover{border-color:var(--muted);color:var(--text)}
+
+/* ── TIMER ── */
+.timer-wrap{
+  width:100%;max-width:580px;
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:.9rem 1.4rem;margin-bottom:1rem;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.timer-display{
+  font-family:Barlow Condensed,sans-serif;font-size:38px;font-weight:900;
+  letter-spacing:4px;color:var(--gold);font-variant-numeric:tabular-nums;
+  min-width:110px;
+}
+.timer-display.running{color:#fff}
+.timer-btns{display:flex;gap:8px}
+
+.correction-toggle{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--surface);border:1px dashed var(--border);color:var(--muted);
+  font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;padding:.6rem;border-radius:10px;cursor:pointer;margin-bottom:.8rem;
+  transition:all .15s;
+}
+.correction-toggle:hover{color:var(--text);border-color:var(--muted)}
+.correction-toggle-arrow{font-size:11px;transition:transform .2s}
+.correction-toggle.open .correction-toggle-arrow{transform:rotate(180deg)}
+.correction-panel{display:none;background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:1rem 1.1rem;margin-bottom:1rem}
+.correction-panel.open{display:block}
+.correction-hint{font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:.9rem}
+.correction-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.correction-col{display:flex;flex-direction:column;gap:6px}
+.correction-col-label{font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;text-align:center;margin-bottom:2px}
+.correction-col-label.a{color:var(--blue)}
+.correction-col-label.b{color:var(--orange)}
+.correction-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.correction-btn{
+  background:var(--surface);border:1px solid var(--border);color:var(--text);
+  font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;padding:.55rem;border-radius:8px;cursor:pointer;transition:all .15s;
+}
+.correction-btn.a:hover{border-color:var(--blue);color:var(--blue)}
+.correction-btn.b:hover{border-color:var(--orange);color:var(--orange)}
+.correction-btn.minus{opacity:.72}
+.correction-btn.minus:hover{opacity:1;border-color:var(--red);color:var(--red)}
+.correction-super-btn{
+  width:100%;margin-top:12px;background:var(--surface);border:1px dashed var(--gold);color:var(--gold);
+  font-family:Barlow Condensed,sans-serif;font-size:11.5px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;padding:.65rem;border-radius:8px;cursor:pointer;transition:all .15s;
+}
+.correction-super-btn:hover{background:rgba(245,197,24,.12)}
+
+.server-indicator{
+  display:flex;align-items:center;gap:8px;width:100%;background:var(--card);
+  border:1px solid var(--gold);border-radius:12px;padding:.6rem .9rem;margin-bottom:1rem;
+}
+.server-indicator.team-a{border-color:var(--blue)}
+.server-indicator.team-b{border-color:var(--orange)}
+.server-ball{font-size:16px;flex-shrink:0}
+.server-indicator span{font-size:12.5px;color:var(--muted)}
+.server-indicator .server-name{color:var(--text);font-family:Barlow Condensed,sans-serif;
+  font-weight:900;letter-spacing:.5px}
+.server-change-btn{
+  margin-left:auto;flex-shrink:0;background:var(--surface);border:1px solid var(--border);
+  color:var(--muted);font-family:Barlow Condensed,sans-serif;font-size:10.5px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;padding:.3rem .7rem;border-radius:14px;cursor:pointer;
+}
+.server-change-btn:hover{color:var(--text);border-color:var(--muted)}
+
+.server-modal-backdrop{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:110;
+  align-items:center;justify-content:center;padding:1rem;
+}
+.server-modal-backdrop.show{display:flex}
+.server-modal-box{
+  background:var(--card);border:1px solid var(--gold);border-radius:16px;
+  padding:1.6rem 1.4rem;max-width:380px;width:100%;text-align:center;
+}
+.server-modal-title{
+  font-family:Barlow Condensed,sans-serif;font-size:17px;font-weight:900;letter-spacing:.5px;
+  color:var(--text);margin-bottom:.3rem;
+}
+.server-modal-box::before{content:'🎾';display:block;font-size:30px;margin-bottom:.5rem}
+.server-modal-btns{display:flex;flex-direction:column;gap:14px;margin-top:1.1rem}
+.server-modal-group{display:flex;flex-direction:column;gap:6px}
+.server-modal-group-label{font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;text-align:left}
+.server-modal-group-label.team-a{color:var(--blue)}
+.server-modal-group-label.team-b{color:var(--orange)}
+.server-modal-group-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.server-modal-btn{
+  background:var(--surface);border:1.5px solid var(--border);color:var(--text);
+  font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;letter-spacing:.5px;
+  padding:.7rem .4rem;border-radius:10px;cursor:pointer;transition:all .15s;
+}
+.server-modal-btn.team-a:hover{border-color:var(--blue);color:var(--blue)}
+.server-modal-btn.team-b:hover{border-color:var(--orange);color:var(--orange)}
+.timer-btn{
+  padding:.5rem 1rem;border-radius:8px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text);
+  font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;
+}
+.timer-btn:hover{background:var(--hover);border-color:var(--muted)}
+.timer-btn.start{border-color:var(--green);color:var(--green)}
+.timer-btn.start:hover{background:rgba(34,197,94,.12)}
+.timer-btn.pause{border-color:var(--gold);color:var(--gold)}
+.timer-btn.pause:hover{background:rgba(245,197,24,.12)}
+.timer-btn.stop{border-color:var(--red);color:var(--red)}
+.timer-btn.stop:hover{background:rgba(239,68,68,.12)}
+.timer-btn.live{border-color:var(--blue);color:var(--blue)}
+.timer-btn.live:hover{background:rgba(59,130,246,.12)}
+.timer-btn.live.active{background:var(--blue);color:#fff}
+.timer-btn.live.active::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff;margin-right:6px;animation:live-pulse 1.4s ease-in-out infinite}
+@keyframes live-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.live-modal-backdrop{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;
+  align-items:center;justify-content:center;padding:1rem;
+}
+.live-modal-backdrop.show{display:flex}
+.live-modal{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:1.4rem;max-width:420px;width:100%;
+}
+.live-modal-title{
+  font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:900;
+  letter-spacing:1px;margin-bottom:.9rem;
+}
+.live-modal-body p{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:.8rem}
+.live-link-row{display:flex;gap:8px;margin-bottom:.6rem}
+.live-link-row input{
+  flex:1;min-width:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:.6rem .7rem;color:var(--text);font-size:13px;
+}
+.live-link-row button{
+  background:var(--gold);border:none;border-radius:8px;padding:.6rem 1rem;
+  font-family:Barlow Condensed,sans-serif;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;font-size:12px;color:#0a0f1a;cursor:pointer;flex-shrink:0;
+}
+.live-modal-note{font-size:11px !important;color:var(--muted)}
+.live-modal-actions{display:flex;gap:8px;margin-top:1rem}
+.live-modal-actions button{
+  flex:1;padding:.6rem;border-radius:8px;font-family:Barlow Condensed,sans-serif;
+  font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+}
+.live-stop-btn{background:none;border:1px solid var(--red);color:var(--red)}
+.live-stop-btn:hover{background:rgba(239,68,68,.12)}
+.live-close-btn{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+.live-close-btn:hover{background:var(--hover)}
+
+@media(max-width:440px){
+  .score-header,.team-row{grid-template-columns:1fr 36px 36px 36px 64px;padding:.8rem .7rem}
+  .cell.set-score{
+  font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:900;
+  text-align:center;color:var(--muted);
+}
+.cell.set-score.active{color:var(--text)}
+.cell.set-score.won{color:var(--gold)}
+.cell.point-cell{font-size:28px}
+  .shot-btn{font-size:14px;padding:.9rem .6rem}
+  .shot-btn .shot-icon{font-size:24px}
+  .actions{grid-template-columns:1fr 1fr 1fr}
+}
+</style>
+
+<script>
+// Enregistrement du service worker (mode hors ligne). Échec silencieux si
+// non supporté ou si le fichier n'est pas encore déployé, pour ne jamais
+// bloquer le chargement normal de la page.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+</script>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top-row">
+    <div class="header-logo">T<span>/</span>Stats</div>
+    <div class="theme-switch-wrap">
+      <button class="header-gear-btn" onclick="toggleGearMenu(event)" aria-label="Menu">⚙</button>
+      <div class="theme-menu theme-menu-right" id="gearMenu">
+        <button class="theme-swatch gear-menu-item" onclick="openThemeSubmenu(event)" data-i18n="settings_theme">Thème<span class="menu-chevron">›</span></button>
+        <button class="theme-swatch gear-menu-item" onclick="openLangSubmenu(event)" data-i18n="settings_lang">Langue<span class="menu-chevron">›</span></button>
+        <button class="theme-swatch gear-menu-item" onclick="openPrefsMenu(event)" data-i18n="settings_prefs">Préférences<span class="menu-chevron">›</span></button>
+      </div>
+      <div class="theme-menu theme-menu-right" id="themeSubmenu">
+        <button class="prefs-back-btn" onclick="closeThemeSubmenu(event)" data-i18n="back">‹ Retour</button>
+        <button class="theme-swatch" data-theme-choice="dark" onclick="setTheme('dark')"><span class="sw sw-dark"></span><span data-i18n="theme_dark">Sombre</span></button>
+        <button class="theme-swatch" data-theme-choice="light" onclick="setTheme('light')"><span class="sw sw-light"></span><span data-i18n="theme_light">Clair</span></button>
+        <button class="theme-swatch" data-theme-choice="neon" onclick="setTheme('neon')"><span class="sw sw-neon"></span>Neon Beach<span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+        <button class="theme-swatch" data-theme-choice="sunset" onclick="setTheme('sunset')"><span class="sw sw-sunset"></span>Sunset Gold<span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+        <button class="theme-swatch" data-theme-choice="lagoon" onclick="setTheme('lagoon')"><span class="sw sw-lagoon"></span><span data-i18n="theme_lagoon">Lagon</span><span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+        <button class="theme-swatch" data-theme-choice="eclat" onclick="setTheme('eclat')"><span class="sw sw-eclat"></span><span data-i18n="theme_eclat">Éclat</span><span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+        <button class="theme-swatch" data-theme-choice="glacier" onclick="setTheme('glacier')"><span class="sw sw-glacier"></span><span data-i18n="theme_glacier">Glacier</span><span class="lock-badge" data-i18n="badge_pro">🔒 PRO</span></button>
+      </div>
+      <div class="theme-menu theme-menu-right" id="langSubmenu">
+        <button class="prefs-back-btn" onclick="closeLangSubmenu(event)" data-i18n="back">‹ Retour</button>
+        <button class="theme-swatch" data-lang-choice="fr" onclick="setLanguage('fr')">Français</button>
+        <button class="theme-swatch" data-lang-choice="en" onclick="setLanguage('en')">English</button>
+        <button class="theme-swatch" data-lang-choice="pt" onclick="setLanguage('pt')">Português</button>
+      </div>
+      <div class="theme-menu theme-menu-right" id="prefsMenu">
+        <button class="prefs-back-btn" onclick="closePrefsMenu(event)" data-i18n="back">‹ Retour</button>
+        <div class="prefs-menu-label" data-i18n="prefs_match">Match</div>
+        <button class="theme-swatch" data-stats-mode-choice="equipe" onclick="switchStatsMode('equipe')"><span class="sw sw-dark"></span><span data-i18n="mode_team">Par équipe</span></button>
+        <button class="theme-swatch" data-stats-mode-choice="joueur" onclick="switchStatsMode('joueur')"><span class="sw sw-light"></span><span data-i18n="mode_player">Par joueur</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="header-back" onclick="window.location.href='/historique'" data-i18n="btn_historique">📋 Historique</button>
+    <button class="header-back" onclick="window.location.href='/'" data-i18n="btn_accueil">← Accueil</button>
+  </div>
+</div>
+
+<div class="status-bar">
+  <div class="status-pill" id="setPill" data-i18n="status_warmup">Échauffement</div>
+  <div class="status-label" id="statusLabel" data-i18n="status_playing">En cours</div>
+</div>
+
+<div class="timer-wrap">
+  <div class="timer-display" id="timerDisplay">00:00</div>
+  <div class="timer-btns">
+    <button class="timer-btn start" id="timerStartBtn" onclick="timerToggle()" data-i18n="timer_start">▶ Start</button>
+    <button class="timer-btn live" id="liveShareBtn" onclick="toggleLiveShare()" data-i18n="live_btn">📡 Live</button>
+  </div>
+</div>
+
+<button type="button" class="correction-toggle" onclick="toggleCorrectionPanel()">
+  <span data-i18n="correction_toggle">⚙️ Rattraper le score</span>
+  <i class="correction-toggle-arrow" id="correctionArrow">▾</i>
+</button>
+<div class="correction-panel" id="correctionPanel">
+  <p class="correction-hint" data-i18n="correction_hint">Pour reprendre un match déjà commencé, ou rattraper un point/jeu oublié. N'affecte jamais les statistiques par coup.</p>
+  <div class="correction-grid">
+    <div class="correction-col">
+      <div class="correction-col-label a" data-i18n="team_a">Équipe A</div>
+      <div class="correction-btn-row">
+        <button class="correction-btn a minus" onclick="removeManualPoint(1)" data-i18n="minus_1pt">−1 Pt</button>
+        <button class="correction-btn a" onclick="addManualPoint(1)" data-i18n="plus_1pt">+1 Pt</button>
+      </div>
+      <div class="correction-btn-row">
+        <button class="correction-btn a minus" onclick="removeManualGame(1)" data-i18n="minus_1game">−1 Jeu</button>
+        <button class="correction-btn a" onclick="addManualGame(1)" data-i18n="plus_1game">+1 Jeu</button>
+      </div>
+    </div>
+    <div class="correction-col">
+      <div class="correction-col-label b" data-i18n="team_b">Équipe B</div>
+      <div class="correction-btn-row">
+        <button class="correction-btn b minus" onclick="removeManualPoint(2)" data-i18n="minus_1pt">−1 Pt</button>
+        <button class="correction-btn b" onclick="addManualPoint(2)" data-i18n="plus_1pt">+1 Pt</button>
+      </div>
+      <div class="correction-btn-row">
+        <button class="correction-btn b minus" onclick="removeManualGame(2)" data-i18n="minus_1game">−1 Jeu</button>
+        <button class="correction-btn b" onclick="addManualGame(2)" data-i18n="plus_1game">+1 Jeu</button>
+      </div>
+    </div>
+  </div>
+  <button type="button" class="correction-super-btn" onclick="jumpToSuperTiebreak()" data-i18n="jump_super_tb">⏩ Passer directement à 1 set partout (Super Tie-Break)</button>
+</div>
+
+<div class="server-indicator" id="serverIndicator" style="display:none">
+  <span class="server-ball">🎾</span>
+  <span data-i18n="serving_label">Au service :</span> <strong class="server-name"></strong>
+  <button type="button" class="server-change-btn" onclick="cycleServerManually()" data-i18n="btn_change">Changer</button>
+</div>
+
+<div class="server-modal-backdrop" id="serverModal">
+  <div class="server-modal-box">
+    <div class="server-modal-title" id="serverModalTitle" data-i18n="who_serves_first">Qui sert en premier ?</div>
+    <div class="server-modal-btns" id="serverModalBtns"></div>
+  </div>
+</div>
+
+<div class="live-modal-backdrop" id="liveModalBackdrop" onclick="closeLiveModal(event)">
+  <div class="live-modal" onclick="event.stopPropagation()">
+    <div class="live-modal-title" data-i18n="live_modal_title">📡 Partage en direct</div>
+    <div class="live-modal-body" id="liveModalBody">
+      <p data-i18n="live_modal_desc">Toute personne avec ce lien peut suivre le score et les stats en direct, sans pouvoir rien modifier.</p>
+      <div class="live-link-row">
+        <input type="text" id="liveLinkInput" readonly>
+        <button onclick="copyLiveLink()" id="liveCopyBtn" data-i18n="live_copy_btn">Copier</button>
+      </div>
+      <p class="live-modal-note" data-i18n="live_modal_note">Le lien reste actif tant que tu marques des points (ou pendant 6h max).</p>
+    </div>
+    <div class="live-modal-actions">
+      <button class="live-stop-btn" onclick="stopLiveShare()" data-i18n="live_stop_btn">Arrêter le partage</button>
+      <button class="live-close-btn" onclick="closeLiveModal()" data-i18n="live_close_btn">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<div class="scoreboard">
+  <div class="score-header" id="scoreHeader">
+    <span data-i18n="header_team">Équipe</span>
+    <span>S1</span>
+    <span>S2</span>
+    <span>S3</span>
+    <span data-i18n="header_points">Points</span>
+  </div>
+  <div class="team-row team-a" id="rowA">
+    <div class="team-info">
+      <input type="text" class="team-name-input" id="teamLabelA" placeholder="Équipe A" maxlength="24" oninput="onTeamLabelInput('A')">
+      <div class="team-players" id="playersA"><span class="player-name" id="playerNameJ1">—</span><span class="player-name" id="playerNameJ2">—</span></div>
+    </div>
+    <div class="cell set-score" id="setA1">—</div>
+    <div class="cell set-score" id="setA2">—</div>
+    <div class="cell set-score" id="setA3">—</div>
+    <div class="cell point-cell" id="ptA">0</div>
+  </div>
+  <div class="team-row team-b" id="rowB">
+    <div class="team-info">
+      <input type="text" class="team-name-input" id="teamLabelB" placeholder="Équipe B" maxlength="24" oninput="onTeamLabelInput('B')">
+      <div class="team-players" id="playersB"><span class="player-name" id="playerNameJ3">—</span><span class="player-name" id="playerNameJ4">—</span></div>
+    </div>
+    <div class="cell set-score" id="setB1">—</div>
+    <div class="cell set-score" id="setB2">—</div>
+    <div class="cell set-score" id="setB3">—</div>
+    <div class="cell point-cell" id="ptB">0</div>
+  </div>
+</div>
+
+<div id="dynamicControls"></div>
+
+<div class="actions" style="margin-top:1rem">
+  <button class="btn-action undo" onclick="undo()" data-i18n="btn_undo">↩ Annuler</button>
+  <button class="btn-action pdf" onclick="exportPDF()" data-i18n="btn_export_pdf">⬇ PDF</button>
+  <button class="btn-action reset" onclick="resetMatch()" data-i18n="btn_reset">⟳ Reset</button>
+</div>
+
+<div class="stats-card" id="statsCard">
+  <div class="stats-title" data-i18n="stats_live_title">Stats en direct</div>
+  <div class="stats-view-switch" id="statsViewSwitch"></div>
+
+  <div id="statsContent">
+    <div class="stat-row">
+      <div class="stat-val a" id="st-wA">0</div>
+      <div class="stat-name" data-i18n="stat_winners">Coups gagnants</div>
+      <div class="stat-val b" id="st-wB">0</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-bar-wrap"><div class="stat-bar-a" id="bar-wA" style="width:50%"></div><div class="stat-bar-b" id="bar-wB" style="width:50%"></div></div>
+    </div>
+
+    <div class="stat-row" style="margin-top:.6rem">
+      <div class="stat-val a" id="st-fA">0</div>
+      <div class="stat-name" data-i18n="stat_faults">Fautes directes</div>
+      <div class="stat-val b" id="st-fB">0</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-bar-wrap"><div class="stat-bar-a" id="bar-fA" style="width:50%"></div><div class="stat-bar-b" id="bar-fB" style="width:50%"></div></div>
+    </div>
+
+    <div class="stat-row" style="margin-top:.6rem">
+      <div class="stat-val a" id="st-pA">0</div>
+      <div class="stat-name" data-i18n="stat_points_won">Points gagnés</div>
+      <div class="stat-val b" id="st-pB">0</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-bar-wrap"><div class="stat-bar-a" id="bar-pA" style="width:50%"></div><div class="stat-bar-b" id="bar-pB" style="width:50%"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="log-wrap">
+  <div class="log-title" data-i18n="log_title">Journal du match</div>
+  <div class="log-list" id="logList"></div>
+</div>
+
+<div class="winner-overlay" id="winnerOverlay">
+  <div class="winner-box">
+    <div class="winner-trophy">🏆</div>
+    <div class="winner-label" data-i18n="match_winner">Vainqueur du match</div>
+    <div class="winner-name" id="winnerName">—</div>
+    <div class="winner-score" id="winnerScore">—</div>
+    <div class="winner-stats">
+      <div class="ws-box">
+        <div class="ws-val a" id="ws-wA">0</div><div class="ws-lbl" data-i18n="ws_winners_a">Winners A</div>
+        <div class="ws-val b" id="ws-wB" style="margin-top:6px">0</div><div class="ws-lbl" data-i18n="ws_winners_b">Winners B</div>
+      </div>
+      <div class="ws-box">
+        <div class="ws-val a" id="ws-fA">0</div><div class="ws-lbl" data-i18n="ws_faults_a">Fautes A</div>
+        <div class="ws-val b" id="ws-fB" style="margin-top:6px">0</div><div class="ws-lbl" data-i18n="ws_faults_b">Fautes B</div>
+      </div>
+    </div>
+    <div class="winner-actions">
+      <button class="winner-btn primary" onclick="exportPDF()" data-i18n="btn_download_pdf">⬇ Télécharger PDF</button>
+      <button class="winner-btn secondary" onclick="resetMatch()" data-i18n="new_match">Nouveau match</button>
+    </div>
+  </div>
+</div>
+
+<div class="winner-overlay" id="resumeOverlay">
+  <div class="winner-box">
+    <div class="winner-trophy">💾</div>
+    <div class="winner-label" data-i18n="match_in_progress">Match en cours détecté</div>
+    <div class="winner-name" id="resumeMatchup" style="font-size:22px">—</div>
+    <div class="winner-score" id="resumeScoreInfo">—</div>
+    <div class="winner-actions">
+      <button class="winner-btn primary" onclick="confirmResume()" data-i18n="resume_match">Reprendre ce match</button>
+      <button class="winner-btn secondary" onclick="discardResume()" data-i18n="new_match">Nouveau match</button>
+    </div>
+  </div>
+</div>
+
+<script src="/barlow-font.js"></script>
+<script src="/shared.js"></script>
+<script>
+// ── LANGUES (chargé en premier : tout le reste du script en dépend) ───────
+const I18N = {
+  fr: {
+    settings_theme: "Thème", settings_lang: "Langue", settings_prefs: "Préférences",
+    back: "‹ Retour", prefs_match: "Match",
+    theme_dark: "Sombre", theme_light: "Clair", theme_lagoon: "Lagon", theme_eclat: "Éclat", theme_glacier: "Glacier",
+    badge_pro: "🔒 PRO",
+    btn_historique: "📋 Historique", btn_accueil: "← Accueil",
+    mode_team: "Par équipe", mode_player: "Par joueur",
+    status_warmup: "Échauffement", status_playing: "En cours", status_over: "Terminé",
+    status_tb: "Tie-Break", status_tb_target: "7 points, 2 d'écart",
+    status_super_tb: "Super Tie-Break", status_super_tb_target: "10 points, 2 d'écart",
+    timer_start: "▶ Start", timer_pause: "⏸ Pause",
+    live_btn: "📡 Live",
+    correction_toggle: "⚙️ Rattraper le score",
+    correction_hint: "Pour reprendre un match déjà commencé, ou rattraper un point/jeu oublié. N'affecte jamais les statistiques par coup.",
+    team_a: "Équipe A", team_b: "Équipe B",
+    minus_1pt: "−1 Pt", plus_1pt: "+1 Pt", minus_1game: "−1 Jeu", plus_1game: "+1 Jeu",
+    jump_super_tb: "⏩ Passer directement à 1 set partout (Super Tie-Break)",
+    confirm_jump_super_tb: "Passer directement à 1 set partout et démarrer le Super Tie-Break ? Cette action remplace le score actuel des sets.",
+    serving_label: "Au service :", btn_change: "Changer",
+    who_serves_first: "Qui sert en premier ?", who_serves_first_other: "Et en face, qui sert en premier ?",
+    team_prefix: "Équipe ",
+    live_modal_title: "📡 Partage en direct",
+    live_modal_desc: "Toute personne avec ce lien peut suivre le score et les stats en direct, sans pouvoir rien modifier.",
+    live_copy_btn: "Copier", live_copied: "Copié !",
+    live_modal_note: "Le lien reste actif tant que tu marques des points (ou pendant 6h max).",
+    live_stop_btn: "Arrêter le partage", live_close_btn: "Fermer",
+    header_team: "Équipe", header_points: "Points",
+    btn_undo: "↩ Annuler", btn_export_pdf: "⬇ PDF", btn_reset: "⟳ Reset",
+    stats_live_title: "Stats en direct",
+    stat_winners: "Coups gagnants", stat_faults: "Fautes directes", stat_points_won: "Points gagnés",
+    stats_player_header: "Joueur", stats_w_short: "W", stats_f_short: "F",
+    point_winner: "Point gagnant", point_winner_sub: "Coup gagnant",
+    point_fault: "Faute directe", point_fault_sub_a: "Point à B", point_fault_sub_b: "Point à A",
+    total_match: "Total match", set_n: "Set {n}", set_current: " (en cours)",
+    log_title: "Journal du match",
+    match_winner: "Vainqueur du match", ws_winners_a: "Winners A", ws_winners_b: "Winners B",
+    ws_faults_a: "Fautes A", ws_faults_b: "Fautes B",
+    btn_download_pdf: "⬇ Télécharger PDF", new_match: "Nouveau match",
+    match_in_progress: "Match en cours détecté", resume_match: "Reprendre ce match",
+    resume_sets_games: "Sets {s1}-{s2} · Jeux {g1}-{g2}",
+    confirm_reset: "Remettre le match à zéro ?",
+    log_match_created: "🎾 Match créé — {a} vs {b}",
+    log_match_started: "▶️ Match démarré",
+    log_wins_tiebreak: "remporte le Tie-Break !",
+    log_wins_game: "remporte le jeu → {score}",
+    log_wins_supertb_match: "remporte le super tie-break ({score}) et le match !",
+    log_wins_set: "remporte le set ({score})",
+    log_match_winner: "🏆 VAINQUEUR DU MATCH !",
+    log_jump_super_tb: "⏩ Passage direct au Super Tie-Break (1 set partout)",
+    log_super_tb_start3: "⚡ Super Tie-Break (3e set) !",
+    log_tb_start: "🔀 Tie-Break !",
+    winner_score_line: "Sets {s1}-{s2} — {duration}",
+  },
+  en: {
+    settings_theme: "Theme", settings_lang: "Language", settings_prefs: "Preferences",
+    back: "‹ Back", prefs_match: "Match",
+    theme_dark: "Dark", theme_light: "Light", theme_lagoon: "Lagoon", theme_eclat: "Radiance", theme_glacier: "Glacier",
+    badge_pro: "🔒 PRO",
+    btn_historique: "📋 History", btn_accueil: "← Home",
+    mode_team: "By team", mode_player: "By player",
+    status_warmup: "Warm-up", status_playing: "In progress", status_over: "Finished",
+    status_tb: "Tiebreak", status_tb_target: "7 points, win by 2",
+    status_super_tb: "Super Tiebreak", status_super_tb_target: "10 points, win by 2",
+    timer_start: "▶ Start", timer_pause: "⏸ Pause",
+    live_btn: "📡 Live",
+    correction_toggle: "⚙️ Adjust score",
+    correction_hint: "To resume a match already in progress, or fix a missed point/game. Never affects shot-by-shot stats.",
+    team_a: "Team A", team_b: "Team B",
+    minus_1pt: "−1 Pt", plus_1pt: "+1 Pt", minus_1game: "−1 Game", plus_1game: "+1 Game",
+    jump_super_tb: "⏩ Jump straight to 1 set all (Super Tiebreak)",
+    confirm_jump_super_tb: "Jump straight to 1 set all and start the Super Tiebreak? This replaces the current set score.",
+    serving_label: "Serving:", btn_change: "Change",
+    who_serves_first: "Who serves first?", who_serves_first_other: "And on the other side, who serves first?",
+    team_prefix: "Team ",
+    live_modal_title: "📡 Live sharing",
+    live_modal_desc: "Anyone with this link can follow the score and stats live, without being able to change anything.",
+    live_copy_btn: "Copy", live_copied: "Copied!",
+    live_modal_note: "The link stays active as long as you're scoring points (or for 6h max).",
+    live_stop_btn: "Stop sharing", live_close_btn: "Close",
+    header_team: "Team", header_points: "Points",
+    btn_undo: "↩ Undo", btn_export_pdf: "⬇ PDF", btn_reset: "⟳ Reset",
+    stats_live_title: "Live stats",
+    stat_winners: "Winners", stat_faults: "Unforced errors", stat_points_won: "Points won",
+    stats_player_header: "Player", stats_w_short: "W", stats_f_short: "E",
+    point_winner: "Winner", point_winner_sub: "Winning shot",
+    point_fault: "Unforced error", point_fault_sub_a: "Point to B", point_fault_sub_b: "Point to A",
+    total_match: "Full match", set_n: "Set {n}", set_current: " (in progress)",
+    log_title: "Match log",
+    match_winner: "Match winner", ws_winners_a: "Winners A", ws_winners_b: "Winners B",
+    ws_faults_a: "Errors A", ws_faults_b: "Errors B",
+    btn_download_pdf: "⬇ Download PDF", new_match: "New match",
+    match_in_progress: "Match in progress found", resume_match: "Resume this match",
+    resume_sets_games: "Sets {s1}-{s2} · Games {g1}-{g2}",
+    confirm_reset: "Reset the match to zero?",
+    log_match_created: "🎾 Match created — {a} vs {b}",
+    log_match_started: "▶️ Match started",
+    log_wins_tiebreak: "wins the Tiebreak!",
+    log_wins_game: "wins the game → {score}",
+    log_wins_supertb_match: "wins the super tiebreak ({score}) and the match!",
+    log_wins_set: "wins the set ({score})",
+    log_match_winner: "🏆 MATCH WINNER!",
+    log_jump_super_tb: "⏩ Jumped straight to Super Tiebreak (1 set all)",
+    log_super_tb_start3: "⚡ Super Tiebreak (3rd set)!",
+    log_tb_start: "🔀 Tiebreak!",
+    winner_score_line: "Sets {s1}-{s2} — {duration}",
+  },
+  pt: {
+    settings_theme: "Tema", settings_lang: "Idioma", settings_prefs: "Preferências",
+    back: "‹ Voltar", prefs_match: "Partida",
+    theme_dark: "Escuro", theme_light: "Claro", theme_lagoon: "Lagoa", theme_eclat: "Brilho", theme_glacier: "Glaciar",
+    badge_pro: "🔒 PRO",
+    btn_historique: "📋 Histórico", btn_accueil: "← Início",
+    mode_team: "Por equipe", mode_player: "Por jogador",
+    status_warmup: "Aquecimento", status_playing: "Em andamento", status_over: "Encerrada",
+    status_tb: "Tie-Break", status_tb_target: "7 pontos, 2 de diferença",
+    status_super_tb: "Super Tie-Break", status_super_tb_target: "10 pontos, 2 de diferença",
+    timer_start: "▶ Iniciar", timer_pause: "⏸ Pausar",
+    live_btn: "📡 Ao vivo",
+    correction_toggle: "⚙️ Corrigir placar",
+    correction_hint: "Para retomar uma partida já iniciada, ou corrigir um ponto/game esquecido. Nunca afeta as estatísticas por jogada.",
+    team_a: "Equipe A", team_b: "Equipe B",
+    minus_1pt: "−1 Pt", plus_1pt: "+1 Pt", minus_1game: "−1 Game", plus_1game: "+1 Game",
+    jump_super_tb: "⏩ Ir direto para 1 set a 1 (Super Tie-Break)",
+    confirm_jump_super_tb: "Ir direto para 1 set a 1 e começar o Super Tie-Break? Isso substitui o placar atual dos sets.",
+    serving_label: "Sacando:", btn_change: "Trocar",
+    who_serves_first: "Quem saca primeiro?", who_serves_first_other: "E do outro lado, quem saca primeiro?",
+    team_prefix: "Equipe ",
+    live_modal_title: "📡 Compartilhamento ao vivo",
+    live_modal_desc: "Qualquer pessoa com este link pode acompanhar o placar e as estatísticas ao vivo, sem poder alterar nada.",
+    live_copy_btn: "Copiar", live_copied: "Copiado!",
+    live_modal_note: "O link fica ativo enquanto você marcar pontos (ou por até 6h).",
+    live_stop_btn: "Parar compartilhamento", live_close_btn: "Fechar",
+    header_team: "Equipe", header_points: "Pontos",
+    btn_undo: "↩ Desfazer", btn_export_pdf: "⬇ PDF", btn_reset: "⟳ Reiniciar",
+    stats_live_title: "Stats ao vivo",
+    stat_winners: "Winners", stat_faults: "Erros não forçados", stat_points_won: "Pontos ganhos",
+    stats_player_header: "Jogador", stats_w_short: "W", stats_f_short: "E",
+    point_winner: "Winner", point_winner_sub: "Golpe vencedor",
+    point_fault: "Erro não forçado", point_fault_sub_a: "Ponto para B", point_fault_sub_b: "Ponto para A",
+    total_match: "Partida toda", set_n: "Set {n}", set_current: " (em andamento)",
+    log_title: "Histórico da partida",
+    match_winner: "Vencedor da partida", ws_winners_a: "Winners A", ws_winners_b: "Winners B",
+    ws_faults_a: "Erros A", ws_faults_b: "Erros B",
+    btn_download_pdf: "⬇ Baixar PDF", new_match: "Nova partida",
+    match_in_progress: "Partida em andamento encontrada", resume_match: "Retomar esta partida",
+    resume_sets_games: "Sets {s1}-{s2} · Games {g1}-{g2}",
+    confirm_reset: "Zerar a partida?",
+    log_match_created: "🎾 Partida criada — {a} vs {b}",
+    log_match_started: "▶️ Partida iniciada",
+    log_wins_tiebreak: "vence o Tie-Break!",
+    log_wins_game: "vence o game → {score}",
+    log_wins_supertb_match: "vence o super tie-break ({score}) e a partida!",
+    log_wins_set: "vence o set ({score})",
+    log_match_winner: "🏆 VENCEDOR DA PARTIDA!",
+    log_jump_super_tb: "⏩ Avançou direto para o Super Tie-Break (1 set a 1)",
+    log_super_tb_start3: "⚡ Super Tie-Break (3º set)!",
+    log_tb_start: "🔀 Tie-Break!",
+    winner_score_line: "Sets {s1}-{s2} — {duration}",
+  },
+};
+
+let currentLang = localStorage.getItem('tstats_lang');
+if (!currentLang) {
+  const nav = (navigator.language || 'fr').toLowerCase();
+  currentLang = nav.startsWith('pt') ? 'pt' : nav.startsWith('en') ? 'en' : 'fr';
+}
+
+
+function applyLanguageToDOM() {
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-lang-choice]').forEach(b => {
+    b.classList.toggle('active', b.dataset.langChoice === currentLang);
+  });
+}
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('tstats_lang', lang);
+  applyLanguageToDOM();
+  document.getElementById('langSubmenu')?.classList.remove('open');
+  initNames();
+  updateDisplay();
+}
+
+// ── PLAYER NAMES & MODE ──────────────────────────────────────────────────────
+const _p = new URLSearchParams(window.location.search);
+// Si l'URL ne contient pas les noms (ex: retour sur cette page via le
+// bouton "Reprendre le match" de l'historique, sans paramètres), on relit
+// mode + noms depuis la dernière progression sauvegardée pour ce mode.
+let _savedIdentity = null;
+if (!_p.get('j1')) {
+  try {
+    const raw = localStorage.getItem('tstats_inprogress_base');
+    if (raw) _savedIdentity = JSON.parse(raw);
+  } catch(e) {}
+}
+const players = {
+  j1: _p.get('j1') || (_savedIdentity && _savedIdentity.players && _savedIdentity.players.j1) || 'Joueur 1',
+  j2: _p.get('j2') || (_savedIdentity && _savedIdentity.players && _savedIdentity.players.j2) || 'Joueur 2',
+  j3: _p.get('j3') || (_savedIdentity && _savedIdentity.players && _savedIdentity.players.j3) || 'Joueur 3',
+  j4: _p.get('j4') || (_savedIdentity && _savedIdentity.players && _savedIdentity.players.j4) || 'Joueur 4'
+};
+let mode = _p.get('mode') || (_savedIdentity && _savedIdentity.mode) || 'equipe'; // 'joueur' ou 'equipe'
+const nameA = players.j1 + ' / ' + players.j2;
+const nameB = players.j3 + ' / ' + players.j4;
+
+// ── NOM D'ÉQUIPE PERSONNALISÉ ────────────────────────────────────────────
+// Optionnel : si laissé vide, le champ affiche simplement le placeholder
+// "Équipe A" / "Équipe B" — aucune valeur n'est alors envoyée nulle part.
+let teamLabelA = _p.get('teamA') || '';
+let teamLabelB = _p.get('teamB') || '';
+
+
+function initNames() {
+  document.getElementById('playerNameJ1').textContent = players.j1;
+  document.getElementById('playerNameJ2').textContent = players.j2;
+  document.getElementById('playerNameJ3').textContent = players.j3;
+  document.getElementById('playerNameJ4').textContent = players.j4;
+  document.getElementById('teamLabelA').value = teamLabelA;
+  document.getElementById('teamLabelB').value = teamLabelB;
+  
+  const container = document.getElementById('dynamicControls');
+  container.innerHTML = '';
+
+  if (mode === 'joueur') {
+    container.innerHTML += createControlBlock('a', players.j1, 1, 'j1');
+    container.innerHTML += createControlBlock('a', players.j2, 1, 'j2');
+    container.innerHTML += createControlBlock('b', players.j3, 2, 'j3');
+    container.innerHTML += createControlBlock('b', players.j4, 2, 'j4');
+
+    // Modifier l'affichage des stats en direct pour le mode individuel
+    let statsHTML = `<div class="stat-row" style="grid-template-columns: 1fr 60px 60px; margin-bottom:8px; border-bottom: 1px solid var(--border); padding-bottom: 5px;">
+      <div class="stat-name" style="text-align:left">${t('stats_player_header')}</div>
+      <div class="stat-name">${t('stats_w_short')}</div>
+      <div class="stat-name">${t('stats_f_short')}</div>
+    </div>`;
+    ['j1', 'j2', 'j3', 'j4'].forEach((key, index) => {
+      const colorClass = index < 2 ? 'var(--blue)' : 'var(--orange)';
+      statsHTML += `
+        <div class="stat-row" style="grid-template-columns: 1fr 60px 60px; align-items:center">
+          <div class="stat-name" style="text-align:left; color:var(--text); font-size:13px">${escapeHtml(players[key])}</div>
+          <div class="stat-val" id="st-w-${key}" style="text-align:center; color:var(--green); font-size:20px">0</div>
+          <div class="stat-val" id="st-f-${key}" style="text-align:center; color:var(--red); font-size:20px">0</div>
+        </div>`;
+    });
+    document.getElementById('statsContent').innerHTML = statsHTML;
+  } else {
+    const shortA = players.j1.split(' ')[0] + ' & ' + players.j2.split(' ')[0];
+    const shortB = players.j3.split(' ')[0] + ' & ' + players.j4.split(' ')[0];
+    container.innerHTML += createControlBlock('a', t('team_a') + ' — ' + shortA, 1, null);
+    container.innerHTML += createControlBlock('b', t('team_b') + ' — ' + shortB, 2, null);
+
+    // Reconstruit explicitement le bloc de stats "par équipe" — nécessaire
+    // pour pouvoir y revenir après être passé en mode joueur (qui remplace
+    // entièrement statsContent), pas seulement au tout premier chargement.
+    document.getElementById('statsContent').innerHTML = `
+      <div class="stat-row">
+        <div class="stat-val a" id="st-wA">0</div>
+        <div class="stat-name">${t('stat_winners')}</div>
+        <div class="stat-val b" id="st-wB">0</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-bar-wrap"><div class="stat-bar-a" id="bar-wA" style="width:50%"></div><div class="stat-bar-b" id="bar-wB" style="width:50%"></div></div>
+      </div>
+      <div class="stat-row" style="margin-top:.6rem">
+        <div class="stat-val a" id="st-fA">0</div>
+        <div class="stat-name">${t('stat_faults')}</div>
+        <div class="stat-val b" id="st-fB">0</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-bar-wrap"><div class="stat-bar-a" id="bar-fA" style="width:50%"></div><div class="stat-bar-b" id="bar-fB" style="width:50%"></div></div>
+      </div>
+      <div class="stat-row" style="margin-top:.6rem">
+        <div class="stat-val a" id="st-pA">0</div>
+        <div class="stat-name">${t('stat_points_won')}</div>
+        <div class="stat-val b" id="st-pB">0</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-bar-wrap"><div class="stat-bar-a" id="bar-pA" style="width:50%"></div><div class="stat-bar-b" id="bar-pB" style="width:50%"></div></div>
+      </div>`;
+  }
+}
+
+// Change de mode ("par équipe" / "par joueur") directement depuis les
+// Préférences, sans jamais avoir à retourner à l'accueil. initNames()
+// reconstruit entièrement les panneaux de saisie ET le bloc de stats dans
+// les deux sens, donc rien n'est perdu en changeant de vue en cours de match.
+function switchStatsMode(newMode) {
+  if (mode !== newMode) {
+    mode = newMode;
+    initNames();
+    updateDisplay();
+    saveProgress();
+  }
+  refreshPrefsMenuUI();
+  document.getElementById('prefsMenu')?.classList.remove('open');
+}
+
+function createControlBlock(teamClass, label, teamId, entityKey) {
+  const opponentId = teamId === 1 ? 2 : 1;
+  const subLabel = teamId === 1 ? t('point_fault_sub_a') : t('point_fault_sub_b');
+  // entityKey vaut toujours 'j1'..'j4' ou null : jamais une valeur saisie
+  // par l'utilisateur, donc sûr à insérer tel quel dans le onclick.
+  const entityArg = entityKey ? `'${entityKey}'` : 'null';
+  return `
+    <div class="team-controls">
+      <div class="team-ctrl-label ${teamClass}">${escapeHtml(label)}</div>
+      <div class="ctrl-row">
+        <button class="btn-winner ${teamClass}" onclick="scorePoint(${teamId},'winner', ${entityArg})">
+          <span class="btn-icon">🎯</span>
+          <span class="btn-main">${t('point_winner')}</span>
+          <span class="btn-sub">${t('point_winner_sub')}</span>
+        </button>
+        <button class="btn-faute ${teamClass}" onclick="scorePoint(${opponentId},'faute', ${entityArg})">
+          <span class="btn-icon">💥</span>
+          <span class="btn-main">${t('point_fault')}</span>
+          <span class="btn-sub">${subLabel}</span>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let p1=0, p2=0, g1=0, g2=0, s1=0, s2=0;
+let setHistory=[]; 
+let inTiebreak=false, inSuperTiebreak=false, matchOver=false;
+let stats = { wA:0, wB:0, fA:0, fB:0, pA:0, pB:0, ind: {} };
+
+// ── SERVICE (qui sert actuellement) ──────────────────────────────────────
+// serverTeamAFirst / serverTeamBFirst : le joueur ('j1'..'j4') qui sert en
+// premier pour chaque équipe (demandé une fois en début de match, puis au
+// 2e jeu pour l'équipe adverse). Le service alterne ensuite automatiquement
+// à chaque jeu, en alternant aussi entre les 2 joueurs d'une même équipe à
+// chaque fois que c'est leur tour. matchGameCount compte tous les jeux
+// terminés depuis le début du match (ne se réinitialise jamais entre les
+// sets, comme au vrai tennis). serverManualAdjustment permet de corriger
+// manuellement le serveur affiché sans casser la rotation automatique
+// ensuite (c'est juste un décalage constant appliqué à la formule).
+let firstServingTeam = null; // 'A' ou 'B' : l'équipe qui sert le tout premier jeu
+let serverTeamAFirst = null;
+let serverTeamBFirst = null;
+let matchGameCount = 0;
+let serverManualAdjustment = 0;
+let pendingCycleAdjustment = null; // cran en attente si "Changer" a dû poser une question avant de l'appliquer
+
+// ── VUE DES STATS : TOTAL DU MATCH OU PAR SET ───────────────────────────────
+// `stats` cumule toujours l'ensemble du match. À chaque set terminé, on
+// capture une photo de `stats` à cet instant ; les stats d'un set donné sont
+// alors la différence entre deux photos consécutives.
+let setSnapshots = [];        // stats cumulées à la fin de chaque set terminé
+let statsViewMode = 'total';  // 'total' | 'set'
+let statsViewSetIdx = 1;      
+function renderStatsViewSwitch() {
+  const wrap = document.getElementById('statsViewSwitch');
+  if (!wrap) return;
+  const finishedSets = setSnapshots.length;
+  const showCurrent = !matchOver;
+  const totalChips = finishedSets + (showCurrent ? 1 : 0);
+
+  let html = `<button class="sv-chip${statsViewMode==='total'?' active':''}" onclick="setStatsView('total')">${t('total_match')}</button>`;
+  for (let i = 1; i <= totalChips; i++) {
+    const isCurrent = i === finishedSets + 1 && showCurrent;
+    html += `<button class="sv-chip${statsViewMode==='set'&&statsViewSetIdx===i?' active':''}" onclick="setStatsView('set',${i})">${t('set_n',{n:i})}${isCurrent?t('set_current'):''}</button>`;
+  }
+  wrap.innerHTML = html;
+}
+
+function setStatsView(mode, idx) {
+  statsViewMode = mode;
+  if (mode === 'set') statsViewSetIdx = idx;
+  renderStatsViewSwitch();
+  updateDisplay();
+}
+let history = [];
+let matchLog = [];
+const TP = ['0','15','30','40'];
+
+// ── PARTAGE EN DIRECT ────────────────────────────────────────────────────
+// Un simple lien de lecture seule : on pousse régulièrement l'état du match
+// vers le Worker (qui le stocke temporairement), et quiconque a le lien peut
+// le consulter via /live?code=xxxxxx sans pouvoir interagir avec le match.
+let liveShareCode = null;
+let liveSocket = null;
+let liveSharePushTimer = null;
+let livePendingPayload = null; 
+function buildLiveState() {
+  return {
+    kind: 'base',
+    nameA, nameB,
+    teamLabelA, teamLabelB,
+    s1, s2, g1, g2, p1, p2,
+    inTiebreak, inSuperTiebreak, matchOver, matchStarted,
+    winner: matchOver ? (s1 > s2 ? nameA : nameB) : null,
+    setHistory,
+    stats: { wA: stats.wA, wB: stats.wB, fA: stats.fA, fB: stats.fB, pA: stats.pA, pB: stats.pB },
+  };
+}
+
+
+// Anti-rebond léger : purement pour regrouper plusieurs mises à jour d'état
+// survenant dans le même instant (ex: un point qui termine aussi le jeu et
+// le set), pas pour économiser un quota — avec les WebSockets, le coût d'un
+// message est négligeable.
+let liveSharePushDebounceTimer = null;
+
+// ── SAVE STATE ────────────────────────────────────────────────────────────────
+function saveState() {
+  history.push({
+    p1,p2,g1,g2,s1,s2,inTiebreak,inSuperTiebreak,matchGameCount,setHistory: JSON.parse(JSON.stringify(setHistory)),
+    stats: JSON.parse(JSON.stringify(stats)),
+    setSnapshots: JSON.parse(JSON.stringify(setSnapshots)),
+    pill: document.getElementById('setPill').innerText,
+    status: document.getElementById('statusLabel').innerText
+  });
+}
+
+
+function scorePoint(player, type, entityKey) {
+  if (matchOver) return;
+  ensureTimerRunning();
+
+  // Tant qu'on ne sait pas qui sert, on affiche la question et on bloque ce
+  // point : il ne doit jamais être compté "derrière" la fenêtre de question.
+  const pending = serverQuestionNeeded();
+  if (pending === 'initial') { askInitialServer(); return; }
+  if (pending === 'second') { askSecondTeamServer(); return; }
+
+  saveState();
+
+  // Le nom réel n'est résolu qu'ici, à partir d'un identifiant sûr ('j1'..'j4') —
+  // jamais reconstruit à partir d'une chaîne injectée dans le onclick.
+  const entityName = entityKey ? players[entityKey] : null;
+
+  // Stats Équipe
+  if (player === 1) {
+    stats.pA++;
+    if (type === 'winner') stats.wA++; else stats.fB++; 
+  } else {
+    stats.pB++;
+    if (type === 'winner') stats.wB++; else stats.fA++; 
+  }
+
+  // Stats Individuelles (indexées par la clé sûre 'j1'..'j4', pas par le nom)
+  if (mode === 'joueur' && entityKey) {
+    if (!stats.ind[entityKey]) stats.ind[entityKey] = { w:0, f:0 };
+    if (type === 'winner') {
+      stats.ind[entityKey].w++;
+    } else {
+      stats.ind[entityKey].f++;
+    }
+  }
+
+  const scoreLabel = scoreSnapshot(player);
+  logPoint(entityName || (player === 1 ? nameA : nameB), type, scoreLabel, player);
+
+  advancePoint(player);
+}
+
+
+// Raccourci pour rejoindre un match déjà à 1 set partout : place directement
+// le score sur 1-1 et démarre le Super Tie-Break, sans avoir à rejouer les
+// jeux/points des 2 sets précédents un par un.
+function jumpToSuperTiebreak() {
+  if (matchOver) return;
+  if (!confirm(t('confirm_jump_super_tb'))) return;
+  saveState();
+  s1 = 1; s2 = 1;
+  g1 = 0; g2 = 0; p1 = 0; p2 = 0;
+  inTiebreak = false; inSuperTiebreak = true;
+  document.getElementById('setPill').textContent = t('status_super_tb');
+  document.getElementById('statusLabel').textContent = t('status_super_tb_target');
+  logEvent('', t('log_jump_super_tb'));
+  updateDisplay();
+}
+
+function winGame(player) {
+  const wasTiebreak = inTiebreak;
+  p1=0; p2=0; inTiebreak=false;
+  if (player === 1) g1++; else g2++;
+  logEvent(player===1 ? nameA : nameB, t('log_wins_game', {score: g1+'-'+g2}));
+
+  matchGameCount++;
+  // Le jeu 2 est sur le point de commencer : c'est la première fois que
+  // l'équipe qui n'a pas servi en premier sert, on doit savoir lequel de
+  // ses 2 joueurs sert en premier pour elle.
+  if (matchGameCount === 1 && firstServingTeam && !matchOver) {
+    const otherKnown = firstServingTeam === 'A' ? serverTeamBFirst : serverTeamAFirst;
+    if (!otherKnown) askSecondTeamServer();
+  }
+
+  if (wasTiebreak) { winSet(player); return; }
+
+  const maxG = Math.max(g1,g2), minG = Math.min(g1,g2);
+  if (maxG >= 6 && maxG - minG >= 2) { winSet(player); return; }
+
+  if (g1 === 6 && g2 === 6) {
+    if (s1 === 1 && s2 === 1) {
+      inSuperTiebreak=true; p1=0; p2=0;
+      document.getElementById('setPill').textContent = t('status_super_tb');
+      document.getElementById('statusLabel').textContent = t('status_super_tb_target');
+      logEvent('', t('log_super_tb_start3'));
+    } else {
+      inTiebreak=true; p1=0; p2=0;
+      document.getElementById('setPill').textContent = t('status_tb');
+      document.getElementById('statusLabel').textContent = t('status_tb_target');
+      logEvent('', t('log_tb_start'));
+    }
+  }
+  updateDisplay();
+}
+
+// ── SERVICE : calcul du serveur actuel ───────────────────────────────────
+// Index de tour de service continu depuis le début du match : +1 à chaque
+// jeu normal terminé, et +1 tous les 2 points pendant un tie-break/super
+// tie-break (le tout premier point d'un tie-break ne compte qu'à lui seul,
+// comme au vrai tennis). Le reste (mod 4) alterne entre l'équipe qui sert en
+// premier (firstServingTeam) et l'autre, chacune alternant ses 2 joueurs à
+// chaque fois que c'est son tour.
+function computeCurrentServer() {
+  if (!firstServingTeam) return null;
+
+  let tiebreakOffset = 0;
+  if (inTiebreak || inSuperTiebreak) {
+    const played = p1 + p2;
+    tiebreakOffset = played === 0 ? 0 : 1 + Math.floor((played - 1) / 2);
+  }
+
+  const turnIndex = matchGameCount + tiebreakOffset + serverManualAdjustment;
+  const residue = ((turnIndex % 4) + 4) % 4;
+
+  const secondTeam = firstServingTeam === 'A' ? 'B' : 'A';
+  const team = (residue % 2 === 0) ? firstServingTeam : secondTeam;
+  const withinTeamTurn = Math.floor(residue / 2) % 2; // 0 = 1er serveur, 1 = 2e serveur
+
+  const secondA = serverTeamAFirst === 'j1' ? 'j2' : (serverTeamAFirst === 'j2' ? 'j1' : null);
+  const secondB = serverTeamBFirst === 'j3' ? 'j4' : (serverTeamBFirst === 'j4' ? 'j3' : null);
+
+  if (team === 'A') {
+    if (!serverTeamAFirst) return { team: 'A', key: null };
+    return { team: 'A', key: withinTeamTurn === 0 ? serverTeamAFirst : secondA };
+  }
+  if (!serverTeamBFirst) return { team: 'B', key: null };
+  return { team: 'B', key: withinTeamTurn === 0 ? serverTeamBFirst : secondB };
+}
+
+
+// Question de tout début de match : on ne sait pas encore quelle équipe sert
+// en premier (ça peut être n'importe laquelle des 2), donc les 4 joueurs
+// sont proposés, groupés par équipe.
+function askInitialServer() {
+  const modal = document.getElementById('serverModal');
+  const title = document.getElementById('serverModalTitle');
+  const btnsWrap = document.getElementById('serverModalBtns');
+  if (!modal) return;
+  title.textContent = t('who_serves_first');
+  btnsWrap.innerHTML = '';
+  // On ne demande QUE le 1er serveur de l'équipe qui commence : on ne sait
+  // pas toujours à l'avance qui servira côté adverse. La question "en face"
+  // n'arrive donc que juste avant le 2e jeu (voir winGame) — ou plus tôt si
+  // "Changer" en a besoin avant ça.
+  buildServerTeamGroup(btnsWrap, 'A', ['j1','j2'], (team, key) => {
+    firstServingTeam = team; serverTeamAFirst = key;
+    modal.classList.remove('show');
+    updateServerBadge(); saveProgress();
+  });
+  buildServerTeamGroup(btnsWrap, 'B', ['j3','j4'], (team, key) => {
+    firstServingTeam = team; serverTeamBFirst = key;
+    modal.classList.remove('show');
+    updateServerBadge(); saveProgress();
+  });
+  modal.classList.add('show');
+}
+
+// Question posée juste avant le 2e jeu : on connaît déjà l'équipe qui sert
+// en premier, il ne reste plus qu'à savoir lequel des 2 joueurs de l'AUTRE
+// équipe sert en premier pour elle.
+function askSecondTeamServer() {
+  const team = firstServingTeam === 'A' ? 'B' : 'A';
+  const modal = document.getElementById('serverModal');
+  const title = document.getElementById('serverModalTitle');
+  const btnsWrap = document.getElementById('serverModalBtns');
+  if (!modal) return;
+  title.textContent = t('who_serves_first_other');
+  btnsWrap.innerHTML = '';
+  buildServerTeamGroup(btnsWrap, team, team === 'A' ? ['j1','j2'] : ['j3','j4'], (t, key) => {
+    if (t === 'A') serverTeamAFirst = key; else serverTeamBFirst = key;
+    modal.classList.remove('show');
+    if (pendingCycleAdjustment !== null) {
+      serverManualAdjustment = pendingCycleAdjustment;
+      pendingCycleAdjustment = null;
+    }
+    updateServerBadge(); saveProgress();
+  });
+  modal.classList.add('show');
+}
+
+
+function winSet(player, scoreOverride){
+  const wasSuperTiebreak = inSuperTiebreak;
+  setHistory.push(scoreOverride || {a:g1,b:g2});
+  setSnapshots.push(JSON.parse(JSON.stringify(stats)));
+  p1=0; p2=0; g1=0; g2=0; 
+  inTiebreak=false; inSuperTiebreak=false;
+  if(player===1) s1++; else s2++;
+  if (wasSuperTiebreak) {
+    logEvent(player===1?nameA:nameB,t('log_wins_supertb_match', {score: scoreOverride.a+"-"+scoreOverride.b}));
+  } else {
+    logEvent(player===1?nameA:nameB,t('log_wins_set', {score: s1+"-"+s2}));
+  }
+
+  if(s1===2 || s2===2){
+    winMatch(player); 
+    return;
+  }
+
+  if(s1===1 && s2===1){
+    inSuperTiebreak = true;
+    document.getElementById('setPill').textContent = t('status_super_tb');
+    document.getElementById('statusLabel').textContent = t('status_super_tb_target');
+  } else {
+    document.getElementById('setPill').textContent = "Set "+(s1+s2+1);
+    document.getElementById('statusLabel').textContent = t('status_playing');
+  }
+  updateDisplay();
+}
+
+function winMatch(player) {
+  matchOver = true;
+  if(timerRunning) timerToggle();
+  const winner = player === 1 ? nameA : nameB;
+  document.getElementById('winnerName').textContent = winner;
+  document.getElementById('winnerScore').textContent = t('winner_score_line', {s1, s2, duration: formatDuration(timerSeconds)});
+  document.getElementById('ws-wA').textContent = stats.wA;
+  document.getElementById('ws-wB').textContent = stats.wB;
+  document.getElementById('ws-fA').textContent = stats.fA;
+  document.getElementById('ws-fB').textContent = stats.fB;
+  document.getElementById('winnerOverlay').classList.add('show');
+  logEvent(winner, t('log_match_winner'));
+  saveMatchToHistory(winner);
+  clearProgress();
+  updateDisplay();
+}
+
+// ── SAUVEGARDE DE L'HISTORIQUE (localStorage) ────────────────────────────────
+// Chaque match terminé est ajouté à un tableau stocké dans le navigateur,
+// sous la clé 'tstats_history'. Il reste disponible tant que
+// l'utilisateur ne vide pas son cache / n'utilise pas un autre appareil.
+function saveMatchToHistory(winner) {
+  const record = {
+    id: Date.now(),
+    date: new Date().toISOString(),
+    page: 'Sbase',
+    nameA, nameB,
+    teamLabelA, teamLabelB,
+    winner,
+    sets: s1 + '-' + s2,
+    setDetail: setHistory.map(sh => sh.a + '/' + sh.b).join('  '),
+    setHistory: JSON.parse(JSON.stringify(setHistory)),
+    matchLog: JSON.parse(JSON.stringify(matchLog)),
+    players: JSON.parse(JSON.stringify(players)),
+    mode,
+    duration: formatDuration(timerSeconds),
+    stats: { wA: stats.wA, wB: stats.wB, fA: stats.fA, fB: stats.fB, pA: stats.pA, pB: stats.pB },
+    // Données complètes (dont le détail par joueur) : nécessaires pour régénérer,
+    // depuis l'historique, le même PDF détaillé que celui téléchargeable en direct.
+    statsFull: JSON.parse(JSON.stringify(stats)),
+    setSnapshotsFull: JSON.parse(JSON.stringify(setSnapshots)),
+    setSnapshots: setSnapshots.map(sn => ({wA:sn.wA||0, wB:sn.wB||0, fA:sn.fA||0, fB:sn.fB||0, pA:sn.pA||0, pB:sn.pB||0}))
+  };
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem('tstats_history')) || []; } catch(e) { hist = []; }
+  hist.push(record);
+
+  // Le stockage local du navigateur est limité (souvent 5-10 Mo). Les données
+  // complètes (statsFull/setSnapshotsFull) rendent chaque match assez lourd,
+  // surtout en mode Pro : si l'espace vient à manquer, on ne doit JAMAIS
+  // perdre le match silencieusement. On retente en 3 niveaux, du plus complet
+  // au plus léger, avant d'avertir clairement en dernier recours.
+  const trySaveHistory = (arr) => {
+    try { localStorage.setItem('tstats_history', JSON.stringify(arr)); return true; }
+    catch(e) { return false; }
+  };
+
+  if (trySaveHistory(hist)) return;
+
+  // Niveau 2 : on retire le détail complet de CE match (le PDF régénéré
+  // depuis l'historique sera alors la version simple, mais le match reste).
+  const last = hist[hist.length - 1];
+  delete last.statsFull;
+  delete last.setSnapshotsFull;
+  if (trySaveHistory(hist)) {
+    console.warn('Stockage presque plein : match sauvegardé en version allégée (sans détail complet).');
+    return;
+  }
+
+  // Niveau 3 : on libère de la place en retirant le détail complet des plus
+  // anciens matchs (du plus vieux au plus récent), un par un.
+  for (let i = 0; i < hist.length - 1; i++) {
+    if (hist[i].statsFull || hist[i].setSnapshotsFull) {
+      delete hist[i].statsFull;
+      delete hist[i].setSnapshotsFull;
+      if (trySaveHistory(hist)) {
+        console.warn("Stockage plein : détail complet retiré d'anciens matchs pour faire de la place.");
+        return;
+      }
+    }
+  }
+
+  // Rien n'a fonctionné : le match n'a vraiment pas pu être sauvegardé.
+  // On prévient clairement plutôt que de le perdre en silence.
+  alert("Ton match n'a pas pu être sauvegardé : la mémoire de stockage de ton navigateur est pleine.\n\nVa dans l'Historique et utilise « Exporter » pour sauvegarder tes matchs dans un fichier, puis « Tout effacer » pour libérer de la place.");
+}
+
+
+// ── DISPLAY ───────────────────────────────────────────────────────────────────
+function updateDisplay() {
+  saveProgress();
+  if (liveShareCode) pushLiveState();
+  updateServerBadge();
+  let ptA, ptB;
+  if (inSuperTiebreak || inTiebreak) {
+    ptA=p1; ptB=p2;
+  } else {
+    ptA=TP[p1]||'0'; ptB=TP[p2]||'0';
+    if (p1===3 && p2===3) { ptA='AD'; ptB='AD'; }
+  }
+  document.getElementById('ptA').textContent = ptA;
+  document.getElementById('ptB').textContent = ptB;
+  for(let i=1;i<=3;i++){
+    const cellA=document.getElementById('setA'+i);
+    const cellB=document.getElementById('setB'+i);
+    if(i-1 < setHistory.length){
+      const sh=setHistory[i-1];
+      cellA.textContent=sh.a; cellB.textContent=sh.b;
+      cellA.className='cell set-score '+(sh.a>sh.b?'won':'');
+      cellB.className='cell set-score '+(sh.b>sh.a?'won':'');
+    } else if(i-1 === setHistory.length){
+      cellA.textContent=g1; cellB.textContent=g2;
+      cellA.className='cell set-score active';
+      cellB.className='cell set-score active';
+    } else {
+      cellA.textContent='—'; cellB.textContent='—';
+      cellA.className='cell set-score'; cellB.className='cell set-score';
+    }
+  }
+
+  renderStatsViewSwitch();
+  const ds = getDisplayStats();
+  if (mode === 'joueur') {
+    ['j1', 'j2', 'j3', 'j4'].forEach(key => {
+      document.getElementById(`st-w-${key}`).textContent = ds.ind?.[key]?.w || 0;
+      document.getElementById(`st-f-${key}`).textContent = ds.ind?.[key]?.f || 0;
+    });
+  } else {
+    document.getElementById('st-wA').textContent = ds.wA || 0;
+    document.getElementById('st-wB').textContent = ds.wB || 0;
+    document.getElementById('st-fA').textContent = ds.fA || 0;
+    document.getElementById('st-fB').textContent = ds.fB || 0;
+    document.getElementById('st-pA').textContent = ds.pA || 0;
+    document.getElementById('st-pB').textContent = ds.pB || 0;
+    updateBar('bar-wA','bar-wB', ds.wA || 0, ds.wB || 0);
+    updateBar('bar-fA','bar-fB', ds.fA || 0, ds.fB || 0);
+    updateBar('bar-pA','bar-pB', ds.pA || 0, ds.pB || 0);
+  }
+}
+
+function updateBar(idA, idB, vA, vB) {
+  const total = vA + vB;
+  const pct = total === 0 ? 50 : Math.round((vA/total)*100);
+  document.getElementById(idA).style.width = pct + '%';
+  document.getElementById(idB).style.width = (100-pct) + '%';
+}
+
+// ── LOG ───────────────────────────────────────────────────────────────────────
+function logPoint(entity, type, scoreLabel, player) {
+  const isA = player ? (player === 1) : (entity === players.j1 || entity === players.j2 || entity === nameA);
+  const time = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  let label, dotClass;
+  if (type === 'winner') {
+    label = '🎯 ' + t('point_winner'); dotClass = isA ? 'dot-a' : 'dot-b';
+  } else {
+    label = '💥 ' + t('point_fault'); dotClass = isA ? 'dot-a' : 'dot-b';
+  }
+  const entry = {team: entity, type, time, msg: label, score: scoreLabel};
+  const className = 'log-entry ' + dotClass;
+  const html = `<span class="dot"></span><span>${time} — <strong>${escapeHtml(entity)}</strong> <span style="color:var(--gold);font-family:Barlow Condensed,sans-serif;font-weight:700">${scoreLabel}</span></span><span class="log-tag ${type}">${label}</span>`;
+  entry._dom = {className, html};
+  matchLog.unshift(entry);
+  const list = document.getElementById('logList');
+  const div = document.createElement('div');
+  div.className = className;
+  div.innerHTML = html;
+  list.prepend(div);
+}
+
+
+// ── SAUVEGARDE DU MATCH EN COURS (protège d'un rafraîchissement accidentel) ──
+const PROGRESS_KEY = 'tstats_inprogress_base';
+
+function saveProgress() {
+  if (matchOver) { clearProgress(); return; }
+  const snapshot = {
+    p1, p2, g1, g2, s1, s2, setHistory, inTiebreak, inSuperTiebreak, matchOver,
+    stats, setSnapshots, history, matchLog, timerSeconds, matchStarted,
+    teamLabelA, teamLabelB,
+    firstServingTeam, serverTeamAFirst, serverTeamBFirst, matchGameCount, serverManualAdjustment,
+    players, mode,
+    liveShareCode,
+    nameA, nameB, savedAt: Date.now(),
+  };
+  try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(snapshot)); } catch(e) {}
+}
+
+
+function applyProgress(snap) {
+  p1=snap.p1; p2=snap.p2; g1=snap.g1; g2=snap.g2; s1=snap.s1; s2=snap.s2;
+  setHistory = snap.setHistory || [];
+  inTiebreak = snap.inTiebreak; inSuperTiebreak = snap.inSuperTiebreak; matchOver = snap.matchOver;
+  stats = snap.stats || stats;
+  setSnapshots = snap.setSnapshots || [];
+  history = snap.history || [];
+  matchLog = snap.matchLog || [];
+  timerSeconds = snap.timerSeconds || 0;
+  matchStarted = snap.matchStarted !== undefined ? snap.matchStarted : true;
+  teamLabelA = snap.teamLabelA || ''; teamLabelB = snap.teamLabelB || '';
+  firstServingTeam = snap.firstServingTeam || null;
+  serverTeamAFirst = snap.serverTeamAFirst || null;
+  serverTeamBFirst = snap.serverTeamBFirst || null;
+  matchGameCount = snap.matchGameCount || 0;
+  serverManualAdjustment = snap.serverManualAdjustment || 0;
+  document.getElementById('teamLabelA').value = teamLabelA;
+  document.getElementById('teamLabelB').value = teamLabelB;
+  document.getElementById('setPill').textContent = !matchStarted ? t('status_warmup') : (inSuperTiebreak ? t('status_super_tb') : 'Set '+(s1+s2+1));
+  document.getElementById('statusLabel').textContent = matchOver ? t('status_over') : t('status_playing');
+  rebuildLog();
+  const m = String(Math.floor(timerSeconds / 60)).padStart(2,'0');
+  const s = String(timerSeconds % 60).padStart(2,'0');
+  document.getElementById('timerDisplay').textContent = m + ':' + s;
+  if (snap.liveShareCode) {
+    liveShareCode = snap.liveShareCode;
+    document.getElementById('liveShareBtn')?.classList.add('active');
+    connectLiveSocket();
+    pushLiveState();
+    liveSharePushTimer = setInterval(pushLiveState, 45000);
+  }
+  updateDisplay();
+}
+
+
+function discardResume() {
+  clearProgress();
+  document.getElementById('resumeOverlay').classList.remove('show');
+  updateDisplay();
+  logEvent('', t('log_match_created', {a: escapeHtml(nameA), b: escapeHtml(nameB)}));
+}
+
+
+// ── RESET ─────────────────────────────────────────────────────────────────────
+function resetMatch() {
+  if (!confirm(t('confirm_reset'))) return;
+  clearProgress();
+  p1=0;p2=0;g1=0;g2=0;s1=0;s2=0;
+  inTiebreak=false;inSuperTiebreak=false;matchOver=false;
+  setHistory=[];
+  timerReset();
+  matchStarted=false;
+  firstServingTeam=null; serverTeamAFirst=null; serverTeamBFirst=null; matchGameCount=0; serverManualAdjustment=0;
+  teamLabelA=''; teamLabelB='';
+  document.getElementById('teamLabelA').value='';
+  document.getElementById('teamLabelB').value='';
+  stats={wA:0,wB:0,fA:0,fB:0,pA:0,pB:0, ind: {}};
+  setSnapshots=[]; statsViewMode='total'; statsViewSetIdx=1;
+  history=[];matchLog=[];
+  document.getElementById('setPill').textContent=t('status_warmup');
+  document.getElementById('statusLabel').textContent=t('status_playing');
+  document.getElementById('logList').innerHTML='';
+  document.getElementById('winnerOverlay').classList.remove('show');
+  updateDisplay();
+  logEvent('',t('log_match_created', {a: escapeHtml(nameA), b: escapeHtml(nameB)}));
+}
+
+// ── PDF EXPORT ────────────────────────────────────────────────────────────────
+function formatDuration(secs){
+  const h=Math.floor(secs/3600);
+  const m=Math.floor((secs%3600)/60);
+  const s=secs%60;
+  if(h>0) return h+'h '+String(m).padStart(2,'0')+'min '+String(s).padStart(2,'0')+'s';
+  return String(m).padStart(2,'0')+'min '+String(s).padStart(2,'0')+'s';
+}
+
+
+
+let _titleFontReady = false;
+
+// Extrait les couleurs ET leur position (%) d'une valeur CSS (dégradé ou
+// couleur unie), pour reconstruire fidèlement un dégradé à N points dans le
+// PDF — plutôt que de se limiter à un simple dégradé à 2 couleurs (début/fin)
+// qui donnerait un aplat plat pour un thème comme Éclat, dont le dégradé
+// commence ET finit en blanc avec des teintes pastel entre les deux.
+function extractColorStopsWithPositions(cssValue) {
+  const re = /(#[0-9a-fA-F]{3,6})(?:\s+(\d+(?:\.\d+)?)%)?/g;
+  const stops = [];
+  let m;
+  while ((m = re.exec(cssValue)) !== null) {
+    stops.push({ color: hexToRgb(m[1]), pos: m[2] !== undefined ? parseFloat(m[2]) : null });
+  }
+  if (!stops.length) return null;
+  const anyPos = stops.some(s => s.pos !== null);
+  if (!anyPos) {
+    stops.forEach((s, i) => { s.pos = stops.length > 1 ? (i / (stops.length - 1)) * 100 : 0; });
+  } else {
+    let lastPos = 0;
+    stops.forEach(s => { if (s.pos === null) s.pos = lastPos; lastPos = s.pos; });
+  }
+  return stops;
+}
+
+
+function readLiveThemeForPDF() {
+  const cs = getComputedStyle(document.documentElement);
+  const readStopsWithPos = (varName, fallbackHex) => {
+    const raw = cs.getPropertyValue(varName);
+    return extractColorStopsWithPositions(raw) || [{ color: hexToRgb(fallbackHex), pos: 0 }];
+  };
+  const readSolid = (varName, fallbackHex) => readStopsWithPos(varName, fallbackHex)[0].color;
+
+  const bgStops = readStopsWithPos('--bg', '#080f1e');
+  const cardStops = readStopsWithPos('--card', '#111e35');
+  const surfaceStops = readStopsWithPos('--surface', '#0d1829');
+  const green = readSolid('--green', '#22c55e');
+  const red = readSolid('--red', '#ef4444');
+
+  return {
+    bg: bgStops[0].color,
+    bgTop: bgStops[0].color,
+    bgBottom: bgStops[bgStops.length - 1].color,
+    bgStops: bgStops,
+    surface: surfaceStops[0].color,
+    card: cardStops[0].color,
+    border: readSolid('--border', '#1e3560'),
+    gold: readSolid('--gold', '#f5c518'),
+    blue: readSolid('--blue', '#3b82f6'),
+    orange: readSolid('--orange', '#f97316'),
+    green: green,
+    greenLight: lightenRgb(green, 0.4),
+    greenDark: darkenRgb(green, 0.32),
+    red: red,
+    redLight: lightenRgb(red, 0.35),
+    redDark: darkenRgb(red, 0.28),
+    text: readSolid('--text', '#e2eaf8'),
+    muted: readSolid('--muted', '#4a6494'),
+  };
+}
+
+function exportPDF() {
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  embedTitleFont(doc);
+  const TF = titleFontName();
+  const theme = readLiveThemeForPDF();
+  const W=210, M=20;
+  let y=M;
+
+  const newPage = () => {
+    doc.addPage();
+    fillPageBackground();
+    y = M;
+  };
+
+  const ensureSpace = (needed) => { if (y + needed > 282) newPage(); };
+
+  // Fond en dégradé vertical doux (légèrement plus clair en haut, qui
+  // s'assombrit progressivement vers le bas) plutôt qu'un aplat uni.
+  function luminance(rgb) { return (0.299*rgb[0] + 0.587*rgb[1] + 0.114*rgb[2]) / 255; }
+
+  const _isDarkTheme = luminance(theme.text) > 0.6;
+  const _anchorLum = luminance(theme.bgTop);
+  const _maxLumDelta = 0.22;
+
+  function safeBgColorAt(t) {
+    let [r, g, b] = colorAtStop(theme.bgStops, t);
+    const lum = luminance([r, g, b]);
+    if (_isDarkTheme && lum > _anchorLum + _maxLumDelta) {
+      const amt = Math.min(1, (lum - (_anchorLum + _maxLumDelta)) / Math.max(0.01, 1 - _anchorLum));
+      r = Math.round(r + (theme.bgTop[0]-r)*amt);
+      g = Math.round(g + (theme.bgTop[1]-g)*amt);
+      b = Math.round(b + (theme.bgTop[2]-b)*amt);
+    } else if (!_isDarkTheme && lum < _anchorLum - _maxLumDelta) {
+      const amt = Math.min(1, ((_anchorLum - _maxLumDelta) - lum) / Math.max(0.01, _anchorLum));
+      r = Math.round(r + (theme.bgTop[0]-r)*amt);
+      g = Math.round(g + (theme.bgTop[1]-g)*amt);
+      b = Math.round(b + (theme.bgTop[2]-b)*amt);
+    }
+    return [r, g, b];
+  }
+
+  function fillPageBackground() {
+    const bands = 60;
+    const bandH = 297 / bands;
+    for (let i = 0; i < bands; i++) {
+      const t = (i / (bands - 1)) * 100;
+      const [r, g, b] = safeBgColorAt(t);
+      doc.setFillColor(r, g, b);
+      doc.rect(0, i*bandH, W, bandH+0.3, 'F');
+    }
+  }
+
+  const stripEmoji = (str) => String(str)
+    .replace(/[\u{1F1E6}-\u{1FFFF}\u{2300}-\u{27BF}\u{2B00}-\u{2BFF}\u{2190}-\u{21FF}\uFE0F\u200D]/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const sectionTitle = (title, color) => {
+    ensureSpace(18);
+    // Sur fond clair, le fondu se rapproche du blanc plutôt que du noir.
+    const bandW = W - 2*M + 8;
+    const steps = 22;
+    const stepW = bandW / steps;
+    const bgRef = safeBgColorAt((y / 297) * 100);
+    for (let i = 0; i < steps; i++) {
+      const t = i / (steps - 1);
+      const intensity = 0.30 * (1 - t*0.85);
+      const r = Math.round(bgRef[0] + (color[0]-bgRef[0])*intensity);
+      const g = Math.round(bgRef[1] + (color[1]-bgRef[1])*intensity);
+      const b = Math.round(bgRef[2] + (color[2]-bgRef[2])*intensity);
+      doc.setFillColor(r, g, b);
+      doc.rect(M-4 + i*stepW, y-6, stepW+0.3, 12, 'F');
+    }
+    doc.setFillColor(...color);
+    doc.roundedRect(M-4, y-6, 1.8, 12, 0.7, 0.7, 'F');
+    doc.setFont(TF,'bold'); doc.setFontSize(13); doc.setTextColor(...color);
+    doc.text(title, M+2, y+1.8);
+    y += 12;
+  };
+
+  const stripe = (rowY, h) => {
+    doc.setFillColor(...theme.surface);
+    doc.rect(M-2, rowY-4.2, W-2*M+4, h, 'F');
+  };
+
+  fillPageBackground();
+
+  doc.setFont(TF,'bold');
+  doc.setFontSize(30); doc.setTextColor(...theme.gold);
+  doc.text('TENNIS', W/2, y+9, {align:'center'});
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(11); doc.setTextColor(...theme.muted);
+  doc.text('STATS DE BASE', W/2, y+17, {align:'center'});
+  y+=27;
+
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(10); doc.setTextColor(...theme.muted);
+  doc.text(new Date().toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'}), W/2, y, {align:'center'});
+  y+=10;
+  doc.setDrawColor(...theme.border); doc.line(M,y,W-M,y); y+=10;
+
+  ensureSpace(40);
+
+  const winnerIsA = s1 > s2;
+  const winnerName = winnerIsA ? nameA : nameB;
+  const scoreStr = setHistory.map(sh => {
+    const wG = winnerIsA ? sh.a : sh.b;
+    const lG = winnerIsA ? sh.b : sh.a;
+    return wG + '/' + lG;
+  }).join('   -   ');
+
+  doc.setFont(TF,'bold'); doc.setFontSize(22); doc.setTextColor(...theme.gold);
+  doc.text(winnerName, W/2, y, {align:'center'}); y+=9;
+  doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(...theme.text);
+  doc.text(scoreStr || '—', W/2, y, {align:'center'}); y+=8;
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(...theme.muted);
+  doc.text('Durée du match : '+formatDuration(timerSeconds), W/2, y, {align:'center'});
+  y+=12;
+
+  [{label: (typeof teamLabelA !== 'undefined' && teamLabelA.trim()) || 'ÉQUIPE A', color:theme.blue, name:nameA, sets:s1, idx:0},
+   {label: (typeof teamLabelB !== 'undefined' && teamLabelB.trim()) || 'ÉQUIPE B', color:theme.orange, name:nameB, sets:s2, idx:1}].forEach(t => {
+    const cardTop = y - 4;
+    doc.setFillColor(...theme.card); doc.roundedRect(M-3, cardTop, W-2*M+6, (setHistory.length? 24:20), 1.5, 1.5, 'F');
+    doc.setDrawColor(...t.color); doc.setLineWidth(0.5);
+    doc.roundedRect(M-3, cardTop, W-2*M+6, (setHistory.length? 24:20), 1.5, 1.5, 'S');
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...t.color);
+    doc.text(t.label.toUpperCase(), M, y);
+    doc.setFont('helvetica','normal'); doc.setFontSize(13); doc.setTextColor(...theme.text);
+    doc.text(t.name, M, y+7);
+    let setStr = setHistory.map((sh,i) => {
+      const sc  = t.idx===0 ? sh.a : sh.b;
+      const opp = t.idx===0 ? sh.b : sh.a;
+      return 'S'+(i+1)+': '+sc+(sc>opp?'*':'');
+    }).join('  ');
+    if (setStr) { doc.setFontSize(9); doc.setTextColor(...theme.muted); doc.text(setStr, M, y+13); }
+    doc.setFont(TF,'bold'); doc.setFontSize(18); doc.setTextColor(...theme.gold);
+    doc.text('Sets : '+t.sets, W-M, y+6, {align:'right'});
+    y += setStr ? 26 : 22;
+  });
+  y+=6;
+
+  sectionTitle('POINTS GAGNANTS & FAUTES DIRECTES — PAR ÉQUIPE', theme.gold);
+
+  const rows = [
+    ['Points gagnants', stats.wA, stats.wB],
+    ['Fautes directes', stats.fA, stats.fB],
+    ['Points gagnés', stats.pA, stats.pB],
+  ];
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...theme.muted);
+  doc.text('Statistique', M, y);
+  doc.text('Éq.A', W/2, y, {align:'center'});
+  doc.text('Éq.B', W-M, y, {align:'right'});
+  y+=4; doc.setDrawColor(...theme.border); doc.line(M,y,W-M,y); y+=5;
+  rows.forEach((r,i) => {
+    if (i % 2 === 0) stripe(y, 7);
+    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(...theme.text); doc.text(r[0], M, y);
+    doc.setFont('helvetica','bold');
+    doc.setTextColor(...theme.blue);  doc.text(String(r[1]), W/2, y, {align:'center'});
+    doc.setTextColor(...theme.orange); doc.text(String(r[2]), W-M, y, {align:'right'});
+    y+=7;
+  });
+  doc.setDrawColor(...theme.border); doc.line(M,y,W-M,y); y+=10;
+
+  if (setSnapshots.length > 0 || !matchOver) {
+    sectionTitle('DÉTAIL PAR SET', theme.gold);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...theme.muted);
+    doc.text('Set', M, y);
+    doc.text('Winners A/B', M+55, y);
+    doc.text('Fautes A/B', M+105, y);
+    doc.text('Points A/B', W-M, y, {align:'right'});
+    y+=4; doc.setDrawColor(...theme.border); doc.line(M,y,W-M,y); y+=6;
+
+    const setRow = (label, d, sh, idx) => {
+      ensureSpace(8);
+      if (idx % 2 === 0) stripe(y, 8);
+      doc.setFont(TF,'bold'); doc.setFontSize(10); doc.setTextColor(...theme.gold);
+      doc.text(label + (sh ? ' (' + sh.a + '-' + sh.b + ')' : ''), M, y);
+      doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(...theme.text);
+      doc.text((d.wA||0) + ' / ' + (d.wB||0), M+55, y);
+      doc.text((d.fA||0) + ' / ' + (d.fB||0), M+105, y);
+      doc.text((d.pA||0) + ' / ' + (d.pB||0), W-M, y, {align:'right'});
+      y+=8;
+    };
+
+    setSnapshots.forEach((snap, i) => {
+      const d = diffStats(snap, setSnapshots[i-1] || {});
+      setRow('Set ' + (i+1), d, setHistory[i], i);
+    });
+    if (!matchOver) {
+      const d = diffStats(stats, setSnapshots[setSnapshots.length-1] || {});
+      setRow('Set ' + (setSnapshots.length+1) + ' (en cours)', d, null, setSnapshots.length);
+    }
+    doc.setDrawColor(...theme.border); doc.line(M,y,W-M,y); y+=10;
+  }
+
+  if (mode === 'joueur') {
+    sectionTitle('DÉTAIL PAR JOUEUR', theme.gold);
+    const playerDefs = [
+      {name:players.j1, key:'j1', color:theme.blue},
+      {name:players.j2, key:'j2', color:theme.blue},
+      {name:players.j3, key:'j3', color:theme.orange},
+      {name:players.j4, key:'j4', color:theme.orange},
+    ];
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...theme.muted);
+    doc.text('Joueur', M, y);
+    doc.text('Winners', W/2, y, {align:'center'});
+    doc.text('Fautes', W-M, y, {align:'right'});
+    y+=4; doc.setDrawColor(...theme.border); doc.line(M,y,W-M,y); y+=6;
+    playerDefs.forEach((pl,i) => {
+      const w = stats.ind[pl.key]?.w || 0;
+      const f = stats.ind[pl.key]?.f || 0;
+      ensureSpace(8);
+      if (i % 2 === 0) stripe(y, 8);
+      doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(...pl.color);
+      doc.text(pl.name, M, y);
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(...theme.green);  doc.text(String(w), W/2, y, {align:'center'});
+      doc.setTextColor(...theme.red); doc.text(String(f), W-M, y, {align:'right'});
+      y+=8;
+    });
+    doc.setDrawColor(...theme.border); doc.line(M,y,W-M,y); y+=10;
+  }
+
+  sectionTitle('JOURNAL DU MATCH COMPLET', theme.gold);
+  let logIdx = 0;
+  [...matchLog].reverse().forEach(entry => {
+    ensureSpace(7);
+    if (logIdx % 2 === 0) stripe(y, 6.5);
+    logIdx++;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    doc.setTextColor(...theme.muted); doc.text(entry.time, M, y);
+    doc.setTextColor(...theme.text);
+    const txt = (entry.team ? stripEmoji(entry.team)+' — ':'')+stripEmoji(entry.msg);
+    doc.text(txt, M+16, y);
+    y+=6.5;
+  });
+
+  doc.save('Tstats_'+new Date().toISOString().slice(0,10)+'.pdf');
+}
+
+
+// ── TIMER ────────────────────────────────────────────────────────────────────
+let timerSeconds = 0;
+let timerInterval = null;
+let timerRunning = false;
+let matchStarted = false; 
+function timerToggle() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timerStartBtn').textContent = t('timer_start');
+    document.getElementById('timerStartBtn').className = 'timer-btn start';
+    document.getElementById('timerDisplay').classList.remove('running');
+  } else {
+    timerRunning = true;
+    document.getElementById('timerStartBtn').textContent = t('timer_pause');
+    document.getElementById('timerStartBtn').className = 'timer-btn pause';
+    document.getElementById('timerDisplay').classList.add('running');
+    if (!matchStarted) {
+      matchStarted = true;
+      document.getElementById('setPill').textContent = 'Set 1';
+      logEvent('', t('log_match_started'));
+      if (!firstServingTeam) askInitialServer();
+    }
+    timerInterval = setInterval(() => {
+      timerSeconds++;
+      const m = String(Math.floor(timerSeconds / 60)).padStart(2,'0');
+      const s = String(timerSeconds % 60).padStart(2,'0');
+      document.getElementById('timerDisplay').textContent = m + ':' + s;
+    }, 1000);
+  }
+}
+
+function timerReset() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = 0;
+  document.getElementById('timerDisplay').textContent = '00:00';
+  document.getElementById('timerDisplay').classList.remove('running');
+  document.getElementById('timerStartBtn').textContent = t('timer_start');
+  document.getElementById('timerStartBtn').className = 'timer-btn start';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+initNames();
+const _savedProgress = loadProgress();
+if (_savedProgress) {
+  checkResumeOnLoad();
+} else {
+  updateDisplay();
+  logEvent('', t('log_match_created', {a: escapeHtml(nameA), b: escapeHtml(nameB)}));
+}
+// ── THÈMES ────────────────────────────────────────────────────────────────
+const PRO_THEMES = ['neon', 'sunset', 'lagoon', 'eclat', 'glacier'];
+let userTier = null;
+
+
+// ── PRÉFÉRENCES (mode d'affichage du match) ──────────────────────────────
+function refreshPrefsMenuUI() {
+  document.querySelectorAll('[data-stats-mode-choice]').forEach(b => {
+    b.classList.toggle('active', b.dataset.statsModeChoice === mode);
+  });
+}
+
+function closeAllSubmenus() {
+  document.getElementById('themeSubmenu')?.classList.remove('open');
+  document.getElementById('langSubmenu')?.classList.remove('open');
+  document.getElementById('prefsMenu')?.classList.remove('open');
+}
+
+function toggleGearMenu(e) {
+  e.stopPropagation();
+  closeAllSubmenus();
+  document.getElementById('gearMenu')?.classList.toggle('open');
+}
+
+
+function openPrefsMenu(e) {
+  e.stopPropagation();
+  document.getElementById('gearMenu')?.classList.remove('open');
+  document.getElementById('prefsMenu')?.classList.add('open');
+  refreshPrefsMenuUI();
+}
+
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.theme-switch-wrap')) {
+    document.getElementById('gearMenu')?.classList.remove('open');
+    closeAllSubmenus();
+  }
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  const current = localStorage.getItem('tstats_theme') || 'dark';
+  document.querySelectorAll('.theme-swatch[data-theme-choice]').forEach(b => b.classList.toggle('active', b.dataset.themeChoice === current));
+  refreshPrefsMenuUI();
+  checkTier();
+  applyLanguageToDOM();
+});
+
+</script>
+<script src="/sync.js"></script>
+</body>
+</html>

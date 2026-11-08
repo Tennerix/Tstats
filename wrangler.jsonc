@@ -1,0 +1,30 @@
+{
+  "name": "tstats",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./protected",
+    "binding": "ASSETS",
+    "html_handling": "none",
+    "run_worker_first": true
+  },
+  // Base D1 partagée avec BeachStats : un seul compte, un seul historique.
+  // Même database_id que BeachStats, volontairement. Les droits (entitlements)
+  // et les matchs doivent avoir les colonnes app et sport avant que Tstats
+  // n'écrive quoi que ce soit dedans.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "beachstats-db", "database_id": "493d3898-3f34-4972-a3a1-066097653e05" }
+  ],
+  // Partage en direct : un Durable Object par match, identifié par son code.
+  // Pas de KV. Le Worker Tstats a son propre espace de Durable Objects,
+  // séparé de celui de BeachStats.
+  "durable_objects": {
+    "bindings": [
+      { "name": "LIVE_MATCH", "class_name": "LiveMatch" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["LiveMatch"] }
+  ]
+}
