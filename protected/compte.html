@@ -61,7 +61,7 @@ a.back{display:block;text-align:center;margin-top:1rem;color:#8ba3c7;font-size:1
       <span class="ok hide" id="okResend" style="display:block;margin:6px 0 0">Lien renvoyé.</span>
     </div>
     <p class="notice hide" id="legacyNote">Cet appareil a encore un ancien accès, désactivé tant que tu es connecté. Entre ton code ci-dessous pour le rattacher à ton compte : tu le retrouveras alors sur tous tes appareils.</p>
-    <form id="fLic" novalidate class="licbox">
+    <form id="fLic" novalidate class="licbox" style="display:none">
       <label for="lic" id="licLabel">Tu as un code d'accès ?</label>
       <input id="lic" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Ton code d'accès">
       <p class="err" id="errLic" role="alert"></p>
@@ -78,7 +78,7 @@ a.back{display:block;text-align:center;margin-top:1rem;color:#8ba3c7;font-size:1
       <a class="secondary" id="btnExport" href="/api/auth/export" download>Télécharger mes données</a>
       <button class="danger" id="btnDelAsk" type="button">Supprimer mon compte</button>
       <form class="delbox hide" id="fDel" novalidate>
-        <p>La suppression est définitive : ton compte, ton historique sauvegardé et le lien avec ton code d'accès sont effacés. <b>Elle ne résilie pas ton abonnement Gumroad</b> : pense à l'arrêter depuis le mail de reçu Gumroad.</p>
+        <p>La suppression est définitive : ton compte, ton historique sauvegardé et le lien avec ton code d'accès sont effacés.</p>
         <label for="delpw">Ton mot de passe pour confirmer</label>
         <input id="delpw" type="password" autocomplete="current-password">
         <p class="err" id="errDel" role="alert"></p>
@@ -145,7 +145,7 @@ a.back{display:block;text-align:center;margin-top:1rem;color:#8ba3c7;font-size:1
   var next = params.get('next') || '/';
   if (next.charAt(0) !== '/' || next.indexOf('//') === 0 || next.indexOf('\\') !== -1) next = '/';
 
-  var TIER_LABEL = { avancees: 'Niveau Avancées', pro: 'Niveau Pro' };
+  var TIER_LABEL = { avancees: 'Niveau Avancées', pro: 'Tout est gratuit pour le moment' };
 
   function show(id) {
     ['vIn', 'vAuth', 'vForgot', 'vReset'].forEach(function (v) { $(v).classList.toggle('hide', v !== id); });
