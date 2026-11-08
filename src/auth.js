@@ -4,6 +4,11 @@
 // auth_attempts (limitation des essais).
 import { WorkerMailer } from "worker-mailer";
 
+// Mode gratuit : tant que c'est true, tout Tstats est ouvert à tout le monde
+// (stats Avancées et Pro, thèmes, historique cloud illimité). Pour remettre
+// le paiement plus tard, il suffit de passer cette valeur à false.
+export const FREE_MODE = true;
+
 const SESSION_COOKIE = "tstats_session";
 const SESSION_DAYS = 30;
 const VERIFY_TTL_MS = 48 * 3600000;
@@ -284,6 +289,7 @@ export async function linkLicense(env, userId, licenseKey) {
 // Les accès issus d'un code Gumroad sont revérifiés au plus une fois par jour :
 // un remboursement ou un abonnement arrêté retire l'accès automatiquement.
 export async function getAccountTier(env, userId) {
+  if (FREE_MODE) return "pro";
   const { results } = await env.DB
     .prepare("SELECT id, tier, license_key, checked_at FROM entitlements WHERE user_id = ?1 AND revoked_at IS NULL")
     .bind(userId)

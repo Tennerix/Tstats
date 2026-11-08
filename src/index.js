@@ -1,5 +1,5 @@
 import { handleMatches } from "./matches.js";
-import { handleAuth, getAccount, getAccountTier, linkLicense } from "./auth.js";
+import { handleAuth, getAccount, getAccountTier, linkLicense, FREE_MODE } from "./auth.js";
 import { handleAdmin, getAdmin } from "./admin.js";
 
 // ── CONFIGURATION ────────────────────────────────────────────────────────
@@ -156,7 +156,7 @@ async function handleRequest(request, env, ctx) {
 
     const route = ROUTES[url.pathname];
     if (route) {
-      if (route.tier === null) {
+      if (route.tier === null || FREE_MODE) {
         const assetUrl = new URL(route.file, request.url);
         return env.ASSETS.fetch(new Request(assetUrl, request));
       }
@@ -295,6 +295,15 @@ async function handleVerify(request, env, url) {
 // crée plus de tels cookies : ceux qui existent encore expirent d'ici 30 jours
 // maximum après leur création, le temps que chacun rattache son code à son compte.
 async function readAccess(request, env) {
+  if (FREE_MODE) {
+    // Tout est gratuit : tout le monde a le niveau le plus haut, connecté ou non.
+    let freeEmail = null;
+    try {
+      const account = await getAccount(request, env);
+      if (account) freeEmail = account.email;
+    } catch (e) {}
+    return { email: freeEmail, tier: "pro", legacyTier: null };
+  }
   let email = null;
   let tier = null;
   let connected = false;
